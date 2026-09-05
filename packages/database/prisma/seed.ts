@@ -7,9 +7,9 @@ async function main() {
   // 1. Categories
   const dairyCattle = await prisma.category.upsert({
     where: { slug: 'dairy-cattle' },
-    update: {},
+    update: { name: 'Dairy Cattle (የወተት ከብቶች)' },
     create: {
-      name: 'Dairy Cattle',
+      name: 'Dairy Cattle (የወተት ከብቶች)',
       slug: 'dairy-cattle',
       icon: '🐄',
       status: 'ACTIVE',
@@ -18,9 +18,9 @@ async function main() {
 
   const beefCattle = await prisma.category.upsert({
     where: { slug: 'beef-cattle' },
-    update: {},
+    update: { name: 'Beef Cattle / Bulls (የስጋ በሬዎች)' },
     create: {
-      name: 'Beef Cattle / Bulls',
+      name: 'Beef Cattle / Bulls (የስጋ በሬዎች)',
       slug: 'beef-cattle',
       icon: '🐂',
       status: 'ACTIVE',
@@ -29,9 +29,9 @@ async function main() {
 
   const calvesHeifers = await prisma.category.upsert({
     where: { slug: 'calves-heifers' },
-    update: {},
+    update: { name: 'Calves & Heifers (ጥጃዎችና ጊደሮች)' },
     create: {
-      name: 'Calves & Heifers',
+      name: 'Calves & Heifers (ጥጃዎችና ጊደሮች)',
       slug: 'calves-heifers',
       icon: '🐮',
       status: 'ACTIVE',
@@ -40,9 +40,9 @@ async function main() {
 
   const sheep = await prisma.category.upsert({
     where: { slug: 'sheep' },
-    update: {},
+    update: { name: 'Sheep (በጎች)' },
     create: {
-      name: 'Sheep',
+      name: 'Sheep (በጎች)',
       slug: 'sheep',
       icon: '🐑',
       status: 'ACTIVE',
@@ -51,9 +51,9 @@ async function main() {
 
   const goats = await prisma.category.upsert({
     where: { slug: 'goats' },
-    update: {},
+    update: { name: 'Goats (ፍየሎች)' },
     create: {
-      name: 'Goats',
+      name: 'Goats (ፍየሎች)',
       slug: 'goats',
       icon: '🐐',
       status: 'ACTIVE',

@@ -1134,7 +1134,7 @@ export default function AdminPortalPage() {
                       type="text"
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
-                      placeholder="e.g. Camels, Horses & Equines"
+                      placeholder="e.g. Camels (ግመሎች)"
                       required
                       className="w-full bg-slate-800 border border-slate-700 rounded-xl py-2 px-3 text-xs text-white outline-none"
                     />

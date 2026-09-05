@@ -41,22 +41,27 @@ export default function Footer() {
             <ul className="space-y-2.5 text-sm">
               <li>
                 <Link href="/listings?category=dairy-cattle" className="hover:text-green-400 transition">
-                  Dairy Cows & Heifers
+                  Dairy Cattle (የወተት ከብቶች)
                 </Link>
               </li>
               <li>
                 <Link href="/listings?category=beef-cattle" className="hover:text-green-400 transition">
-                  Bulls & Fattened Cattle
+                  Beef Cattle / Bulls (የስጋ በሬዎች)
+                </Link>
+              </li>
+              <li>
+                <Link href="/listings?category=calves-heifers" className="hover:text-green-400 transition">
+                  Calves & Heifers (ጥጃዎችና ጊደሮች)
                 </Link>
               </li>
               <li>
                 <Link href="/listings?category=sheep" className="hover:text-green-400 transition">
-                  Sheep (Dorper & Menz)
+                  Sheep (በጎች)
                 </Link>
               </li>
               <li>
                 <Link href="/listings?category=goats" className="hover:text-green-400 transition">
-                  Goats (Boer & Somali)
+                  Goats (ፍየሎች)
                 </Link>
               </li>
               <li>

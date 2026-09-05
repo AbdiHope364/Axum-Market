@@ -71,11 +71,11 @@ export default function Navbar() {
   };
 
   const categories = [
-    { name: 'Dairy Cattle', icon: '🐄', query: 'dairy-cattle' },
-    { name: 'Beef Cattle', icon: '🐂', query: 'beef-cattle' },
-    { name: 'Calves & Heifers', icon: '🐮', query: 'calves-and-heifers' },
-    { name: 'Sheep', icon: '🐑', query: 'sheep' },
-    { name: 'Goats', icon: '🐐', query: 'goats' },
+    { name: 'Dairy Cattle (የወተት ከብቶች)', icon: '🐄', query: 'dairy-cattle' },
+    { name: 'Beef Cattle / Bulls (የስጋ በሬዎች)', icon: '🐂', query: 'beef-cattle' },
+    { name: 'Calves & Heifers (ጥጃዎችና ጊደሮች)', icon: '🐮', query: 'calves-heifers' },
+    { name: 'Sheep (በጎች)', icon: '🐑', query: 'sheep' },
+    { name: 'Goats (ፍየሎች)', icon: '🐐', query: 'goats' },
   ];
 
   return (

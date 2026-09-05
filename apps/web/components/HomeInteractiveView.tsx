@@ -94,6 +94,8 @@ export default function HomeInteractiveView({
       if (activeTab === 'dairy') {
         const isDairy =
           item.category?.name?.toLowerCase().includes('cow') ||
+          item.category?.name?.toLowerCase().includes('dairy') ||
+          item.category?.name?.includes('የወተት') ||
           item.breed?.name?.toLowerCase().includes('friesian') ||
           item.title?.toLowerCase().includes('dairy') ||
           item.title?.toLowerCase().includes('milk');
@@ -101,6 +103,8 @@ export default function HomeInteractiveView({
       } else if (activeTab === 'beef') {
         const isBeef =
           item.category?.name?.toLowerCase().includes('bull') ||
+          item.category?.name?.toLowerCase().includes('beef') ||
+          item.category?.name?.includes('የስጋ') ||
           item.category?.name?.toLowerCase().includes('ox') ||
           item.title?.toLowerCase().includes('fatten') ||
           item.breed?.name?.toLowerCase().includes('borana');
@@ -108,7 +112,9 @@ export default function HomeInteractiveView({
       } else if (activeTab === 'sheep_goat') {
         const isSmallRuminant =
           item.category?.name?.toLowerCase().includes('sheep') ||
-          item.category?.name?.toLowerCase().includes('goat');
+          item.category?.name?.toLowerCase().includes('goat') ||
+          item.category?.name?.includes('በጎች') ||
+          item.category?.name?.includes('ፍየሎች');
         if (!isSmallRuminant) return false;
       } else if (activeTab === 'budget') {
         if (item.price > 60000) return false;
@@ -275,7 +281,7 @@ export default function HomeInteractiveView({
               }`}
             >
               <span className="text-base">🐾</span>
-              <span>All Livestock</span>
+              <span>All Livestock (ሁሉም ከብቶች)</span>
             </button>
 
             {categories.map((cat) => {
@@ -303,11 +309,11 @@ export default function HomeInteractiveView({
         {/* 4. Interactive Market Mood Tabs */}
         <section className="bg-slate-100/80 p-1.5 rounded-2xl flex items-center gap-1 overflow-x-auto no-scrollbar">
           {[
-            { id: 'all', label: 'All Listings', icon: '📋' },
-            { id: 'dairy', label: '🥛 Dairy Cows', icon: '🥛' },
-            { id: 'beef', label: '🥩 Beef / Bulls', icon: '🥩' },
-            { id: 'sheep_goat', label: '🐑 Sheep & Goats', icon: '🐑' },
-            { id: 'budget', label: '💰 Under 60k ETB', icon: '💰' },
+            { id: 'all', label: 'All Listings (ሁሉም)', icon: '📋' },
+            { id: 'dairy', label: '🥛 Dairy (የወተት)', icon: '🥛' },
+            { id: 'beef', label: '🥩 Beef (የስጋ)', icon: '🥩' },
+            { id: 'sheep_goat', label: '🐑 Sheep & Goats (በጎችና ፍየሎች)', icon: '🐑' },
+            { id: 'budget', label: '💰 Under 60k ETB (ከ60ሺህ በታች)', icon: '💰' },
           ].map((tab) => {
             const isActive = activeTab === tab.id;
             return (
