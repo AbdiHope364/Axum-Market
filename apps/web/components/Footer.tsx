@@ -1,0 +1,103 @@
+import React from 'react';
+import Link from 'next/link';
+import { ShieldCheck, Phone, MapPin, Heart } from 'lucide-react';
+
+export default function Footer() {
+  return (
+    <footer className="bg-gray-900 text-gray-300 pt-12 pb-20 md:pb-12 border-t border-gray-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+          {/* Brand Col */}
+          <div className="space-y-3 md:col-span-2">
+            <div className="flex items-center gap-2">
+              <span className="w-8 h-8 rounded-lg bg-green-600 flex items-center justify-center text-white text-lg">
+                🐄
+              </span>
+              <span className="text-xl font-black tracking-tight text-white">
+                Axum<span className="text-green-500">Market</span>
+              </span>
+            </div>
+            <p className="text-sm text-gray-400 max-w-md leading-relaxed">
+              Ethiopia&rsquo;s dedicated livestock classifieds and marketplace platform. Connecting dairy farmers, cattle fatteners, and pastoralists directly with buyers.
+            </p>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-800/80 border border-gray-700 text-xs text-amber-400">
+              <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>Direct offline transactions only • Zero online checkout</span>
+            </div>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4">
+              Explore Livestock
+            </h4>
+            <ul className="space-y-2.5 text-sm">
+              <li>
+                <Link href="/listings?category=dairy-cattle" className="hover:text-green-400 transition">
+                  Dairy Cows & Heifers
+                </Link>
+              </li>
+              <li>
+                <Link href="/listings?category=beef-cattle" className="hover:text-green-400 transition">
+                  Bulls & Fattened Cattle
+                </Link>
+              </li>
+              <li>
+                <Link href="/listings?category=sheep" className="hover:text-green-400 transition">
+                  Sheep (Dorper & Menz)
+                </Link>
+              </li>
+              <li>
+                <Link href="/listings?category=goats" className="hover:text-green-400 transition">
+                  Goats (Boer & Somali)
+                </Link>
+              </li>
+              <li>
+                <Link href="/listings" className="hover:text-green-400 transition">
+                  All Livestock Listings
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Sellers & Safety */}
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4">
+              Sellers & Safety
+            </h4>
+            <ul className="space-y-2.5 text-sm">
+              <li>
+                <Link href="/seller/create" className="text-green-400 font-semibold hover:underline">
+                  + Post Animal Listing
+                </Link>
+              </li>
+              <li>
+                <Link href="/seller/login" className="hover:text-green-400 transition">
+                  Seller Dashboard Login
+                </Link>
+              </li>
+              <li>
+                <Link href="/seller/register" className="hover:text-green-400 transition">
+                  Register as Livestock Seller
+                </Link>
+              </li>
+              <li>
+                <Link href="/#safety" className="hover:text-green-400 transition">
+                  Buyer Safety Guidelines
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
+          <p>© {new Date().getFullYear()} AxumMarket. Dedicated to Ethiopian Agricultural Livestock.</p>
+          <p className="flex items-center gap-1">
+            Built for Ethiopian farmers & buyers with direct phone connectivity.
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
