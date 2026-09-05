@@ -8,6 +8,7 @@ export interface ListingCardData {
   id: string;
   title: string;
   price: number;
+  weightKg?: number | null;
   age: string;
   gender: string;
   region: string;
@@ -59,6 +60,12 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
             <span>{listing.category.icon || '🐾'}</span>
             <span>{listing.category.name}</span>
           </span>
+          {listing.weightKg && (
+            <span className="bg-amber-500 text-slate-950 font-black text-[11px] px-2.5 py-1 rounded-full shadow-md flex items-center gap-1">
+              <span>⚖️</span>
+              <span>{listing.weightKg} kg</span>
+            </span>
+          )}
           {listing.breed && (
             <span className="bg-white/90 backdrop-blur-md text-gray-800 text-[11px] font-semibold px-2 py-1 rounded-full shadow-sm">
               {listing.breed.name}
@@ -98,7 +105,7 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
             </h3>
           </Link>
 
-          {/* Attributes Pills (Gender, Age) */}
+          {/* Attributes Pills (Gender, Age, Weight) */}
           <div className="flex flex-wrap gap-1 mt-1.5 sm:mt-2 text-[10px] sm:text-xs">
             <span className="bg-gray-100 text-gray-700 font-medium px-1.5 sm:px-2 py-0.5 rounded-md">
               {listing.gender === 'FEMALE' ? 'Female' : 'Male'}
@@ -106,6 +113,12 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
             <span className="bg-gray-100 text-gray-700 font-medium px-1.5 sm:px-2 py-0.5 rounded-md">
               Age: {listing.age}
             </span>
+            {listing.weightKg && (
+              <span className="bg-amber-50 text-amber-900 border border-amber-300 font-bold px-1.5 sm:px-2 py-0.5 rounded-md flex items-center gap-1">
+                <span>⚖️</span>
+                <span>{listing.weightKg} kg (ኪ.ግ)</span>
+              </span>
+            )}
           </div>
 
           {/* Location */}

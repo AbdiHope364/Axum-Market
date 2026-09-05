@@ -31,6 +31,7 @@ export default function CreateListingPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
+  const [weightKg, setWeightKg] = useState('');
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('FEMALE');
   const [region, setRegion] = useState('Oromia');
@@ -155,6 +156,7 @@ export default function CreateListingPage() {
           title,
           description,
           price,
+          weightKg: weightKg ? parseFloat(weightKg) : undefined,
           age,
           gender,
           region,
@@ -268,8 +270,8 @@ export default function CreateListingPage() {
             />
           </div>
 
-          {/* Gender & Age */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Gender, Age & Optional Weight */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
                 Gender *
@@ -284,7 +286,7 @@ export default function CreateListingPage() {
                       : 'border-gray-300 text-gray-700 bg-gray-50'
                   }`}
                 >
-                  Female
+                  Female ♀
                 </button>
                 <button
                   type="button"
@@ -295,7 +297,7 @@ export default function CreateListingPage() {
                       : 'border-gray-300 text-gray-700 bg-gray-50'
                   }`}
                 >
-                  Male
+                  Male ♂
                 </button>
               </div>
             </div>
@@ -310,6 +312,23 @@ export default function CreateListingPage() {
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
                 placeholder="e.g. 4 years, 18 months, or 4 teeth"
+                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                <span>Weight (kg) / ክብደት</span>
+                <span className="text-[10px] text-amber-700 font-semibold bg-amber-50 px-1.5 py-0.5 rounded">Optional</span>
+              </label>
+              <input
+                type="number"
+                step="0.5"
+                min={5}
+                max={2500}
+                value={weightKg}
+                onChange={(e) => setWeightKg(e.target.value)}
+                placeholder="e.g. 460 kg (Bulls/በሬ)"
                 className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>

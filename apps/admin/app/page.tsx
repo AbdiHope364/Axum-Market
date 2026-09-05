@@ -57,6 +57,7 @@ interface PendingListing {
   id: string;
   title: string;
   price: number;
+  weightKg?: number | null;
   age: string;
   gender: string;
   region: string;
@@ -73,6 +74,7 @@ interface InventoryListing {
   id: string;
   title: string;
   price: number;
+  weightKg?: number | null;
   status: string;
   age: string;
   gender: string;
@@ -177,6 +179,7 @@ export default function AdminPortalPage() {
   const [postTitle, setPostTitle] = useState('');
   const [postDescription, setPostDescription] = useState('');
   const [postPrice, setPostPrice] = useState('');
+  const [postWeightKg, setPostWeightKg] = useState('');
   const [postAge, setPostAge] = useState('3.5 years');
   const [postGender, setPostGender] = useState<'FEMALE' | 'MALE'>('FEMALE');
   const [postRegion, setPostRegion] = useState('Oromia');
@@ -286,6 +289,7 @@ export default function AdminPortalPage() {
           title: postTitle,
           description: postDescription,
           price: postPrice,
+          weightKg: postWeightKg ? parseFloat(postWeightKg) : undefined,
           age: postAge,
           gender: postGender,
           region: postRegion,
@@ -317,6 +321,7 @@ export default function AdminPortalPage() {
         setPostTitle('');
         setPostDescription('');
         setPostPrice('');
+        setPostWeightKg('');
         setPostFrontUrl('');
         setPostLeftUrl('');
         setPostRightUrl('');
@@ -1173,8 +1178,16 @@ export default function AdminPortalPage() {
                         >
                           {listing.status}
                         </span>
-                        <div className="text-base font-black text-green-400 mt-1">
-                          {formatPriceETB(listing.price)}
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-base font-black text-green-400">
+                            {formatPriceETB(listing.price)}
+                          </span>
+                          {listing.weightKg && (
+                            <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                              <span>⚖️</span>
+                              <span>{listing.weightKg} kg</span>
+                            </span>
+                          )}
                         </div>
                       </div>
                       <span className="text-[10px] text-slate-500">
@@ -1688,8 +1701,8 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                {/* 3. Title & Price */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* 3. Title, Price & Weight */}
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                   <div className="sm:col-span-2">
                     <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
                       Animal Listing Title *
@@ -1714,6 +1727,21 @@ export default function AdminPortalPage() {
                       value={postPrice}
                       onChange={(e) => setPostPrice(e.target.value)}
                       placeholder="e.g. 150000"
+                      className="w-full bg-slate-800 border border-slate-700 rounded-xl py-2.5 px-3 text-xs text-white outline-none font-bold text-green-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                      <span>Weight in KG (ኪ.ግ)</span>
+                      <span className="text-[10px] text-amber-400 font-normal">Optional</span>
+                    </label>
+                    <input
+                      type="number"
+                      step="0.5"
+                      value={postWeightKg}
+                      onChange={(e) => setPostWeightKg(e.target.value)}
+                      placeholder="e.g. 460 kg (Bulls/Meat)"
                       className="w-full bg-slate-800 border border-slate-700 rounded-xl py-2.5 px-3 text-xs text-white outline-none"
                     />
                   </div>

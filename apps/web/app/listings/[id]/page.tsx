@@ -119,7 +119,17 @@ export default async function ListingDetailPage({ params }: PageProps) {
                 <span className="font-bold text-gray-900">{listing.age}</span>
               </div>
 
-              <div className="p-3 bg-gray-50 rounded-xl sm:col-span-2">
+              {listing.weightKg && (
+                <div className="p-3 bg-amber-50/90 border border-amber-200 rounded-xl">
+                  <span className="text-amber-800 block text-xs font-semibold">Live Weight / ክብደት</span>
+                  <span className="font-black text-amber-950 text-sm sm:text-base flex items-center gap-1 mt-0.5">
+                    <span>⚖️</span>
+                    <span>{listing.weightKg} kg (ኪ.ግ)</span>
+                  </span>
+                </div>
+              )}
+
+              <div className={`p-3 bg-gray-50 rounded-xl ${listing.weightKg ? 'sm:col-span-1' : 'sm:col-span-2'}`}>
                 <span className="text-gray-500 block text-xs">Inspection Location</span>
                 <span className="font-bold text-gray-900 flex items-center gap-1">
                   <MapPin className="w-3.5 h-3.5 text-green-600" />

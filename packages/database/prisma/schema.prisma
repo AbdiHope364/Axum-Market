@@ -65,6 +65,7 @@ model Listing {
   title           String
   description     String
   price           Float          // In ETB (Ethiopian Birr)
+  weightKg        Float?         // Optional live weight in KG (e.g. 450 for meat/bulls)
   age             String         // e.g. "4 years", "18 months"
   gender          String         // FEMALE, MALE
   region          String
