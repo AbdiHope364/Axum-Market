@@ -22,6 +22,18 @@ import {
   AlertCircle,
   ArrowRight,
   ExternalLink,
+  Search,
+  Plus,
+  Trash2,
+  Tag,
+  DollarSign,
+  Layers,
+  Sparkles,
+  TrendingUp,
+  RefreshCw,
+  Edit,
+  Sliders,
+  Check,
 } from 'lucide-react';
 import { formatPriceETB } from '@/lib/constants';
 
@@ -53,6 +65,23 @@ interface PendingListing {
   images: { imageUrl: string; imageType: string }[];
 }
 
+interface InventoryListing {
+  id: string;
+  title: string;
+  price: number;
+  status: string;
+  age: string;
+  gender: string;
+  region: string;
+  city: string;
+  contactPhone: string;
+  createdAt: string;
+  category: { id: string; name: string; icon?: string | null };
+  breed?: { id: string; name: string } | null;
+  seller: { id: string; fullName: string; phone: string; email: string };
+  images: { id: string; imageUrl: string; imageType: string }[];
+}
+
 interface ReportItem {
   id: string;
   reason: string;
@@ -74,10 +103,21 @@ interface SellerItem {
   fullName: string;
   email: string;
   phone: string;
+  role: string;
   status: string;
   region?: string | null;
   city?: string | null;
   createdAt: string;
+  _count: { listings: number };
+}
+
+interface CategoryItem {
+  id: string;
+  name: string;
+  slug: string;
+  icon?: string | null;
+  status: string;
+  breeds: { id: string; name: string; status: string }[];
   _count: { listings: number };
 }
 
@@ -98,14 +138,32 @@ export default function AdminPortalPage() {
     pendingSellersCount: 0,
     activeListings: 0,
     pendingListings: 0,
+    soldListings: 0,
     totalReports: 0,
+    totalInventoryValueETB: 0,
   });
   const [pendingSellers, setPendingSellers] = useState<PendingSeller[]>([]);
   const [pendingItems, setPendingItems] = useState<PendingListing[]>([]);
   const [reports, setReports] = useState<ReportItem[]>([]);
   const [sellers, setSellers] = useState<SellerItem[]>([]);
-  const [activeTab, setActiveTab] = useState<'seller_approvals' | 'moderation' | 'reports' | 'sellers'>('seller_approvals');
+  const [allListings, setAllListings] = useState<InventoryListing[]>([]);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+
+  // Navigation & Search State
+  const [activeTab, setActiveTab] = useState<
+    'seller_approvals' | 'moderation' | 'all_listings' | 'categories' | 'sellers' | 'reports'
+  >('seller_approvals');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [listingSearchQuery, setListingSearchQuery] = useState('');
+  const [listingStatusFilter, setListingStatusFilter] = useState('ALL');
+  const [sellerSearchQuery, setSellerSearchQuery] = useState('');
+
+  // New Category & Breed Modal / Form State
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryIcon, setNewCategoryIcon] = useState('🐄');
+  const [newBreedName, setNewBreedName] = useState('');
+  const [selectedCategoryIdForBreed, setSelectedCategoryIdForBreed] = useState('');
+  const [categoryFormOpen, setCategoryFormOpen] = useState(false);
 
   const checkSession = useCallback(async () => {
     try {
@@ -138,6 +196,11 @@ export default function AdminPortalPage() {
         setPendingItems(data.pendingItems || []);
         setReports(data.reports || []);
         setSellers(data.sellers || []);
+        setAllListings(data.allListings || []);
+        setCategories(data.categories || []);
+        if (data.categories?.length > 0 && !selectedCategoryIdForBreed) {
+          setSelectedCategoryIdForBreed(data.categories[0].id);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -177,7 +240,7 @@ export default function AdminPortalPage() {
     setSessionUser(null);
   };
 
-  // Seller Approval Action
+  // 1. Seller Approval Action
   const handleSellerApproval = async (sellerId: string, action: 'APPROVE' | 'REJECT') => {
     setActionLoading(sellerId);
     try {
@@ -201,6 +264,7 @@ export default function AdminPortalPage() {
               fullName: approvedSeller.fullName,
               email: approvedSeller.email,
               phone: approvedSeller.phone,
+              role: 'SELLER',
               status: 'ACTIVE',
               region: approvedSeller.region,
               city: approvedSeller.city,
@@ -218,8 +282,8 @@ export default function AdminPortalPage() {
     }
   };
 
-  // Listing Moderation Action
-  const handleModerate = async (listingId: string, action: 'APPROVE' | 'REJECT') => {
+  // 2. Listing Moderation Action
+  const handleListingModeration = async (listingId: string, action: 'APPROVE' | 'REJECT') => {
     setActionLoading(listingId);
     try {
       const res = await fetch('/api/moderate', {
@@ -234,6 +298,7 @@ export default function AdminPortalPage() {
           pendingListings: Math.max(0, prev.pendingListings - 1),
           activeListings: action === 'APPROVE' ? prev.activeListings + 1 : prev.activeListings,
         }));
+        loadDashboardData();
       }
     } catch (err) {
       console.error(err);
@@ -242,8 +307,50 @@ export default function AdminPortalPage() {
     }
   };
 
-  // Seller Suspension Action
-  const handleSellerStatus = async (sellerId: string, currentStatus: string) => {
+  // 3. Full Inventory Control Actions
+  const handleUpdateListingStatus = async (listingId: string, newStatus: string) => {
+    setActionLoading(listingId);
+    try {
+      const res = await fetch(`/api/listings/${listingId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (res.ok) {
+        setAllListings((prev) =>
+          prev.map((l) => (l.id === listingId ? { ...l, status: newStatus } : l))
+        );
+        loadDashboardData();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteListing = async (listingId: string) => {
+    if (!confirm('Are you sure you want to permanently delete this listing? This action cannot be undone.')) {
+      return;
+    }
+    setActionLoading(listingId);
+    try {
+      const res = await fetch(`/api/listings/${listingId}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setAllListings((prev) => prev.filter((l) => l.id !== listingId));
+        loadDashboardData();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // 4. Seller Directory Controls
+  const handleToggleSellerStatus = async (sellerId: string, currentStatus: string) => {
     const nextStatus = currentStatus === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
     setActionLoading(sellerId);
     try {
@@ -264,36 +371,160 @@ export default function AdminPortalPage() {
     }
   };
 
+  const handleToggleSellerRole = async (sellerId: string, currentRole: string) => {
+    const nextRole = currentRole === 'ADMIN' ? 'SELLER' : 'ADMIN';
+    if (!confirm(`Are you sure you want to change this user's role to ${nextRole}?`)) {
+      return;
+    }
+    setActionLoading(sellerId);
+    try {
+      const res = await fetch(`/api/sellers/${sellerId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: nextRole }),
+      });
+      if (res.ok) {
+        setSellers((prev) =>
+          prev.map((s) => (s.id === sellerId ? { ...s, role: nextRole } : s))
+        );
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteSeller = async (sellerId: string) => {
+    if (!confirm('Are you sure you want to permanently delete this seller and all their livestock listings?')) {
+      return;
+    }
+    setActionLoading(sellerId);
+    try {
+      const res = await fetch(`/api/sellers/${sellerId}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setSellers((prev) => prev.filter((s) => s.id !== sellerId));
+        loadDashboardData();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // 5. Category & Breed Actions
+  const handleCreateCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCategoryName.trim()) return;
+    try {
+      const res = await fetch('/api/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newCategoryName, icon: newCategoryIcon }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCategories((prev) => [...prev, data.category]);
+        setNewCategoryName('');
+        setCategoryFormOpen(false);
+      } else {
+        alert(data.error || 'Failed to create category');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleCreateBreed = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newBreedName.trim() || !selectedCategoryIdForBreed) return;
+    try {
+      const res = await fetch('/api/breeds', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoryId: selectedCategoryIdForBreed, name: newBreedName }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCategories((prev) =>
+          prev.map((c) =>
+            c.id === selectedCategoryIdForBreed
+              ? { ...c, breeds: [...c.breeds, data.breed] }
+              : c
+          )
+        );
+        setNewBreedName('');
+      } else {
+        alert(data.error || 'Failed to create breed');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteBreed = async (breedId: string, categoryId: string) => {
+    if (!confirm('Are you sure you want to delete this breed?')) return;
+    try {
+      const res = await fetch(`/api/breeds?id=${breedId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setCategories((prev) =>
+          prev.map((c) =>
+            c.id === categoryId
+              ? { ...c, breeds: c.breeds.filter((b) => b.id !== breedId) }
+              : c
+          )
+        );
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-slate-400">
-        Initializing Administrative Console...
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400 font-mono text-sm">
+        <div className="flex items-center gap-3">
+          <RefreshCw className="w-5 h-5 animate-spin text-amber-500" />
+          <span>Authenticating Administrator...</span>
+        </div>
       </div>
     );
   }
 
-  // 1. Unauthenticated Login Screen
+  // ---------------------------------------------------------------------------
+  // LOGIN SCREEN (with Official Admin Crest Logo)
+  // ---------------------------------------------------------------------------
   if (!sessionUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-slate-950 text-slate-100">
-        <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
-          <div className="text-center space-y-2">
-            <div className="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center mx-auto shadow-inner">
-              <ShieldCheck className="w-7 h-7" />
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black text-slate-100 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl space-y-6">
+          {/* Official Admin Logo Crest */}
+          <div className="text-center space-y-3">
+            <div className="relative w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-amber-400/80 shadow-xl shadow-amber-500/10 bg-slate-950">
+              <Image
+                src="/admin-logo.png"
+                alt="AxumMarket Administration & Governance Logo"
+                fill
+                sizes="96px"
+                className="object-cover"
+                priority
+              />
             </div>
-            <div className="inline-block text-[11px] font-extrabold uppercase tracking-widest text-amber-400 bg-amber-950/60 border border-amber-800 px-3 py-0.5 rounded-full">
-              Dedicated Admin Server • Port 3001
+            <div>
+              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                AxumMarket <span className="text-amber-400">Admin Console</span>
+              </h1>
+              <p className="text-xs text-slate-400 mt-1">
+                Port 3001 • Platform Governance & Full Management
+              </p>
             </div>
-            <h1 className="text-2xl font-black text-white tracking-tight">
-              Administrative Portal
-            </h1>
-            <p className="text-xs text-slate-400">
-              Isolated governance portal for seller approvals, listing moderation, and account management.
-            </p>
           </div>
 
           {loginError && (
-            <div className="p-3.5 bg-red-950/80 border border-red-800 text-red-200 rounded-xl text-xs flex items-center gap-2">
+            <div className="p-3.5 bg-red-950/50 border border-red-800/80 rounded-xl text-xs text-red-300 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
               <span>{loginError}</span>
             </div>
@@ -301,39 +532,40 @@ export default function AdminPortalPage() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
                 Admin Email
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Mail className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-500" />
                 <input
                   type="email"
-                  required
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  required
+                  placeholder="admin@axummarket.et"
+                  className="w-full bg-slate-800/80 border border-slate-700 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-amber-500 transition"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
                 Admin Password
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-500" />
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  required
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  required
+                  placeholder="••••••••"
+                  className="w-full bg-slate-800/80 border border-slate-700 rounded-xl py-2.5 pl-10 pr-11 text-sm text-white focus:outline-none focus:border-amber-500 transition"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 p-1"
-                  aria-label={showPassword ? 'Blind/Hide password' : 'See/Show password'}
+                  className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-200 transition"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -343,58 +575,92 @@ export default function AdminPortalPage() {
             <button
               type="submit"
               disabled={loginLoading}
-              className="w-full py-3 bg-amber-600 hover:bg-amber-500 text-slate-950 font-black rounded-xl text-sm shadow-md transition active:scale-98 disabled:opacity-60 flex items-center justify-center gap-2"
+              className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 active:scale-98 text-slate-950 font-black text-sm rounded-xl shadow-lg transition flex items-center justify-center gap-2"
             >
-              <span>{loginLoading ? 'Authenticating...' : 'Sign In as Administrator'}</span>
-              <ArrowRight className="w-4 h-4" />
+              {loginLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
+              <span>Enter Admin Console</span>
             </button>
           </form>
 
-          <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-xs text-slate-400 space-y-1">
-            <p className="font-semibold text-slate-200">Pre-seeded Credentials:</p>
-            <p>Email: <span className="font-mono text-amber-300">admin@axummarket.et</span></p>
-            <p>Password: <span className="font-mono text-amber-300">AdminSecure2026!</span></p>
+          <div className="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50 text-[11px] text-slate-400 text-center space-y-1">
+            <span className="font-bold text-slate-300">Default Administrator Credentials:</span>
+            <div className="font-mono text-[10px] text-amber-300/90">
+              admin@axummarket.et / AdminSecure2026!
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  // 2. Authenticated Admin Dashboard
+  // Filter listings based on search query & status filter
+  const filteredInventoryListings = allListings.filter((l) => {
+    if (listingStatusFilter !== 'ALL' && l.status !== listingStatusFilter) return false;
+    if (listingSearchQuery.trim()) {
+      const q = listingSearchQuery.toLowerCase();
+      const matchTitle = l.title.toLowerCase().includes(q);
+      const matchSeller = l.seller?.fullName?.toLowerCase().includes(q);
+      const matchCity = l.city?.toLowerCase().includes(q);
+      const matchBreed = l.breed?.name?.toLowerCase().includes(q);
+      if (!matchTitle && !matchSeller && !matchCity && !matchBreed) return false;
+    }
+    return true;
+  });
+
+  const filteredSellers = sellers.filter((s) => {
+    if (sellerSearchQuery.trim()) {
+      const q = sellerSearchQuery.toLowerCase();
+      return (
+        s.fullName.toLowerCase().includes(q) ||
+        s.email.toLowerCase().includes(q) ||
+        s.phone.includes(q) ||
+        s.city?.toLowerCase().includes(q)
+      );
+    }
+    return true;
+  });
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 sm:p-6 lg:p-8 space-y-8 max-w-7xl mx-auto">
-      {/* Top Banner */}
-      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="w-9 h-9 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-black text-base shadow">
-              🛡️
-            </span>
-            <span className="text-xl font-black tracking-tight text-white">
-              Axum<span className="text-amber-400">Market</span> Admin
-            </span>
-            <span className="ml-2 text-[10px] font-extrabold uppercase tracking-widest text-amber-400 bg-amber-950/80 border border-amber-800 px-2.5 py-0.5 rounded-full">
-              PORT 3001
-            </span>
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+      {/* Top Header with Admin Crest Logo */}
+      <header className="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-8 py-3.5 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-amber-400/80 shadow-md bg-slate-950 shrink-0">
+            <Image
+              src="/admin-logo.png"
+              alt="AxumMarket Admin Logo"
+              fill
+              sizes="44px"
+              className="object-cover"
+              priority
+            />
           </div>
-          <p className="text-xs text-slate-400">
-            Authenticated as: <strong className="text-slate-200">{sessionUser.fullName}</strong> ({sessionUser.email})
-          </p>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-base sm:text-lg font-black text-white tracking-tight">
+                Axum<span className="text-amber-400">Market</span>
+              </span>
+              <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                Full Control Panel
+              </span>
+            </div>
+            <div className="text-[10px] text-slate-400">
+              Logged in as <strong className="text-slate-200">{sessionUser.fullName}</strong>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-          <a
-            href="http://localhost:3000"
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl border border-slate-700 transition"
+        <div className="flex items-center gap-3">
+          <button
+            onClick={loadDashboardData}
+            title="Refresh dashboard data"
+            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition"
           >
-            <span>Public Site (3000)</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
+            <RefreshCw className="w-4 h-4" />
+          </button>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-red-950/60 hover:bg-red-900 text-red-200 text-xs font-semibold rounded-xl border border-red-800 transition"
+            className="px-3.5 py-1.5 rounded-xl bg-red-950/60 hover:bg-red-900/80 border border-red-800/80 text-red-300 text-xs font-bold transition flex items-center gap-1.5"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>
@@ -402,402 +668,773 @@ export default function AdminPortalPage() {
         </div>
       </header>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
-        {/* Pending Sellers Card */}
-        <div className="bg-slate-900 p-4 sm:p-5 rounded-2xl border border-amber-500/50 shadow-sm bg-gradient-to-br from-slate-900 to-amber-950/30">
-          <span className="text-xs text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
-            <UserPlus className="w-3.5 h-3.5 text-amber-400" />
-            Seller Approvals
-          </span>
-          <div className="text-2xl sm:text-3xl font-black text-amber-300 mt-1">
-            {stats.pendingSellersCount}
-          </div>
-        </div>
-
-        <div className="bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-800 shadow-sm">
-          <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider flex items-center gap-1.5">
-            <Users className="w-3.5 h-3.5 text-blue-400" />
-            Approved Sellers
-          </span>
-          <div className="text-2xl sm:text-3xl font-black text-white mt-1">
-            {stats.totalSellers}
-          </div>
-        </div>
-
-        <div className="bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-800 shadow-sm">
-          <span className="text-xs text-green-400 font-semibold uppercase tracking-wider flex items-center gap-1.5">
-            <CheckCircle className="w-3.5 h-3.5" />
-            Active Animals
-          </span>
-          <div className="text-2xl sm:text-3xl font-black text-green-400 mt-1">
-            {stats.activeListings}
-          </div>
-        </div>
-
-        <div className="bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-800 shadow-sm">
-          <span className="text-xs text-amber-400 font-semibold uppercase tracking-wider flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5" />
-            Pending Listings
-          </span>
-          <div className="text-2xl sm:text-3xl font-black text-amber-400 mt-1">
-            {stats.pendingListings}
-          </div>
-        </div>
-
-        <div className="bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-800 shadow-sm">
-          <span className="text-xs text-red-400 font-semibold uppercase tracking-wider flex items-center gap-1.5">
-            <Flag className="w-3.5 h-3.5" />
-            Open Reports
-          </span>
-          <div className="text-2xl sm:text-3xl font-black text-red-400 mt-1">
-            {stats.totalReports}
-          </div>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex border-b border-slate-800 gap-3 overflow-x-auto no-scrollbar">
-        <button
-          onClick={() => setActiveTab('seller_approvals')}
-          className={`pb-3 text-xs sm:text-sm font-bold transition flex items-center gap-1.5 border-b-2 shrink-0 ${
-            activeTab === 'seller_approvals'
-              ? 'border-amber-500 text-amber-400 font-black'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <UserPlus className="w-4 h-4" />
-          <span>Seller Approvals</span>
-          {pendingSellers.length > 0 && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-500 text-slate-950 font-black">
-              {pendingSellers.length}
-            </span>
-          )}
-        </button>
-
-        <button
-          onClick={() => setActiveTab('moderation')}
-          className={`pb-3 text-xs sm:text-sm font-bold transition flex items-center gap-1.5 border-b-2 shrink-0 ${
-            activeTab === 'moderation'
-              ? 'border-green-500 text-green-400 font-black'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <Clock className="w-4 h-4" />
-          <span>Listing Moderation ({pendingItems.length})</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('reports')}
-          className={`pb-3 text-xs sm:text-sm font-bold transition flex items-center gap-1.5 border-b-2 shrink-0 ${
-            activeTab === 'reports'
-              ? 'border-red-500 text-red-400 font-black'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <Flag className="w-4 h-4" />
-          <span>User Reports ({reports.length})</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('sellers')}
-          className={`pb-3 text-xs sm:text-sm font-bold transition flex items-center gap-1.5 border-b-2 shrink-0 ${
-            activeTab === 'sellers'
-              ? 'border-blue-500 text-blue-400 font-black'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <Users className="w-4 h-4" />
-          <span>Sellers Directory ({sellers.length})</span>
-        </button>
-      </div>
-
-      {/* TAB 1: Seller Approvals Queue */}
-      {activeTab === 'seller_approvals' && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-white">
-              Seller Registrations Awaiting Verification
-            </h2>
-            <span className="text-xs text-slate-400">
-              {pendingSellers.length} pending
-            </span>
-          </div>
-
-          {pendingSellers.length === 0 ? (
-            <div className="bg-slate-900 rounded-3xl border border-slate-800 p-12 text-center space-y-2">
-              <CheckCircle className="w-10 h-10 text-green-500 mx-auto" />
-              <h3 className="font-bold text-slate-200 text-base">
-                No pending seller registrations
-              </h3>
-              <p className="text-xs text-slate-400">
-                All registered sellers have been approved or reviewed.
-              </p>
+      {/* Main Container */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+        {/* KPI Summary Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+          <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-1">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+              <span>Pending Sellers</span>
+              <Clock className="w-3.5 h-3.5 text-amber-400" />
             </div>
-          ) : (
-            <div className="space-y-3">
-              {pendingSellers.map((seller) => (
-                <div
-                  key={seller.id}
-                  className="bg-slate-900 rounded-2xl border border-amber-500/40 p-5 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
-                >
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="bg-amber-950 text-amber-300 border border-amber-800 text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase">
-                        Pending Admin Approval
-                      </span>
-                      <span className="text-xs text-slate-400">
-                        Registered: {new Date(seller.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
+            <div className="text-2xl font-black text-amber-400">{stats.pendingSellersCount}</div>
+            <div className="text-[10px] text-slate-500">Awaiting approval</div>
+          </div>
 
-                    <h3 className="text-lg font-black text-white">
-                      {seller.fullName}
-                    </h3>
-
-                    <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300">
-                      <span className="flex items-center gap-1 font-mono text-green-400">
-                        <Phone className="w-3.5 h-3.5" />
-                        {seller.phone}
-                      </span>
-                      <span className="flex items-center gap-1 text-slate-300">
-                        <Mail className="w-3.5 h-3.5 text-blue-400" />
-                        {seller.email}
-                      </span>
-                      <span className="flex items-center gap-1 text-slate-400">
-                        <MapPin className="w-3.5 h-3.5 text-red-400" />
-                        {seller.city}, {seller.region} {seller.area ? `(${seller.area})` : ''}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <button
-                      onClick={() => handleSellerApproval(seller.id, 'APPROVE')}
-                      disabled={actionLoading === seller.id}
-                      className="flex-1 sm:flex-none px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5"
-                    >
-                      <UserCheck className="w-4 h-4" />
-                      <span>Approve Seller</span>
-                    </button>
-                    <button
-                      onClick={() => handleSellerApproval(seller.id, 'REJECT')}
-                      disabled={actionLoading === seller.id}
-                      className="flex-1 sm:flex-none px-4 py-2.5 bg-red-950/80 hover:bg-red-900 text-red-300 font-bold text-xs rounded-xl border border-red-800 transition"
-                    >
-                      Decline
-                    </button>
-                  </div>
-                </div>
-              ))}
+          <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-1">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+              <span>Pending Animals</span>
+              <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
             </div>
-          )}
+            <div className="text-2xl font-black text-amber-400">{stats.pendingListings}</div>
+            <div className="text-[10px] text-slate-500">Need 3-photo review</div>
+          </div>
+
+          <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-1">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+              <span>Live Livestock</span>
+              <CheckCircle className="w-3.5 h-3.5 text-green-400" />
+            </div>
+            <div className="text-2xl font-black text-green-400">{stats.activeListings}</div>
+            <div className="text-[10px] text-slate-500">Active on marketplace</div>
+          </div>
+
+          <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-1">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+              <span>Total Sellers</span>
+              <Users className="w-3.5 h-3.5 text-blue-400" />
+            </div>
+            <div className="text-2xl font-black text-blue-400">{stats.totalSellers}</div>
+            <div className="text-[10px] text-slate-500">Registered users</div>
+          </div>
+
+          <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-1">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+              <span>Reports</span>
+              <Flag className="w-3.5 h-3.5 text-red-400" />
+            </div>
+            <div className="text-2xl font-black text-red-400">{stats.totalReports}</div>
+            <div className="text-[10px] text-slate-500">Scam/sold reports</div>
+          </div>
+
+          <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-1">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+              <span>Market Value</span>
+              <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+            </div>
+            <div className="text-lg font-black text-emerald-400 truncate">
+              {formatPriceETB(stats.totalInventoryValueETB)}
+            </div>
+            <div className="text-[10px] text-slate-500">Live inventory value</div>
+          </div>
         </div>
-      )}
 
-      {/* TAB 2: Listing Moderation Queue */}
-      {activeTab === 'moderation' && (
-        <div className="space-y-4">
-          {pendingItems.length === 0 ? (
-            <div className="bg-slate-900 rounded-3xl border border-slate-800 p-12 text-center space-y-2">
-              <CheckCircle className="w-10 h-10 text-green-500 mx-auto" />
-              <h3 className="font-bold text-slate-200 text-base">
-                Moderation queue is clear
-              </h3>
-              <p className="text-xs text-slate-400">
-                All animal submissions have been moderated.
-              </p>
+        {/* Navigation Tabs Bar */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar bg-slate-900/80 p-1.5 rounded-2xl border border-slate-800">
+          {[
+            {
+              id: 'seller_approvals',
+              label: 'Seller Approvals',
+              count: stats.pendingSellersCount,
+              badgeColor: 'bg-amber-500 text-slate-950',
+            },
+            {
+              id: 'moderation',
+              label: 'Listing Moderation',
+              count: stats.pendingListings,
+              badgeColor: 'bg-amber-500 text-slate-950',
+            },
+            {
+              id: 'all_listings',
+              label: 'All Livestock Inventory',
+              count: allListings.length,
+              badgeColor: 'bg-slate-700 text-slate-200',
+            },
+            {
+              id: 'categories',
+              label: 'Categories & Breeds',
+              count: categories.length,
+              badgeColor: 'bg-slate-700 text-slate-200',
+            },
+            {
+              id: 'sellers',
+              label: 'Sellers Directory',
+              count: stats.totalSellers,
+              badgeColor: 'bg-slate-700 text-slate-200',
+            },
+            {
+              id: 'reports',
+              label: 'Safety Reports',
+              count: stats.totalReports,
+              badgeColor: 'bg-red-500 text-white',
+            },
+          ].map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`py-2.5 px-3.5 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap ${
+                  isActive
+                    ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                }`}
+              >
+                <span>{tab.label}</span>
+                {tab.count !== undefined && tab.count > 0 && (
+                  <span
+                    className={`text-[10px] font-black px-1.5 py-0.2 rounded-full ${
+                      isActive ? 'bg-slate-950 text-amber-400' : tab.badgeColor
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* TAB 1: SELLER APPROVALS */}
+        {activeTab === 'seller_approvals' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-base sm:text-lg font-black text-white">
+                  Pending Seller Approvals ({pendingSellers.length})
+                </h2>
+                <p className="text-xs text-slate-400">
+                  Verify newly registered farmers and traders before they can post animals.
+                </p>
+              </div>
             </div>
-          ) : (
-            pendingItems.map((item) => {
-              const front = item.images.find((i) => i.imageType === 'FRONT') || item.images[0];
-              return (
-                <div
-                  key={item.id}
-                  className="bg-slate-900 rounded-3xl border border-slate-800 p-5 sm:p-6 shadow-sm space-y-4"
-                >
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3.5">
-                      <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-slate-950 shrink-0">
-                        {front && (
-                          <Image
-                            src={front.imageUrl}
-                            alt={item.title}
-                            fill
-                            className="object-cover"
-                          />
-                        )}
-                      </div>
+
+            {pendingSellers.length === 0 ? (
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-12 text-center space-y-2">
+                <CheckCircle className="w-10 h-10 text-green-500 mx-auto" />
+                <h3 className="font-bold text-white text-base">No Pending Seller Applications</h3>
+                <p className="text-xs text-slate-400">All registered sellers have been reviewed.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {pendingSellers.map((seller) => (
+                  <div
+                    key={seller.id}
+                    className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-sm"
+                  >
+                    <div className="flex items-start justify-between gap-2">
                       <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="bg-amber-950 text-amber-300 border border-amber-800 font-bold px-2 py-0.5 rounded-full">
-                            Pending Review
-                          </span>
-                          <span className="text-slate-400">
-                            {item.category.name} {item.breed ? `• ${item.breed.name}` : ''}
+                        <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                          Awaiting Approval
+                        </span>
+                        <h3 className="text-base font-black text-white">{seller.fullName}</h3>
+                        <div className="text-xs text-slate-400 flex items-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-slate-500" />
+                          <span>
+                            {seller.city}, {seller.region} {seller.area ? `(${seller.area})` : ''}
                           </span>
                         </div>
-                        <h3 className="font-bold text-base text-white">{item.title}</h3>
-                        <div className="text-xs text-slate-400 flex items-center gap-3">
-                          <span className="font-black text-green-400 text-sm">
-                            {formatPriceETB(item.price)}
-                          </span>
-                          <span>•</span>
-                          <span>Seller: {item.seller.fullName} ({item.seller.phone})</span>
-                          <span>•</span>
-                          <span>Location: {item.city}, {item.region}</span>
-                        </div>
+                      </div>
+                      <span className="text-[10px] text-slate-500">
+                        {new Date(seller.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1.5">
+                      <div className="flex items-center gap-2 text-slate-300">
+                        <Phone className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                        <a href={`tel:${seller.phone}`} className="hover:underline font-bold text-green-400">
+                          {seller.phone}
+                        </a>
+                      </div>
+                      <div className="flex items-center gap-2 text-slate-400">
+                        <Mail className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                        <span>{seller.email}</span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <div className="flex items-center gap-2 pt-1">
                       <button
-                        onClick={() => handleModerate(item.id, 'APPROVE')}
-                        disabled={actionLoading === item.id}
-                        className="flex-1 sm:flex-none px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white font-bold text-xs rounded-xl shadow transition"
+                        onClick={() => handleSellerApproval(seller.id, 'APPROVE')}
+                        disabled={actionLoading === seller.id}
+                        className="flex-1 py-2.5 px-3 rounded-xl bg-green-600 hover:bg-green-700 active:scale-98 text-white font-bold text-xs shadow-sm transition flex items-center justify-center gap-1.5"
                       >
-                        Approve Listing
+                        <CheckCircle className="w-3.5 h-3.5" />
+                        <span>Approve Seller</span>
                       </button>
+
                       <button
-                        onClick={() => handleModerate(item.id, 'REJECT')}
+                        onClick={() => handleSellerApproval(seller.id, 'REJECT')}
+                        disabled={actionLoading === seller.id}
+                        className="py-2.5 px-3 rounded-xl bg-red-950/80 hover:bg-red-900 border border-red-800 text-red-300 font-bold text-xs transition flex items-center justify-center gap-1.5"
+                      >
+                        <XCircle className="w-3.5 h-3.5" />
+                        <span>Decline</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 2: LISTING MODERATION */}
+        {activeTab === 'moderation' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-base sm:text-lg font-black text-white">
+                  Livestock Listings Pending Review ({pendingItems.length})
+                </h2>
+                <p className="text-xs text-slate-400">
+                  Verify required 3 photo angles (Front, Left, Right) and ensure appropriate pricing.
+                </p>
+              </div>
+            </div>
+
+            {pendingItems.length === 0 ? (
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-12 text-center space-y-2">
+                <CheckCircle className="w-10 h-10 text-green-500 mx-auto" />
+                <h3 className="font-bold text-white text-base">No Pending Listings</h3>
+                <p className="text-xs text-slate-400">All submitted animals have been reviewed.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {pendingItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between"
+                  >
+                    <div className="p-4 space-y-3">
+                      {/* Photo Angles Preview */}
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {item.images?.map((img, idx) => (
+                          <div key={idx} className="relative aspect-[4/3] rounded-lg overflow-hidden bg-slate-800">
+                            <Image
+                              src={img.imageUrl}
+                              alt={img.imageType}
+                              fill
+                              sizes="120px"
+                              className="object-cover"
+                            />
+                            <span className="absolute bottom-1 left-1 bg-black/70 text-white text-[9px] font-bold px-1 rounded">
+                              {img.imageType}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div>
+                        <div className="text-lg font-black text-green-400">
+                          {formatPriceETB(item.price)}
+                        </div>
+                        <h3 className="font-bold text-white text-sm line-clamp-1">{item.title}</h3>
+                        <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1">
+                          <span>{item.category?.name}</span>
+                          {item.breed && <span>• {item.breed.name}</span>}
+                          <span>• {item.gender}</span>
+                          <span>• Age: {item.age}</span>
+                        </div>
+                      </div>
+
+                      <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-[11px] space-y-1">
+                        <div className="font-bold text-slate-300">Seller: {item.seller?.fullName}</div>
+                        <div className="text-slate-400">Phone: {item.contactPhone}</div>
+                        <div className="text-slate-500">Location: {item.city}, {item.region}</div>
+                      </div>
+                    </div>
+
+                    <div className="p-4 pt-0 flex items-center gap-2">
+                      <button
+                        onClick={() => handleListingModeration(item.id, 'APPROVE')}
                         disabled={actionLoading === item.id}
-                        className="flex-1 sm:flex-none px-4 py-2.5 bg-red-950/80 hover:bg-red-900 text-red-300 font-bold text-xs rounded-xl border border-red-800 transition"
+                        className="flex-1 py-2 px-3 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-xs shadow-sm transition flex items-center justify-center gap-1.5"
+                      >
+                        <CheckCircle className="w-3.5 h-3.5" />
+                        <span>Publish Live</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleListingModeration(item.id, 'REJECT')}
+                        disabled={actionLoading === item.id}
+                        className="py-2 px-3 rounded-xl bg-red-950/80 hover:bg-red-900 border border-red-800 text-red-300 font-bold text-xs transition flex items-center justify-center gap-1.5"
+                      >
+                        <XCircle className="w-3.5 h-3.5" />
+                        <span>Reject</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 3: ALL LIVESTOCK INVENTORY (NEW FULL CONTROL) */}
+        {activeTab === 'all_listings' && (
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-base sm:text-lg font-black text-white">
+                  Full Livestock Inventory ({filteredInventoryListings.length})
+                </h2>
+                <p className="text-xs text-slate-400">
+                  Search, force status updates (Sold/Active/Removed), or delete any listing.
+                </p>
+              </div>
+
+              {/* Status Filter Pills */}
+              <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs">
+                {['ALL', 'ACTIVE', 'SOLD', 'PENDING', 'REJECTED'].map((st) => (
+                  <button
+                    key={st}
+                    onClick={() => setListingStatusFilter(st)}
+                    className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition ${
+                      listingStatusFilter === st
+                        ? 'bg-amber-500 text-slate-950'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {st}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Search Bar */}
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-500" />
+              <input
+                type="text"
+                value={listingSearchQuery}
+                onChange={(e) => setListingSearchQuery(e.target.value)}
+                placeholder="Search by animal title, seller name, breed, or city..."
+                className="w-full bg-slate-900 border border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-xs sm:text-sm text-white focus:outline-none focus:border-amber-500 transition"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {filteredInventoryListings.map((listing) => (
+                <div
+                  key={listing.id}
+                  className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 flex flex-col justify-between"
+                >
+                  <div className="space-y-2.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <span
+                          className={`text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider ${
+                            listing.status === 'ACTIVE'
+                              ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                              : listing.status === 'SOLD'
+                              ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                              : listing.status === 'PENDING'
+                              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                              : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                          }`}
+                        >
+                          {listing.status}
+                        </span>
+                        <div className="text-base font-black text-green-400 mt-1">
+                          {formatPriceETB(listing.price)}
+                        </div>
+                      </div>
+                      <span className="text-[10px] text-slate-500">
+                        {new Date(listing.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    <h4 className="font-bold text-white text-sm line-clamp-1">{listing.title}</h4>
+
+                    <div className="text-[11px] text-slate-400 space-y-0.5">
+                      <div>Category: <strong className="text-slate-200">{listing.category?.name}</strong> {listing.breed && `(${listing.breed.name})`}</div>
+                      <div>Seller: <strong className="text-slate-200">{listing.seller?.fullName}</strong> ({listing.seller?.phone})</div>
+                      <div>Location: {listing.city}, {listing.region}</div>
+                    </div>
+                  </div>
+
+                  {/* Actions row */}
+                  <div className="pt-2 border-t border-slate-800/80 flex items-center gap-1.5 flex-wrap">
+                    {listing.status !== 'ACTIVE' && (
+                      <button
+                        onClick={() => handleUpdateListingStatus(listing.id, 'ACTIVE')}
+                        className="py-1.5 px-2.5 rounded-lg bg-green-700/60 hover:bg-green-700 text-green-100 font-bold text-[11px] transition"
+                      >
+                        Set Active
+                      </button>
+                    )}
+
+                    {listing.status !== 'SOLD' && (
+                      <button
+                        onClick={() => handleUpdateListingStatus(listing.id, 'SOLD')}
+                        className="py-1.5 px-2.5 rounded-lg bg-blue-700/60 hover:bg-blue-700 text-blue-100 font-bold text-[11px] transition"
+                      >
+                        Mark Sold
+                      </button>
+                    )}
+
+                    {listing.status !== 'REJECTED' && (
+                      <button
+                        onClick={() => handleUpdateListingStatus(listing.id, 'REJECTED')}
+                        className="py-1.5 px-2.5 rounded-lg bg-amber-700/60 hover:bg-amber-700 text-amber-100 font-bold text-[11px] transition"
                       >
                         Reject
                       </button>
-                    </div>
-                  </div>
-
-                  {/* 3 Photos Inspection strip */}
-                  <div className="grid grid-cols-3 gap-3 border-t border-slate-800 pt-3">
-                    {item.images.map((img, idx) => (
-                      <div key={idx} className="relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
-                        <Image src={img.imageUrl} alt={img.imageType} fill className="object-cover" />
-                        <span className="absolute bottom-1.5 left-1.5 bg-black/80 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                          {img.imageType}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-      )}
-
-      {/* TAB 3: User Reports */}
-      {activeTab === 'reports' && (
-        <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-sm overflow-hidden p-5 space-y-4">
-          <h2 className="text-base font-bold text-white border-b border-slate-800 pb-3">
-            Buyer Safety Reports
-          </h2>
-          {reports.length === 0 ? (
-            <p className="text-center py-8 text-xs text-slate-500">
-              No reports have been submitted.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {reports.map((r) => (
-                <div
-                  key={r.id}
-                  className="p-4 rounded-2xl border border-slate-800 bg-slate-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="bg-red-950 text-red-300 border border-red-800 text-xs font-bold px-2.5 py-0.5 rounded-full">
-                        Reason: {r.reason}
-                      </span>
-                      <span className="text-xs text-slate-400">
-                        Listing: {r.listing.title} ({formatPriceETB(r.listing.price)})
-                      </span>
-                    </div>
-                    {r.description && (
-                      <p className="text-xs text-slate-300 bg-slate-900 p-2.5 rounded-xl border border-slate-800">
-                        &ldquo;{r.description}&rdquo;
-                      </p>
                     )}
-                    <p className="text-[11px] text-slate-500">
-                      Seller: {r.listing.seller.fullName} ({r.listing.seller.phone}) • Reporter Contact: {r.reporterContact || 'Anonymous'}
-                    </p>
-                  </div>
 
-                  <a
-                    href={`http://localhost:3000/listings/${r.listing.id}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg border border-slate-700 transition shrink-0"
-                  >
-                    View Listing
-                  </a>
+                    <button
+                      onClick={() => handleDeleteListing(listing.id)}
+                      className="py-1.5 px-2.5 rounded-lg bg-red-950 hover:bg-red-900 text-red-400 border border-red-800/80 font-bold text-[11px] transition ml-auto flex items-center gap-1"
+                      title="Permanently delete listing"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      <span>Delete</span>
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
-          )}
-        </div>
-      )}
-
-      {/* TAB 4: Sellers Directory */}
-      {activeTab === 'sellers' && (
-        <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-sm overflow-hidden p-5 space-y-4">
-          <h2 className="text-base font-bold text-white border-b border-slate-800 pb-3">
-            Active & Verified Livestock Sellers
-          </h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs sm:text-sm">
-              <thead>
-                <tr className="text-slate-400 border-b border-slate-800">
-                  <th className="pb-3 font-semibold">Seller</th>
-                  <th className="pb-3 font-semibold">Phone</th>
-                  <th className="pb-3 font-semibold">Location</th>
-                  <th className="pb-3 font-semibold">Listings</th>
-                  <th className="pb-3 font-semibold">Status</th>
-                  <th className="pb-3 font-semibold text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800">
-                {sellers.map((s) => (
-                  <tr key={s.id} className="hover:bg-slate-800/50 transition">
-                    <td className="py-3 font-bold text-white">{s.fullName}</td>
-                    <td className="py-3 text-slate-300 font-mono">{s.phone}</td>
-                    <td className="py-3 text-slate-400">
-                      {s.city || 'Sululta'}, {s.region || 'Oromia'}
-                    </td>
-                    <td className="py-3 font-semibold text-white">
-                      {s._count.listings}
-                    </td>
-                    <td className="py-3">
-                      <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                          s.status === 'ACTIVE'
-                            ? 'bg-green-950 text-green-300 border border-green-800'
-                            : 'bg-red-950 text-red-300 border border-red-800'
-                        }`}
-                      >
-                        {s.status}
-                      </span>
-                    </td>
-                    <td className="py-3 text-right">
-                      <button
-                        onClick={() => handleSellerStatus(s.id, s.status)}
-                        disabled={actionLoading === s.id}
-                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
-                          s.status === 'ACTIVE'
-                            ? 'bg-red-950 text-red-300 hover:bg-red-900 border border-red-800'
-                            : 'bg-green-950 text-green-300 hover:bg-green-900 border border-green-800'
-                        }`}
-                      >
-                        {s.status === 'ACTIVE' ? 'Suspend' : 'Reactivate'}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* TAB 4: CATEGORIES & BREEDS TAXONOMY (NEW FULL CONTROL) */}
+        {activeTab === 'categories' && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-base sm:text-lg font-black text-white">
+                  Livestock Taxonomy & Breeds Governance
+                </h2>
+                <p className="text-xs text-slate-400">
+                  Manage animal categories and valid Ethiopian breeds for seller listings.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setCategoryFormOpen(!categoryFormOpen)}
+                className="py-2 px-3.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs rounded-xl shadow-sm transition flex items-center gap-1.5"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Category</span>
+              </button>
+            </div>
+
+            {/* Create Category Modal / Drawer Form */}
+            {categoryFormOpen && (
+              <form
+                onSubmit={handleCreateCategory}
+                className="bg-slate-900 border border-amber-500/40 rounded-2xl p-4 sm:p-5 space-y-3"
+              >
+                <h3 className="font-black text-sm text-white">Add New Livestock Category</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 mb-1">Category Name</label>
+                    <input
+                      type="text"
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      placeholder="e.g. Camels, Horses & Equines"
+                      required
+                      className="w-full bg-slate-800 border border-slate-700 rounded-xl py-2 px-3 text-xs text-white outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 mb-1">Emoji Icon</label>
+                    <input
+                      type="text"
+                      value={newCategoryIcon}
+                      onChange={(e) => setNewCategoryIcon(e.target.value)}
+                      placeholder="e.g. 🐪, 🐴, 🐔"
+                      className="w-full bg-slate-800 border border-slate-700 rounded-xl py-2 px-3 text-xs text-white outline-none"
+                    />
+                  </div>
+
+                  <div className="flex items-end gap-2">
+                    <button
+                      type="submit"
+                      className="flex-1 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded-xl transition"
+                    >
+                      Save Category
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCategoryFormOpen(false)}
+                      className="py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </form>
+            )}
+
+            {/* Add Breed Form */}
+            <form
+              onSubmit={handleCreateBreed}
+              className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3"
+            >
+              <h3 className="font-bold text-xs uppercase tracking-wider text-slate-400">
+                + Add Breed to Category
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <select
+                    value={selectedCategoryIdForBreed}
+                    onChange={(e) => setSelectedCategoryIdForBreed(e.target.value)}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl py-2 px-3 text-xs text-white outline-none cursor-pointer"
+                  >
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.icon || '🐾'} {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <input
+                    type="text"
+                    value={newBreedName}
+                    onChange={(e) => setNewBreedName(e.target.value)}
+                    placeholder="New Breed Name (e.g. Fogera, Barka, Dorper)"
+                    required
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl py-2 px-3 text-xs text-white outline-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-bold text-xs rounded-xl transition shadow-sm"
+                >
+                  Add Breed
+                </button>
+              </div>
+            </form>
+
+            {/* Categories & Breeds List */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {categories.map((cat) => (
+                <div
+                  key={cat.id}
+                  className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">{cat.icon || '🐾'}</span>
+                      <div>
+                        <h4 className="font-black text-white text-base">{cat.name}</h4>
+                        <div className="text-[10px] text-slate-400">
+                          Slug: <span className="font-mono text-amber-300">{cat.slug}</span> •{' '}
+                          {cat._count?.listings || 0} listings
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Breeds Chips */}
+                  <div className="space-y-1.5 pt-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                      Approved Breeds ({cat.breeds?.length || 0}):
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {cat.breeds?.map((b) => (
+                        <span
+                          key={b.id}
+                          className="bg-slate-800 text-slate-200 text-xs px-2.5 py-1 rounded-lg border border-slate-700 flex items-center gap-1.5"
+                        >
+                          <span>{b.name}</span>
+                          <button
+                            onClick={() => handleDeleteBreed(b.id, cat.id)}
+                            title="Delete breed"
+                            className="text-slate-500 hover:text-red-400"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 5: SELLERS DIRECTORY */}
+        {activeTab === 'sellers' && (
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-base sm:text-lg font-black text-white">
+                  User & Seller Directory ({filteredSellers.length})
+                </h2>
+                <p className="text-xs text-slate-400">
+                  Manage accounts, suspend scam users, promote/demote roles, or delete users.
+                </p>
+              </div>
+
+              <div className="relative w-full sm:w-72">
+                <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
+                <input
+                  type="text"
+                  value={sellerSearchQuery}
+                  onChange={(e) => setSellerSearchQuery(e.target.value)}
+                  placeholder="Search user name, phone, email..."
+                  className="w-full bg-slate-900 border border-slate-800 rounded-xl py-2 pl-9 pr-3 text-xs text-white outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {filteredSellers.map((seller) => (
+                <div
+                  key={seller.id}
+                  className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 flex flex-col justify-between"
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="font-black text-white text-sm">{seller.fullName}</h4>
+                          {seller.role === 'ADMIN' && (
+                            <span className="bg-amber-500/20 text-amber-300 text-[9px] font-bold px-1.5 py-0.2 rounded border border-amber-500/30">
+                              ADMIN
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-slate-400">{seller.email}</div>
+                      </div>
+
+                      <span
+                        className={`text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider ${
+                          seller.status === 'ACTIVE'
+                            ? 'bg-green-500/20 text-green-400'
+                            : 'bg-red-500/20 text-red-400'
+                        }`}
+                      >
+                        {seller.status}
+                      </span>
+                    </div>
+
+                    <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-[11px] space-y-1">
+                      <div className="flex items-center gap-1.5 text-slate-300">
+                        <Phone className="w-3 h-3 text-green-400" />
+                        <a href={`tel:${seller.phone}`} className="hover:underline text-green-400 font-bold">
+                          {seller.phone}
+                        </a>
+                      </div>
+                      <div className="text-slate-500">
+                        Location: {seller.city || 'N/A'}, {seller.region || 'Ethiopia'}
+                      </div>
+                      <div className="text-slate-500">
+                        Listings Posted: <strong className="text-slate-300">{seller._count?.listings || 0}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Seller Actions */}
+                  <div className="pt-2 border-t border-slate-800/80 flex items-center gap-2">
+                    <button
+                      onClick={() => handleToggleSellerStatus(seller.id, seller.status)}
+                      className={`flex-1 py-1.5 px-2.5 rounded-lg font-bold text-[11px] transition ${
+                        seller.status === 'ACTIVE'
+                          ? 'bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-800/80'
+                          : 'bg-green-700 hover:bg-green-600 text-white'
+                      }`}
+                    >
+                      {seller.status === 'ACTIVE' ? 'Suspend' : 'Reactivate'}
+                    </button>
+
+                    <button
+                      onClick={() => handleToggleSellerRole(seller.id, seller.role)}
+                      className="py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-[11px] transition"
+                      title="Promote or Demote Role"
+                    >
+                      {seller.role === 'ADMIN' ? 'Demote' : 'Make Admin'}
+                    </button>
+
+                    <button
+                      onClick={() => handleDeleteSeller(seller.id)}
+                      className="py-1.5 px-2 rounded-lg bg-red-950 hover:bg-red-900 text-red-400 border border-red-800 transition"
+                      title="Permanently delete user"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 6: SAFETY REPORTS */}
+        {activeTab === 'reports' && (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-base sm:text-lg font-black text-white">
+                Buyer Safety & Scam Reports ({reports.length})
+              </h2>
+              <p className="text-xs text-slate-400">
+                User-flagged listings for suspicious behavior, wrong phone numbers, or offline sold animals.
+              </p>
+            </div>
+
+            {reports.length === 0 ? (
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-12 text-center space-y-2">
+                <ShieldCheck className="w-10 h-10 text-green-500 mx-auto" />
+                <h3 className="font-bold text-white text-base">Zero Active Safety Reports</h3>
+                <p className="text-xs text-slate-400">No scams or issues flagged by buyers.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {reports.map((report) => (
+                  <div
+                    key={report.id}
+                    className="bg-slate-900 border border-red-950 rounded-2xl p-5 space-y-3"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <span className="text-[10px] font-black bg-red-500/20 text-red-400 px-2 py-0.5 rounded border border-red-500/30 uppercase">
+                          Reason: {report.reason}
+                        </span>
+                        <h4 className="font-bold text-white text-sm mt-1.5">
+                          Listing: {report.listing?.title}
+                        </h4>
+                      </div>
+                      <span className="text-[10px] text-slate-500">
+                        {new Date(report.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    {report.description && (
+                      <p className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs text-slate-300">
+                        &ldquo;{report.description}&rdquo;
+                      </p>
+                    )}
+
+                    <div className="text-[11px] text-slate-400 space-y-0.5">
+                      <div>Seller: <strong className="text-slate-200">{report.listing?.seller?.fullName}</strong></div>
+                      <div>Contact: {report.listing?.seller?.phone}</div>
+                      {report.reporterContact && <div>Reporter: {report.reporterContact}</div>}
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-2 border-t border-slate-800">
+                      <button
+                        onClick={() => handleUpdateListingStatus(report.listing.id, 'REMOVED')}
+                        className="flex-1 py-2 px-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition"
+                      >
+                        Remove Listing
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </main>
     </div>
   );
 }
-
