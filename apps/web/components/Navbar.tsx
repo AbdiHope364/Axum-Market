@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   Menu,
@@ -85,9 +86,16 @@ export default function Navbar() {
             {/* Logo & Brand */}
             <div className="flex items-center gap-3">
               <Link href="/" className="flex items-center gap-2.5 group">
-                <span className="w-10 h-10 rounded-2xl bg-gradient-to-br from-green-600 via-green-700 to-emerald-800 flex items-center justify-center text-white text-xl shadow-md group-hover:scale-105 transition-transform">
-                  🐄
-                </span>
+                <div className="relative w-10 h-10 rounded-2xl overflow-hidden shadow-md ring-1 ring-black/5 group-hover:scale-105 transition-transform bg-emerald-800 shrink-0">
+                  <Image
+                    src="/logo.png"
+                    alt="AxumMarket Logo"
+                    fill
+                    sizes="40px"
+                    className="object-cover"
+                    priority
+                  />
+                </div>
                 <div>
                   <span className="text-xl font-black tracking-tight text-gray-900 flex items-center gap-1">
                     Axum<span className="text-green-600">Market</span>
@@ -208,9 +216,15 @@ export default function Navbar() {
             {/* Drawer Header */}
             <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-green-50/50 to-white">
               <div className="flex items-center gap-2.5">
-                <span className="w-9 h-9 rounded-xl bg-green-600 text-white flex items-center justify-center text-lg shadow-sm">
-                  🐄
-                </span>
+                <div className="relative w-9 h-9 rounded-xl overflow-hidden shadow-sm bg-emerald-800 shrink-0">
+                  <Image
+                    src="/logo.png"
+                    alt="AxumMarket Logo"
+                    fill
+                    sizes="36px"
+                    className="object-cover"
+                  />
+                </div>
                 <div>
                   <div className="text-base font-black text-gray-900 tracking-tight">
                     Axum<span className="text-green-600">Market</span>

@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Search,
   MapPin,
@@ -151,15 +152,27 @@ export default function HomeInteractiveView({
             </div>
           </div>
 
-          {/* Heading */}
-          <div className="space-y-1 text-center sm:text-left">
-            <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-white leading-tight">
-              Buy & Sell Livestock <br className="hidden sm:inline" />
-              <span className="text-green-400">Directly with Farmers</span>
-            </h1>
-            <p className="text-xs sm:text-base text-green-100/90 max-w-xl font-normal">
-              Verified dairy cows, Borana bulls, sheep, and goats. Connect by phone & inspect in daylight.
-            </p>
+          {/* Heading with Brand Logo Emblem */}
+          <div className="flex flex-col sm:flex-row items-center gap-3.5 sm:gap-4 text-center sm:text-left">
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-amber-400/80 shadow-lg shrink-0 bg-emerald-950">
+              <Image
+                src="/logo-emblem.png"
+                alt="AxumMarket Livestock Marketplace Logo"
+                fill
+                sizes="80px"
+                className="object-cover"
+                priority
+              />
+            </div>
+            <div className="space-y-1">
+              <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-white leading-tight">
+                Buy & Sell Livestock <br className="hidden sm:inline" />
+                <span className="text-green-400">Directly with Farmers</span>
+              </h1>
+              <p className="text-xs sm:text-base text-green-100/90 max-w-xl font-normal">
+                Verified dairy cows, Borana bulls, sheep, and goats. Connect by phone & inspect in daylight.
+              </p>
+            </div>
           </div>
 
           {/* 2. Interactive Search & Quick Region Bar */}

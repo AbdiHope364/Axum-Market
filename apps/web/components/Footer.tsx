@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ShieldCheck, Phone, MapPin, Heart } from 'lucide-react';
 
 export default function Footer() {
@@ -9,10 +10,16 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
           {/* Brand Col */}
           <div className="space-y-3 md:col-span-2">
-            <div className="flex items-center gap-2">
-              <span className="w-8 h-8 rounded-lg bg-green-600 flex items-center justify-center text-white text-lg">
-                🐄
-              </span>
+            <div className="flex items-center gap-2.5">
+              <div className="relative w-9 h-9 rounded-xl overflow-hidden shadow-sm bg-emerald-800 shrink-0">
+                <Image
+                  src="/logo.png"
+                  alt="AxumMarket Logo"
+                  fill
+                  sizes="36px"
+                  className="object-cover"
+                />
+              </div>
               <span className="text-xl font-black tracking-tight text-white">
                 Axum<span className="text-green-500">Market</span>
               </span>

@@ -23,6 +23,9 @@ build/
 *.db-journal
 dev.db
 
+# Extensions & Binaries
+*.vsix
+
 # Logs
 npm-debug.log*
 yarn-debug.log*
