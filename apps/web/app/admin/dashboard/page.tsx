@@ -1875,10 +1875,10 @@ export default function AdminDashboardPage() {
                       {inspectListing.seller?.fullName}
                     </div>
                     <div className="flex items-center justify-between text-xs text-green-800 font-mono">
-                      <span>{inspectListing.contactPhone || inspectListing.seller?.phone}</span>
+                      <span>{(inspectListing.contactPhone || inspectListing.seller?.phone || '').replace(/(\d{4})(\d{3})(\d{3,4})/, '$1 $2 $3')}</span>
                       <button
                         onClick={(e) => handleCopyPhone(inspectListing.contactPhone || inspectListing.seller?.phone, e)}
-                        className="px-2 py-0.5 bg-white border border-gray-200 text-gray-700 rounded text-[10px] font-sans font-bold"
+                        className="px-2 py-0.5 bg-white border border-gray-200 text-gray-700 rounded text-[10px] font-sans font-bold active:scale-95 transition"
                       >
                         {copiedPhone === (inspectListing.contactPhone || inspectListing.seller?.phone) ? 'Copied' : 'Copy'}
                       </button>
@@ -1886,10 +1886,10 @@ export default function AdminDashboardPage() {
                     <div className="pt-1">
                       <a
                         href={`tel:${inspectListing.contactPhone || inspectListing.seller?.phone}`}
-                        className="w-full py-1.5 bg-green-700 hover:bg-green-600 text-white rounded-xl text-center text-xs font-bold transition flex items-center justify-center gap-1.5"
+                        className="w-full py-2 bg-green-600 hover:bg-green-700 active:scale-98 text-white rounded-xl text-center text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-xs"
                       >
                         <Phone className="w-3.5 h-3.5" />
-                        <span>Call Seller Directly</span>
+                        <span>Call Seller</span>
                       </a>
                     </div>
                   </div>

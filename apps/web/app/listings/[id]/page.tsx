@@ -200,26 +200,26 @@ export default async function ListingDetailPage({ params }: PageProps) {
           </div>
 
           {/* Seller Profile Card */}
-          <div className="bg-white p-5 sm:p-6 rounded-3xl border border-gray-200 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
+          <div className="bg-white p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl border border-gray-200 shadow-xs space-y-3">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
                 Seller Information
               </span>
-              <span className="text-[11px] bg-green-50 text-green-800 font-bold px-2 py-0.5 rounded-md border border-green-200 flex items-center gap-1">
+              <span className="text-[10px] bg-green-50 text-green-800 font-bold px-2 py-0.5 rounded-md border border-green-200 flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3 text-green-600" />
                 Verified Seller
               </span>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-green-100 text-green-800 font-black text-lg flex items-center justify-center shrink-0">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-green-100 text-green-800 font-bold text-sm flex items-center justify-center shrink-0">
                 {listing.seller.fullName[0]}
               </div>
               <div className="min-w-0">
-                <h4 className="font-bold text-base text-gray-900 truncate">
+                <h4 className="font-bold text-xs sm:text-sm text-gray-900 truncate">
                   {listing.seller.fullName}
                 </h4>
-                <p className="text-xs text-gray-500 flex items-center gap-1">
+                <p className="text-[11px] text-gray-500 flex items-center gap-1">
                   <MapPin className="w-3 h-3 text-gray-400" />
                   {listing.seller.city}, {listing.seller.region}
                 </p>

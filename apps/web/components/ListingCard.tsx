@@ -121,21 +121,28 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
             )}
           </div>
 
-          {/* Location */}
-          <div className="flex items-center gap-1 text-gray-500 text-[9px] sm:text-xs mt-1.5 sm:mt-2">
-            <MapPin className="w-3 h-3 text-gray-400 shrink-0" />
-            <span className="truncate">
-              {listing.city}, {listing.region}
-            </span>
+          {/* Location & Direct Phone Tag */}
+          <div className="flex items-center justify-between gap-1 text-[9px] sm:text-xs text-gray-500 mt-1 sm:mt-1.5">
+            <div className="flex items-center gap-1 min-w-0 truncate">
+              <MapPin className="w-3 h-3 text-gray-400 shrink-0" />
+              <span className="truncate">
+                {listing.city}, {listing.region}
+              </span>
+            </div>
+            {listing.contactPhone && (
+              <span className="font-mono text-[9px] text-gray-500 shrink-0 bg-gray-50 px-1 py-0.2 rounded border border-gray-100 hidden xs:inline-block">
+                📞 {listing.contactPhone.replace(/[^\d+]/g, '').slice(-4)}
+              </span>
+            )}
           </div>
         </div>
 
         {/* Actions (Call Seller direct dial) */}
-        <div className="pt-2 sm:pt-3 mt-1.5 sm:mt-2.5 border-t border-gray-100 flex items-center gap-1 sm:gap-2">
+        <div className="pt-1.5 sm:pt-2.5 mt-1.5 sm:mt-2 border-t border-gray-100 flex items-center gap-1 sm:gap-1.5">
           {!isSold ? (
             <a
               href={`tel:${listing.contactPhone}`}
-              className="flex-1 flex items-center justify-center gap-1 py-1.5 sm:py-2 px-1.5 sm:px-2.5 rounded-lg sm:rounded-xl bg-green-600 hover:bg-green-700 active:scale-98 text-white font-bold text-[11px] sm:text-xs shadow-xs transition"
+              className="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg bg-green-600 hover:bg-green-700 active:scale-95 text-white font-bold text-xs shadow-xs transition"
               title={`Call ${listing.contactPhone}`}
             >
               <Phone className="w-3 h-3 shrink-0" />
@@ -144,7 +151,7 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
           ) : (
             <button
               disabled
-              className="flex-1 py-1.5 sm:py-2 px-2 rounded-lg sm:rounded-xl bg-gray-100 text-gray-400 font-medium text-[10px] sm:text-xs text-center cursor-not-allowed"
+              className="flex-1 py-1.5 px-2 rounded-lg bg-gray-100 text-gray-400 font-medium text-[10px] text-center cursor-not-allowed"
             >
               Sold
             </button>
@@ -152,7 +159,7 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
 
           <Link
             href={`/listings/${listing.id}`}
-            className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-[10px] sm:text-xs transition text-center"
+            className="px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs transition text-center"
           >
             Details
           </Link>
