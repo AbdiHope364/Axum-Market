@@ -677,7 +677,7 @@ export default function AdminDashboardPage() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 pb-24 md:pb-8 space-y-4 sm:space-y-6">
       {/* Toast Notification Floating Banner */}
       {toast && (
         <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-4 duration-300">
@@ -705,34 +705,35 @@ export default function AdminDashboardPage() {
       )}
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-200 pb-5">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-black text-gray-900 flex items-center gap-2">
+      <div className="flex items-center justify-between gap-3 border-b border-gray-200 pb-4 sm:pb-5">
+        <div className="min-w-0">
+          <h1 className="text-lg sm:text-2xl font-black text-gray-900 flex items-center gap-1.5 sm:gap-2 truncate">
             <span>🛡️</span>
-            <span>Platform Governance & Admin</span>
+            <span className="truncate">Platform Governance & Admin</span>
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+          <p className="text-[11px] sm:text-sm text-gray-500 mt-0.5 truncate">
             Real-time management for Ethiopian livestock, verified sellers, and platform health.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <button
             onClick={() => setPostModalOpen(true)}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-green-700 to-emerald-600 hover:from-green-600 hover:to-emerald-500 text-white text-xs font-black shadow-md transition flex items-center gap-1.5 active:scale-95 cursor-pointer"
+            className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-green-700 to-emerald-600 hover:from-green-600 hover:to-emerald-500 text-white text-xs font-black shadow-md transition flex items-center gap-1 sm:gap-1.5 active:scale-95 cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
-            <span>+ Post Livestock</span>
+            <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">+ Post Livestock</span>
+            <span className="sm:hidden">Post</span>
           </button>
           <button
             onClick={() => {
               fetchAdminData();
               showToast('Refreshed latest data! ✓', 'info');
             }}
-            className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition cursor-pointer"
+            className="p-1.5 sm:p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition cursor-pointer"
             title="Refresh"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
         </div>
       </div>
@@ -744,11 +745,11 @@ export default function AdminDashboardPage() {
           <span className="text-green-700 font-semibold hidden sm:inline">⚡ 1-Click Navigation</span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
           {/* 1. Pending Sellers */}
           <button
             onClick={() => setActiveTab('seller_approvals')}
-            className={`text-left p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+            className={`text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
               activeTab === 'seller_approvals'
                 ? 'bg-amber-50 border-amber-400 shadow-md ring-2 ring-amber-400/40'
                 : 'bg-white border-gray-200 hover:border-amber-400 hover:-translate-y-0.5 shadow-sm'
@@ -758,8 +759,8 @@ export default function AdminDashboardPage() {
               <span>Pending Sellers</span>
               <Clock className="w-3.5 h-3.5 text-amber-500" />
             </div>
-            <div className="text-2xl font-black text-amber-600 my-1">{stats.pendingSellersCount}</div>
-            <div className="text-[10px] text-gray-500 flex items-center justify-between w-full">
+            <div className="text-xl sm:text-2xl font-black text-amber-600 my-1">{stats.pendingSellersCount}</div>
+            <div className="text-[9px] sm:text-[10px] text-gray-500 flex items-center justify-between w-full">
               <span>Awaiting review</span>
               <ArrowRight className="w-3 h-3 text-amber-500" />
             </div>
@@ -768,7 +769,7 @@ export default function AdminDashboardPage() {
           {/* 2. Pending Animals */}
           <button
             onClick={() => setActiveTab('moderation')}
-            className={`text-left p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+            className={`text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
               activeTab === 'moderation'
                 ? 'bg-amber-50 border-amber-400 shadow-md ring-2 ring-amber-400/40'
                 : 'bg-white border-gray-200 hover:border-amber-400 hover:-translate-y-0.5 shadow-sm'
@@ -778,8 +779,8 @@ export default function AdminDashboardPage() {
               <span>Pending Animals</span>
               <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
             </div>
-            <div className="text-2xl font-black text-amber-600 my-1">{stats.pendingListings}</div>
-            <div className="text-[10px] text-gray-500 flex items-center justify-between w-full">
+            <div className="text-xl sm:text-2xl font-black text-amber-600 my-1">{stats.pendingListings}</div>
+            <div className="text-[9px] sm:text-[10px] text-gray-500 flex items-center justify-between w-full">
               <span>3-photo review</span>
               <ArrowRight className="w-3 h-3 text-amber-500" />
             </div>
@@ -791,7 +792,7 @@ export default function AdminDashboardPage() {
               setActiveTab('all_listings');
               setListingStatusFilter('ACTIVE');
             }}
-            className={`text-left p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+            className={`text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
               activeTab === 'all_listings' && listingStatusFilter === 'ACTIVE'
                 ? 'bg-green-50 border-green-500 shadow-md ring-2 ring-green-500/40'
                 : 'bg-white border-gray-200 hover:border-green-500 hover:-translate-y-0.5 shadow-sm'
@@ -801,8 +802,8 @@ export default function AdminDashboardPage() {
               <span>Live Animals</span>
               <CheckCircle className="w-3.5 h-3.5 text-green-600" />
             </div>
-            <div className="text-2xl font-black text-green-700 my-1">{stats.activeListings}</div>
-            <div className="text-[10px] text-gray-500 flex items-center justify-between w-full">
+            <div className="text-xl sm:text-2xl font-black text-green-700 my-1">{stats.activeListings}</div>
+            <div className="text-[9px] sm:text-[10px] text-gray-500 flex items-center justify-between w-full">
               <span>Active on site</span>
               <ArrowRight className="w-3 h-3 text-green-600" />
             </div>
@@ -814,7 +815,7 @@ export default function AdminDashboardPage() {
               setActiveTab('all_listings');
               setListingStatusFilter('SOLD');
             }}
-            className={`text-left p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+            className={`text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
               activeTab === 'all_listings' && listingStatusFilter === 'SOLD'
                 ? 'bg-blue-50 border-blue-500 shadow-md ring-2 ring-blue-500/40'
                 : 'bg-white border-gray-200 hover:border-blue-500 hover:-translate-y-0.5 shadow-sm'
@@ -824,8 +825,8 @@ export default function AdminDashboardPage() {
               <span>Sold (የተሸጡ)</span>
               <Sparkles className="w-3.5 h-3.5 text-blue-600" />
             </div>
-            <div className="text-2xl font-black text-blue-700 my-1">{stats.soldListings}</div>
-            <div className="text-[10px] text-gray-500 flex items-center justify-between w-full">
+            <div className="text-xl sm:text-2xl font-black text-blue-700 my-1">{stats.soldListings}</div>
+            <div className="text-[9px] sm:text-[10px] text-gray-500 flex items-center justify-between w-full">
               <span>Completed sales</span>
               <ArrowRight className="w-3 h-3 text-blue-600" />
             </div>
@@ -834,7 +835,7 @@ export default function AdminDashboardPage() {
           {/* 5. Sellers */}
           <button
             onClick={() => setActiveTab('sellers')}
-            className={`text-left p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+            className={`text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
               activeTab === 'sellers'
                 ? 'bg-purple-50 border-purple-500 shadow-md ring-2 ring-purple-500/40'
                 : 'bg-white border-gray-200 hover:border-purple-500 hover:-translate-y-0.5 shadow-sm'
@@ -844,8 +845,8 @@ export default function AdminDashboardPage() {
               <span>All Sellers</span>
               <Users className="w-3.5 h-3.5 text-purple-600" />
             </div>
-            <div className="text-2xl font-black text-purple-700 my-1">{stats.totalSellers}</div>
-            <div className="text-[10px] text-gray-500 flex items-center justify-between w-full">
+            <div className="text-xl sm:text-2xl font-black text-purple-700 my-1">{stats.totalSellers}</div>
+            <div className="text-[9px] sm:text-[10px] text-gray-500 flex items-center justify-between w-full">
               <span>Registered base</span>
               <ArrowRight className="w-3 h-3 text-purple-600" />
             </div>
@@ -854,7 +855,7 @@ export default function AdminDashboardPage() {
           {/* 6. Reports */}
           <button
             onClick={() => setActiveTab('reports')}
-            className={`text-left p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+            className={`text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
               activeTab === 'reports'
                 ? 'bg-red-50 border-red-500 shadow-md ring-2 ring-red-500/40'
                 : 'bg-white border-gray-200 hover:border-red-500 hover:-translate-y-0.5 shadow-sm'
@@ -864,8 +865,8 @@ export default function AdminDashboardPage() {
               <span>Reports</span>
               <Flag className="w-3.5 h-3.5 text-red-600" />
             </div>
-            <div className="text-2xl font-black text-red-600 my-1">{stats.totalReports}</div>
-            <div className="text-[10px] text-gray-500 flex items-center justify-between w-full">
+            <div className="text-xl sm:text-2xl font-black text-red-600 my-1">{stats.totalReports}</div>
+            <div className="text-[9px] sm:text-[10px] text-gray-500 flex items-center justify-between w-full">
               <span>Scam alerts</span>
               <ArrowRight className="w-3 h-3 text-red-600" />
             </div>
@@ -1738,16 +1739,16 @@ export default function AdminDashboardPage() {
       {/* INTERACTIVE INSPECTION LIGHTBOX MODAL */}
       {/* =================================================================== */}
       {inspectListing && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
-          <div className="max-w-4xl w-full bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
-            <div className="p-4 sm:p-5 border-b border-gray-200 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
+          <div className="max-w-4xl w-full bg-white border-t sm:border border-gray-200 rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
+            <div className="p-3.5 sm:p-5 border-b border-gray-200 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <span className="p-1.5 bg-green-100 text-green-800 rounded-lg">
                   <Eye className="w-4 h-4" />
                 </span>
                 <div>
-                  <h3 className="font-black text-gray-900 text-base line-clamp-1">{inspectListing.title}</h3>
-                  <div className="text-xs text-gray-500 flex items-center gap-2">
+                  <h3 className="font-black text-gray-900 text-sm sm:text-base line-clamp-1">{inspectListing.title}</h3>
+                  <div className="text-[11px] sm:text-xs text-gray-500 flex items-center gap-1.5 sm:gap-2">
                     <span>{inspectListing.category?.name}</span>
                     {inspectListing.breed && <span>• {inspectListing.breed.name}</span>}
                     <span>• {inspectListing.gender}</span>
@@ -1763,7 +1764,7 @@ export default function AdminDashboardPage() {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5">
+            <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
               {/* Left: 3-Angle Full Viewer */}
               <div className="lg:col-span-8 space-y-3">
                 <div className="flex items-center gap-2">
@@ -1937,18 +1938,18 @@ export default function AdminDashboardPage() {
       {/* POST LIVESTOCK MODAL */}
       {/* =================================================================== */}
       {postModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-          <div className="max-w-4xl w-full bg-white rounded-3xl p-5 sm:p-7 shadow-2xl my-auto space-y-6">
-            <div className="flex items-center justify-between border-b border-gray-200 pb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-green-100 text-green-800">
-                  <Plus className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-6 overflow-y-auto">
+          <div className="max-w-4xl w-full bg-white border-t sm:border border-gray-200 rounded-t-3xl sm:rounded-3xl p-4 sm:p-7 shadow-2xl my-0 sm:my-auto max-h-[92vh] overflow-y-auto space-y-4 sm:space-y-6">
+            <div className="flex items-center justify-between border-b border-gray-200 pb-3 sm:pb-4">
+              <div className="flex items-center gap-2 sm:gap-2.5">
+                <div className="p-1.5 sm:p-2 rounded-xl bg-green-100 text-green-800">
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div>
-                  <h2 className="text-base sm:text-lg font-black text-gray-900">
+                  <h2 className="text-sm sm:text-lg font-black text-gray-900">
                     Create & Publish Livestock
                   </h2>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-[11px] sm:text-xs text-gray-500">
                     Post directly to the live marketplace with instant verified approval.
                   </p>
                 </div>
@@ -2362,6 +2363,83 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Mobile Bottom Navigation Bar (Fixed for phone thumb reach) */}
+      <nav aria-label="Mobile Navigation" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 border-t border-gray-200 backdrop-blur-xl px-1.5 py-1.5 flex items-center justify-around shadow-2xl">
+        {[
+          {
+            id: 'seller_approvals',
+            label: 'Sellers',
+            icon: Users,
+            count: stats.pendingSellersCount,
+            badgeColor: 'bg-amber-500 text-white',
+          },
+          {
+            id: 'moderation',
+            label: 'Approvals',
+            icon: Clock,
+            count: stats.pendingListings,
+            badgeColor: 'bg-amber-500 text-white',
+          },
+          {
+            id: 'all_listings',
+            label: 'Animals',
+            icon: Layers,
+            count: allListings.length,
+            badgeColor: 'bg-gray-200 text-gray-700',
+          },
+          {
+            id: 'categories',
+            label: 'Breeds',
+            icon: Tag,
+            count: categories.length,
+            badgeColor: 'bg-gray-200 text-gray-700',
+          },
+          {
+            id: 'sellers',
+            label: 'Directory',
+            icon: UserCheck,
+            count: stats.totalSellers,
+            badgeColor: 'bg-gray-200 text-gray-700',
+          },
+          {
+            id: 'reports',
+            label: 'Reports',
+            icon: Flag,
+            count: stats.totalReports,
+            badgeColor: 'bg-red-500 text-white',
+          },
+        ].map((item) => {
+          const isActive = activeTab === item.id;
+          const IconComponent = item.icon;
+          return (
+            <button
+              key={item.id}
+              onClick={() => {
+                setActiveTab(item.id as any);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className={`relative flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all duration-150 min-w-[50px] cursor-pointer ${
+                isActive
+                  ? 'text-green-700 bg-green-50 font-black'
+                  : 'text-gray-500 hover:text-gray-900 active:scale-95'
+              }`}
+            >
+              <div className="relative">
+                <IconComponent className={`w-5 h-5 transition-transform ${isActive ? 'scale-110' : ''}`} />
+                {item.count !== undefined && item.count > 0 && (
+                  <span
+                    className={`absolute -top-1.5 -right-2.5 min-w-[16px] h-4 px-1 rounded-full text-[9px] font-black flex items-center justify-center shadow-sm ${item.badgeColor}`}
+                  >
+                    {item.count > 99 ? '99+' : item.count}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] mt-0.5 tracking-tight font-medium">{item.label}</span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 }
