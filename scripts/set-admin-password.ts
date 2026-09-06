@@ -1,7 +1,7 @@
 import { prisma } from '../packages/database/src/index';
 import bcrypt from 'bcryptjs';
-import fs from 'node:fs';
-import path from 'node:path';
+import fs from 'fs';
+import path from 'path';
 
 async function main() {
   const newPassword = process.argv[2] || process.env.NEW_ADMIN_PASSWORD;
