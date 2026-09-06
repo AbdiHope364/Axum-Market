@@ -42,7 +42,7 @@ export default async function ListingDetailPage({ params }: PageProps) {
   const isSold = listing.status === 'SOLD';
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div className="max-w-6xl mx-auto px-2.5 sm:px-6 lg:px-8 py-3 sm:py-6 space-y-3 sm:space-y-6">
       {/* Back Button */}
       <div className="flex items-center justify-between">
         <Link
@@ -60,79 +60,79 @@ export default async function ListingDetailPage({ params }: PageProps) {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8 items-start">
         {/* Left 2 Cols: 3-Photo Gallery & Specs */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-3 sm:space-y-6">
           {/* 3-view Image Gallery */}
-          <div className="bg-white p-3 sm:p-5 rounded-3xl border border-gray-200 shadow-sm">
+          <div className="bg-white p-2.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-gray-200 shadow-xs">
             <ImageGallery images={listing.images} title={listing.title} />
           </div>
 
           {/* Title & Price Header (Mobile only) */}
-          <div className="lg:hidden bg-white p-5 rounded-2xl border border-gray-200 space-y-3">
-            <div className="flex items-center gap-2 text-xs">
-              <span className="bg-green-100 text-green-800 font-semibold px-2.5 py-0.5 rounded-full">
+          <div className="lg:hidden bg-white p-3.5 sm:p-5 rounded-2xl border border-gray-200 space-y-2">
+            <div className="flex items-center gap-1.5 text-xs">
+              <span className="bg-green-100 text-green-800 font-semibold px-2 py-0.5 rounded-md">
                 {listing.category.name}
               </span>
               {listing.breed && (
-                <span className="bg-gray-100 text-gray-800 font-semibold px-2.5 py-0.5 rounded-full">
+                <span className="bg-gray-100 text-gray-800 font-semibold px-2 py-0.5 rounded-md">
                   {listing.breed.name}
                 </span>
               )}
             </div>
 
-            <h1 className="text-xl sm:text-2xl font-black text-gray-900 leading-tight">
+            <h1 className="text-lg sm:text-2xl font-black text-gray-900 leading-tight">
               {listing.title}
             </h1>
 
-            <div className="text-2xl font-black text-green-700">
+            <div className="text-xl sm:text-2xl font-black text-green-700">
               {formatPriceETB(listing.price)}
             </div>
           </div>
 
           {/* Detailed Attributes Grid */}
-          <div className="bg-white p-5 sm:p-6 rounded-3xl border border-gray-200 space-y-4">
-            <h2 className="text-base font-bold text-gray-900 border-b border-gray-100 pb-2">
+          <div className="bg-white p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl border border-gray-200 space-y-3 sm:space-y-4">
+            <h2 className="text-sm sm:text-base font-bold text-gray-900 border-b border-gray-100 pb-2">
               Livestock Details & Specifications
             </h2>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs sm:text-sm">
-              <div className="p-3 bg-gray-50 rounded-xl">
-                <span className="text-gray-500 block text-xs">Animal Category</span>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm">
+              <div className="p-2 sm:p-3 bg-gray-50 rounded-xl">
+                <span className="text-gray-500 block text-[11px]">Animal Category</span>
                 <span className="font-bold text-gray-900">{listing.category.name}</span>
               </div>
 
-              <div className="p-3 bg-gray-50 rounded-xl">
-                <span className="text-gray-500 block text-xs">Breed</span>
+              <div className="p-2 sm:p-3 bg-gray-50 rounded-xl">
+                <span className="text-gray-500 block text-[11px]">Breed</span>
                 <span className="font-bold text-gray-900">{listing.breed?.name || 'Cross / Local'}</span>
               </div>
 
-              <div className="p-3 bg-gray-50 rounded-xl">
-                <span className="text-gray-500 block text-xs">Gender</span>
+              <div className="p-2 sm:p-3 bg-gray-50 rounded-xl">
+                <span className="text-gray-500 block text-[11px]">Gender</span>
                 <span className="font-bold text-gray-900">
                   {listing.gender === 'FEMALE' ? 'Female' : 'Male'}
                 </span>
               </div>
 
-              <div className="p-3 bg-gray-50 rounded-xl">
-                <span className="text-gray-500 block text-xs">Age</span>
+              <div className="p-2 sm:p-3 bg-gray-50 rounded-xl">
+                <span className="text-gray-500 block text-[11px]">Age</span>
                 <span className="font-bold text-gray-900">{listing.age}</span>
               </div>
 
               {listing.weightKg && (
-                <div className="p-3 bg-amber-50/90 border border-amber-200 rounded-xl">
-                  <span className="text-amber-800 block text-xs font-semibold">Live Weight / ክብደት</span>
-                  <span className="font-black text-amber-950 text-sm sm:text-base flex items-center gap-1 mt-0.5">
+                <div className="p-2 sm:p-3 bg-amber-50/90 border border-amber-200 rounded-xl">
+                  <span className="text-amber-800 block text-[11px] font-semibold">Live Weight / ክብደት</span>
+                  <span className="font-black text-amber-950 text-xs sm:text-base flex items-center gap-1 mt-0.5">
                     <span>⚖️</span>
-                    <span>{listing.weightKg} kg (ኪ.ግ)</span>
+                    <span>{listing.weightKg} kg</span>
                   </span>
                 </div>
               )}
 
-              <div className={`p-3 bg-gray-50 rounded-xl ${listing.weightKg ? 'sm:col-span-1' : 'sm:col-span-2'}`}>
-                <span className="text-gray-500 block text-xs">Inspection Location</span>
-                <span className="font-bold text-gray-900 flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-green-600" />
+              <div className={`p-2 sm:p-3 bg-gray-50 rounded-xl ${listing.weightKg ? 'sm:col-span-1' : 'sm:col-span-2'}`}>
+                <span className="text-gray-500 block text-[11px]">Inspection Location</span>
+                <span className="font-bold text-gray-900 flex items-center gap-1 text-xs">
+                  <MapPin className="w-3.5 h-3.5 text-green-600 shrink-0" />
                   {listing.city}, {listing.region} {listing.area ? `(${listing.area})` : ''}
                 </span>
               </div>

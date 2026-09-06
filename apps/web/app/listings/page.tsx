@@ -215,30 +215,30 @@ function ListingsContent() {
   ].filter(Boolean).length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-3 sm:py-6 space-y-3 sm:space-y-5">
       {/* Top Search & Filter Bar for Mobile */}
-      <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center justify-between">
         <div className="relative flex-1">
-          <Search className="w-5 h-5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
             placeholder="Search by breed, cow, bull, location..."
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm sm:text-base outline-none focus:ring-2 focus:ring-green-500 shadow-sm"
+            className="w-full pl-9 pr-3 py-2 bg-white border border-gray-300 rounded-xl text-xs sm:text-sm outline-none focus:ring-2 focus:ring-green-500 shadow-xs"
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <button
             onClick={() => setMobileFiltersOpen(true)}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 shadow-sm transition"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-2 bg-white border border-gray-300 rounded-xl text-xs sm:text-sm font-semibold text-gray-700 hover:bg-gray-50 shadow-xs transition"
           >
-            <SlidersHorizontal className="w-4 h-4 text-green-600" />
+            <SlidersHorizontal className="w-3.5 h-3.5 text-green-600" />
             <span>Filters</span>
             {activeFilterCount > 0 && (
-              <span className="w-5 h-5 rounded-full bg-green-600 text-white text-xs flex items-center justify-center">
+              <span className="w-4 h-4 rounded-full bg-green-600 text-white text-[10px] flex items-center justify-center">
                 {activeFilterCount}
               </span>
             )}
@@ -246,7 +246,7 @@ function ListingsContent() {
 
           <button
             onClick={() => handleApplyFilters()}
-            className="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-sm shadow-sm transition"
+            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-xs transition"
           >
             Apply
           </button>
@@ -551,20 +551,20 @@ function ListingsContent() {
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div
                   key={i}
-                  className="bg-white rounded-2xl border border-gray-200 aspect-[3/4] animate-pulse p-4 space-y-3"
+                  className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 aspect-[3/4] animate-pulse p-2.5 sm:p-4 space-y-2 sm:space-y-3"
                 >
-                  <div className="aspect-[4/3] bg-gray-200 rounded-xl" />
-                  <div className="h-4 bg-gray-200 rounded w-1/2" />
-                  <div className="h-6 bg-gray-200 rounded w-3/4" />
+                  <div className="aspect-[4/3] bg-gray-200 rounded-lg sm:rounded-xl" />
+                  <div className="h-3.5 sm:h-4 bg-gray-200 rounded w-1/2" />
+                  <div className="h-5 sm:h-6 bg-gray-200 rounded w-3/4" />
                 </div>
               ))}
             </div>
           ) : listings.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
               {listings.map((item) => (
                 <ListingCard key={item.id} listing={item} />
               ))}

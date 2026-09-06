@@ -81,23 +81,23 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200/80 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 sm:h-16">
             {/* Logo & Brand */}
             <div className="flex items-center gap-3">
-              <Link href="/" className="flex items-center gap-2.5 group">
-                <div className="relative w-10 h-10 rounded-2xl overflow-hidden shadow-md ring-1 ring-black/5 group-hover:scale-105 transition-transform bg-emerald-800 shrink-0">
+              <Link href="/" className="flex items-center gap-2 group">
+                <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl overflow-hidden shadow-sm ring-1 ring-black/5 group-hover:scale-105 transition-transform bg-emerald-800 shrink-0">
                   <Image
                     src="/logo.png"
                     alt="AxumMarket Logo"
                     fill
-                    sizes="40px"
+                    sizes="36px"
                     className="object-cover"
                     priority
                   />
                 </div>
                 <div>
-                  <span className="text-xl font-black tracking-tight text-gray-900 flex items-center gap-1">
+                  <span className="text-lg sm:text-xl font-black tracking-tight text-gray-900 flex items-center gap-1">
                     Axum<span className="text-green-600">Market</span>
                   </span>
                   <span className="hidden sm:block text-[10px] uppercase tracking-wider font-bold text-gray-400 -mt-1">
@@ -170,20 +170,20 @@ export default function Navbar() {
             </nav>
 
             {/* Mobile Actions: Sell CTA + Comfortable Touch Toggle */}
-            <div className="flex md:hidden items-center gap-2">
+            <div className="flex md:hidden items-center gap-1.5">
               <Link
                 href="/seller/create"
-                className="inline-flex items-center gap-1 px-3.5 py-2 rounded-xl bg-green-600 hover:bg-green-700 text-white text-xs font-bold shadow-xs active:scale-95 transition"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-xs font-bold shadow-xs active:scale-95 transition"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
                 Sell
               </Link>
 
-              {/* Large, comfortable thumb-friendly toggle button (44x44px minimum touch target) */}
+              {/* Thumb-friendly toggle button */}
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={`w-11 h-11 flex items-center justify-center rounded-2xl border transition-all active:scale-90 focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                className={`w-9 h-9 flex items-center justify-center rounded-xl border transition-all active:scale-90 focus:outline-none focus:ring-2 focus:ring-green-500 ${
                   mobileMenuOpen
                     ? 'bg-green-50 border-green-300 text-green-700 shadow-inner'
                     : 'bg-gray-100/90 hover:bg-gray-200 border-gray-200/80 text-gray-800 shadow-xs'
@@ -192,9 +192,9 @@ export default function Navbar() {
                 aria-label={mobileMenuOpen ? 'Close navigation drawer' : 'Open navigation drawer'}
               >
                 {mobileMenuOpen ? (
-                  <X className="w-5 h-5 transition-transform duration-200 rotate-90 scale-110" />
+                  <X className="w-4 h-4 transition-transform duration-200 rotate-90 scale-110" />
                 ) : (
-                  <Menu className="w-5 h-5 transition-transform duration-200" />
+                  <Menu className="w-4 h-4 transition-transform duration-200" />
                 )}
               </button>
             </div>
