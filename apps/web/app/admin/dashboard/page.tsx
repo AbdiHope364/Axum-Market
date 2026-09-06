@@ -316,10 +316,11 @@ export default function AdminDashboardPage() {
       });
 
       const data = await res.json();
-      if (res.ok && data.url) {
-        if (angle === 'FRONT') setPostFrontUrl(data.url);
-        if (angle === 'LEFT') setPostLeftUrl(data.url);
-        if (angle === 'RIGHT') setPostRightUrl(data.url);
+      const uploadedUrl = data.imageUrl || data.url;
+      if (res.ok && uploadedUrl) {
+        if (angle === 'FRONT') setPostFrontUrl(uploadedUrl);
+        if (angle === 'LEFT') setPostLeftUrl(uploadedUrl);
+        if (angle === 'RIGHT') setPostRightUrl(uploadedUrl);
         showToast(`${angle} photo uploaded successfully! ✓`, 'success');
       } else {
         showToast(data.error || 'Upload failed', 'error');

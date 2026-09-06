@@ -60,6 +60,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
+      url: publicUrl,
       imageUrl: publicUrl,
       imageType,
     });
