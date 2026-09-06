@@ -8,6 +8,26 @@ if (typeof window !== 'undefined') {
     'unhandledrejection',
     (event: PromiseRejectionEvent) => {
       const reason = event.reason;
+      // Handle Next.js ChunkLoadError after rebuild or file updates
+      const isChunkLoadError =
+        reason?.name === 'ChunkLoadError' ||
+        (typeof reason?.message === 'string' &&
+          (reason.message.includes('Loading chunk') ||
+            reason.message.includes('ChunkLoadError') ||
+            reason.message.includes('Failed to fetch dynamically imported module')));
+
+      if (isChunkLoadError) {
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        const lastReload = sessionStorage.getItem('admin_chunk_reload_ts');
+        const now = Date.now();
+        if (!lastReload || now - parseInt(lastReload, 10) > 10000) {
+          sessionStorage.setItem('admin_chunk_reload_ts', now.toString());
+          window.location.reload();
+        }
+        return;
+      }
+
       if (
         reason instanceof Event ||
         (reason &&
@@ -22,6 +42,28 @@ if (typeof window !== 'undefined') {
           type: (reason as any)?.type,
           target: (reason as any)?.target,
         });
+      }
+    },
+    true
+  );
+
+  window.addEventListener(
+    'error',
+    (event: ErrorEvent) => {
+      const isChunkLoad =
+        event.error?.name === 'ChunkLoadError' ||
+        (typeof event.message === 'string' &&
+          (event.message.includes('Loading chunk') || event.message.includes('ChunkLoadError')));
+
+      if (isChunkLoad) {
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        const lastReload = sessionStorage.getItem('admin_chunk_reload_ts');
+        const now = Date.now();
+        if (!lastReload || now - parseInt(lastReload, 10) > 10000) {
+          sessionStorage.setItem('admin_chunk_reload_ts', now.toString());
+          window.location.reload();
+        }
       }
     },
     true
