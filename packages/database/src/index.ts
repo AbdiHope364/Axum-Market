@@ -8,22 +8,32 @@ declare global {
 }
 
 function resolveDbPath(): string {
+  // First, search upwards from process.cwd() for the canonical repo database: packages/database/prisma/dev.db
+  let curr = process.cwd();
+  for (let i = 0; i < 6; i++) {
+    const canonical = path.join(curr, 'packages/database/prisma/dev.db');
+    if (fs.existsSync(canonical)) {
+      return canonical;
+    }
+    const parent = path.dirname(curr);
+    if (parent === curr) break;
+    curr = parent;
+  }
+
+  // Second, check DATABASE_URL if explicitly pointing to an existing file
   if (process.env.DATABASE_URL?.startsWith('file:')) {
     const rawPath = process.env.DATABASE_URL.replace('file:', '');
     if (fs.existsSync(rawPath)) {
-      return rawPath;
+      return path.resolve(rawPath);
     }
   }
 
-  let curr = process.cwd();
+  // Fallback: check prisma/dev.db in parent chain
+  curr = process.cwd();
   for (let i = 0; i < 6; i++) {
-    const candidate1 = path.join(curr, 'packages/database/prisma/dev.db');
-    if (fs.existsSync(candidate1)) {
-      return candidate1;
-    }
-    const candidate2 = path.join(curr, 'prisma/dev.db');
-    if (fs.existsSync(candidate2)) {
-      return candidate2;
+    const candidate = path.join(curr, 'prisma/dev.db');
+    if (fs.existsSync(candidate)) {
+      return candidate;
     }
     const parent = path.dirname(curr);
     if (parent === curr) break;
