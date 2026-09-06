@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   ShieldAlert,
+  ShieldCheck,
   CheckCircle,
   XCircle,
   Clock,
@@ -20,6 +21,29 @@ import {
   Phone,
   Mail,
   Calendar,
+  Search,
+  Plus,
+  Trash2,
+  Tag,
+  DollarSign,
+  Sparkles,
+  TrendingUp,
+  RefreshCw,
+  Edit,
+  Sliders,
+  Check,
+  CheckCircle2,
+  Upload,
+  Camera,
+  Image as ImageIcon,
+  Copy,
+  MessageCircle,
+  Maximize2,
+  ArrowRight,
+  Filter,
+  AlertCircle,
+  Eye,
+  X,
 } from 'lucide-react';
 import { formatPriceETB } from '@/lib/constants';
 
@@ -39,6 +63,7 @@ interface PendingListing {
   id: string;
   title: string;
   price: number;
+  weightKg?: number | null;
   age: string;
   gender: string;
   region: string;
@@ -49,6 +74,24 @@ interface PendingListing {
   category: { name: string };
   breed?: { name: string } | null;
   images: { imageUrl: string; imageType: string }[];
+}
+
+interface InventoryListing {
+  id: string;
+  title: string;
+  price: number;
+  weightKg?: number | null;
+  status: string;
+  age: string;
+  gender: string;
+  region: string;
+  city: string;
+  contactPhone: string;
+  createdAt: string;
+  category: { id: string; name: string; icon?: string | null };
+  breed?: { id: string; name: string } | null;
+  seller: { id: string; fullName: string; phone: string; email: string };
+  images: { id: string; imageUrl: string; imageType: string }[];
 }
 
 interface ReportItem {
@@ -72,29 +115,156 @@ interface SellerItem {
   fullName: string;
   email: string;
   phone: string;
-  status: string; // ACTIVE, SUSPENDED, REJECTED
+  role: string;
+  status: string;
   region?: string | null;
   city?: string | null;
   createdAt: string;
   _count: { listings: number };
 }
 
+interface CategoryItem {
+  id: string;
+  name: string;
+  slug: string;
+  icon?: string | null;
+  status: string;
+  breeds: { id: string; name: string; status: string }[];
+  _count: { listings: number };
+}
+
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+
+  // Dashboard Stats
   const [stats, setStats] = useState({
     totalSellers: 0,
     pendingSellersCount: 0,
     activeListings: 0,
     pendingListings: 0,
+    soldListings: 0,
     totalReports: 0,
+    totalInventoryValueETB: 0,
   });
   const [pendingSellers, setPendingSellers] = useState<PendingSeller[]>([]);
   const [pendingItems, setPendingItems] = useState<PendingListing[]>([]);
   const [reports, setReports] = useState<ReportItem[]>([]);
   const [sellers, setSellers] = useState<SellerItem[]>([]);
-  const [activeTab, setActiveTab] = useState<'seller_approvals' | 'moderation' | 'reports' | 'sellers'>('seller_approvals');
+  const [allListings, setAllListings] = useState<InventoryListing[]>([]);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+
+  // Navigation & Search State
+  const [activeTab, setActiveTab] = useState<
+    'seller_approvals' | 'moderation' | 'all_listings' | 'categories' | 'sellers' | 'reports'
+  >('seller_approvals');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [listingSearchQuery, setListingSearchQuery] = useState('');
+  const [listingStatusFilter, setListingStatusFilter] = useState('ALL');
+  const [listingCategoryFilter, setListingCategoryFilter] = useState('ALL');
+  const [sellerSearchQuery, setSellerSearchQuery] = useState('');
+
+  // Toast System
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast((cur) => (cur?.message === message ? null : cur));
+    }, 3500);
+  };
+
+  // Clipboard Phone Copy
+  const [copiedPhone, setCopiedPhone] = useState<string | null>(null);
+  const handleCopyPhone = (phone: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    navigator.clipboard.writeText(phone);
+    setCopiedPhone(phone);
+    showToast(`Copied ${phone} to clipboard!`, 'info');
+    setTimeout(() => {
+      setCopiedPhone((cur) => (cur === phone ? null : cur));
+    }, 2000);
+  };
+
+  // Inline Price Editing
+  const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
+  const [editingPriceValue, setEditingPriceValue] = useState<string>('');
+
+  const handleStartEditPrice = (listing: InventoryListing, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setEditingPriceId(listing.id);
+    setEditingPriceValue(listing.price.toString());
+  };
+
+  const handleSaveInlinePrice = async (listingId: string, e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const newPrice = parseFloat(editingPriceValue);
+    if (isNaN(newPrice) || newPrice <= 0) {
+      showToast('Please enter a valid price amount in ETB', 'error');
+      return;
+    }
+    setActionLoading(listingId);
+    try {
+      const res = await fetch(`/api/listings/${listingId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ price: newPrice }),
+      });
+      if (res.ok) {
+        setAllListings((prev) =>
+          prev.map((l) => (l.id === listingId ? { ...l, price: newPrice } : l))
+        );
+        setEditingPriceId(null);
+        showToast(`Price updated to ${formatPriceETB(newPrice)}! ✓`, 'success');
+        fetchAdminData();
+      } else {
+        showToast('Failed to update price', 'error');
+      }
+    } catch {
+      showToast('Network error updating price', 'error');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // Image Lightbox / Full Inspection Modal
+  const [inspectListing, setInspectListing] = useState<any | null>(null);
+  const [inspectAngle, setInspectAngle] = useState<'FRONT' | 'LEFT' | 'RIGHT'>('FRONT');
+
+  const openInspectionModal = (listing: any, initialAngle: 'FRONT' | 'LEFT' | 'RIGHT' = 'FRONT') => {
+    setInspectListing(listing);
+    setInspectAngle(initialAngle);
+  };
+
+  // New Category & Breed Modal / Form State
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryIcon, setNewCategoryIcon] = useState('🐄');
+  const [newBreedName, setNewBreedName] = useState('');
+  const [selectedCategoryIdForBreed, setSelectedCategoryIdForBreed] = useState('');
+  const [categoryFormOpen, setCategoryFormOpen] = useState(false);
+
+  // Admin Create Livestock State
+  const [postModalOpen, setPostModalOpen] = useState(false);
+  const [postSellerId, setPostSellerId] = useState('self');
+  const [postCategoryId, setPostCategoryId] = useState('');
+  const [postBreedId, setPostBreedId] = useState('');
+  const [postTitle, setPostTitle] = useState('');
+  const [postDescription, setPostDescription] = useState('');
+  const [postPrice, setPostPrice] = useState('');
+  const [postWeightKg, setPostWeightKg] = useState('');
+  const [postAge, setPostAge] = useState('3.5 years');
+  const [postGender, setPostGender] = useState<'FEMALE' | 'MALE'>('FEMALE');
+  const [postRegion, setPostRegion] = useState('Oromia');
+  const [postCity, setPostCity] = useState('Sululta');
+  const [postArea, setPostArea] = useState('');
+  const [postContactPhone, setPostContactPhone] = useState('+251911000000');
+  const [postStatus, setPostStatus] = useState<'ACTIVE' | 'PENDING'>('ACTIVE');
+  const [postFrontUrl, setPostFrontUrl] = useState('');
+  const [postLeftUrl, setPostLeftUrl] = useState('');
+  const [postRightUrl, setPostRightUrl] = useState('');
+  const [uploadingAngle, setUploadingAngle] = useState<string | null>(null);
+  const [postFormError, setPostFormError] = useState('');
+  const [postFormSuccess, setPostFormSuccess] = useState('');
+  const [postSubmitting, setPostSubmitting] = useState(false);
 
   const fetchAdminData = useCallback(async () => {
     try {
@@ -110,17 +280,128 @@ export default function AdminDashboardPage() {
         setPendingItems(data.pendingItems || []);
         setReports(data.reports || []);
         setSellers(data.sellers || []);
+        setAllListings(data.allListings || []);
+        setCategories(data.categories || []);
+        if (data.categories?.length > 0) {
+          if (!selectedCategoryIdForBreed) {
+            setSelectedCategoryIdForBreed(data.categories[0].id);
+          }
+          if (!postCategoryId) {
+            setPostCategoryId(data.categories[0].id);
+          }
+        }
       }
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }, [router, stats]);
+  }, [router, stats, selectedCategoryIdForBreed, postCategoryId]);
 
   useEffect(() => {
     fetchAdminData();
   }, [fetchAdminData]);
+
+  // Photo Upload Handler
+  const handleUploadPhoto = async (file: File, angle: 'FRONT' | 'LEFT' | 'RIGHT') => {
+    setUploadingAngle(angle);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('imageType', angle);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok && data.url) {
+        if (angle === 'FRONT') setPostFrontUrl(data.url);
+        if (angle === 'LEFT') setPostLeftUrl(data.url);
+        if (angle === 'RIGHT') setPostRightUrl(data.url);
+        showToast(`${angle} photo uploaded successfully! ✓`, 'success');
+      } else {
+        showToast(data.error || 'Upload failed', 'error');
+      }
+    } catch {
+      showToast('Network error during photo upload', 'error');
+    } finally {
+      setUploadingAngle(null);
+    }
+  };
+
+  // Post Livestock Handler
+  const handlePostLivestock = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPostFormError('');
+    setPostFormSuccess('');
+
+    if (!postTitle.trim() || !postPrice.trim() || !postCategoryId) {
+      setPostFormError('Please fill title, price and select category.');
+      return;
+    }
+
+    if (!postFrontUrl || !postLeftUrl || !postRightUrl) {
+      setPostFormError('All 3 required photo angles (Front, Left, Right) must be provided.');
+      return;
+    }
+
+    setPostSubmitting(true);
+    try {
+      const res = await fetch('/api/listings/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: postTitle.trim(),
+          description: postDescription.trim() || 'Prime verified livestock from AxumMarket.',
+          price: postPrice,
+          weightKg: postWeightKg.trim() || null,
+          age: postAge.trim(),
+          gender: postGender,
+          categoryId: postCategoryId,
+          breedId: postBreedId || null,
+          region: postRegion,
+          city: postCity,
+          area: postArea.trim() || null,
+          contactPhone: postContactPhone.trim(),
+          sellerId: postSellerId === 'self' ? null : postSellerId,
+          status: postStatus,
+          images: [
+            { imageType: 'FRONT', imageUrl: postFrontUrl },
+            { imageType: 'LEFT', imageUrl: postLeftUrl },
+            { imageType: 'RIGHT', imageUrl: postRightUrl },
+          ],
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setPostFormError(data.error || 'Failed to publish animal.');
+        setPostSubmitting(false);
+        return;
+      }
+
+      setPostFormSuccess('Livestock published successfully to AxumMarket!');
+      showToast('Livestock published successfully! ✓', 'success');
+      setPostSubmitting(false);
+      fetchAdminData();
+      setTimeout(() => {
+        setPostModalOpen(false);
+        setPostFormSuccess('');
+        setPostTitle('');
+        setPostDescription('');
+        setPostPrice('');
+        setPostWeightKg('');
+        setPostFrontUrl('');
+        setPostLeftUrl('');
+        setPostRightUrl('');
+      }, 1000);
+    } catch {
+      setPostFormError('Network error while creating listing.');
+      setPostSubmitting(false);
+    }
+  };
 
   // Seller Approval Handler
   const handleSellerApproval = async (sellerId: string, action: 'APPROVE' | 'REJECT') => {
@@ -146,6 +427,7 @@ export default function AdminDashboardPage() {
               fullName: approvedSeller.fullName,
               email: approvedSeller.email,
               phone: approvedSeller.phone,
+              role: 'SELLER',
               status: 'ACTIVE',
               region: approvedSeller.region,
               city: approvedSeller.city,
@@ -155,9 +437,14 @@ export default function AdminDashboardPage() {
             ...prev,
           ]);
         }
+        showToast(
+          action === 'APPROVE' ? 'Seller approved & activated! ✓' : 'Seller application rejected',
+          action === 'APPROVE' ? 'success' : 'info'
+        );
       }
     } catch (err) {
       console.error(err);
+      showToast('Action failed', 'error');
     } finally {
       setActionLoading(null);
     }
@@ -174,14 +461,76 @@ export default function AdminDashboardPage() {
       });
       if (res.ok) {
         setPendingItems((prev) => prev.filter((item) => item.id !== listingId));
+        if (inspectListing?.id === listingId) {
+          setInspectListing(null);
+        }
         setStats((prev) => ({
           ...prev,
           pendingListings: Math.max(0, prev.pendingListings - 1),
           activeListings: action === 'APPROVE' ? prev.activeListings + 1 : prev.activeListings,
         }));
+        showToast(
+          action === 'APPROVE' ? 'Listing approved & published live! ✓' : 'Listing rejected',
+          action === 'APPROVE' ? 'success' : 'info'
+        );
+        fetchAdminData();
       }
     } catch (err) {
       console.error(err);
+      showToast('Moderation action failed', 'error');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // Force Update Listing Status
+  const handleUpdateListingStatus = async (listingId: string, newStatus: string) => {
+    setActionLoading(listingId);
+    try {
+      const res = await fetch(`/api/listings/${listingId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (res.ok) {
+        setAllListings((prev) =>
+          prev.map((l) => (l.id === listingId ? { ...l, status: newStatus } : l))
+        );
+        if (inspectListing?.id === listingId) {
+          setInspectListing((cur: any) => (cur ? { ...cur, status: newStatus } : null));
+        }
+        showToast(`Listing status updated to ${newStatus}! ✓`, 'success');
+        fetchAdminData();
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to update status', 'error');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // Delete Listing
+  const handleDeleteListing = async (listingId: string) => {
+    if (!confirm('Are you sure you want to permanently delete this listing? This action cannot be undone.')) {
+      return;
+    }
+    setActionLoading(listingId);
+    try {
+      const res = await fetch(`/api/listings/${listingId}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setAllListings((prev) => prev.filter((l) => l.id !== listingId));
+        if (inspectListing?.id === listingId) {
+          setInspectListing(null);
+        }
+        showToast('Listing deleted successfully', 'info');
+        fetchAdminData();
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to delete listing', 'error');
     } finally {
       setActionLoading(null);
     }
@@ -201,234 +550,447 @@ export default function AdminDashboardPage() {
         setSellers((prev) =>
           prev.map((s) => (s.id === sellerId ? { ...s, status: nextStatus } : s))
         );
+        showToast(`Seller status updated to ${nextStatus}! ✓`, 'success');
+        fetchAdminData();
       }
     } catch (err) {
       console.error(err);
+      showToast('Failed to update seller status', 'error');
     } finally {
       setActionLoading(null);
     }
   };
 
+  // Category & Breed Actions
+  const handleCreateCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCategoryName.trim()) return;
+    try {
+      const res = await fetch('/api/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newCategoryName, icon: newCategoryIcon }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCategories((prev) => [...prev, data.category]);
+        setNewCategoryName('');
+        setCategoryFormOpen(false);
+        showToast('New livestock category created! ✓', 'success');
+      } else {
+        showToast(data.error || 'Failed to create category', 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Network error creating category', 'error');
+    }
+  };
+
+  const handleCreateBreed = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newBreedName.trim() || !selectedCategoryIdForBreed) return;
+    try {
+      const res = await fetch('/api/breeds', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoryId: selectedCategoryIdForBreed, name: newBreedName }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCategories((prev) =>
+          prev.map((c) =>
+            c.id === selectedCategoryIdForBreed
+              ? { ...c, breeds: [...c.breeds, data.breed] }
+              : c
+          )
+        );
+        setNewBreedName('');
+        showToast('New breed registered! ✓', 'success');
+      } else {
+        showToast(data.error || 'Failed to create breed', 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Network error creating breed', 'error');
+    }
+  };
+
+  const handleDeleteBreed = async (breedId: string, categoryId: string) => {
+    if (!confirm('Are you sure you want to delete this breed?')) return;
+    try {
+      const res = await fetch(`/api/breeds?id=${breedId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setCategories((prev) =>
+          prev.map((c) =>
+            c.id === categoryId
+              ? { ...c, breeds: c.breeds.filter((b) => b.id !== breedId) }
+              : c
+          )
+        );
+        showToast('Breed removed', 'info');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to delete breed', 'error');
+    }
+  };
+
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 py-16 text-center text-gray-500">
-        Loading Admin Dashboard...
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center space-y-3">
+          <RefreshCw className="w-8 h-8 animate-spin text-green-600 mx-auto" />
+          <p className="text-sm font-semibold text-gray-500">Loading admin operations center...</p>
+        </div>
       </div>
     );
   }
 
+  // Filtered inventory & sellers
+  const filteredInventoryListings = allListings.filter((l) => {
+    if (listingStatusFilter !== 'ALL' && l.status !== listingStatusFilter) return false;
+    if (listingCategoryFilter !== 'ALL' && l.category?.id !== listingCategoryFilter) return false;
+    if (listingSearchQuery.trim()) {
+      const q = listingSearchQuery.toLowerCase();
+      const matchTitle = l.title.toLowerCase().includes(q);
+      const matchSeller = l.seller?.fullName?.toLowerCase().includes(q);
+      const matchPhone = l.contactPhone?.includes(q) || l.seller?.phone?.includes(q);
+      const matchCity = l.city?.toLowerCase().includes(q) || l.region?.toLowerCase().includes(q);
+      const matchBreed = l.breed?.name?.toLowerCase().includes(q);
+      if (!matchTitle && !matchSeller && !matchPhone && !matchCity && !matchBreed) return false;
+    }
+    return true;
+  });
+
+  const filteredSellers = sellers.filter((s) => {
+    if (sellerSearchQuery.trim()) {
+      const q = sellerSearchQuery.toLowerCase();
+      return (
+        s.fullName.toLowerCase().includes(q) ||
+        s.email.toLowerCase().includes(q) ||
+        s.phone.includes(q) ||
+        s.city?.toLowerCase().includes(q)
+      );
+    }
+    return true;
+  });
+
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Admin Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-900 text-white p-6 rounded-3xl shadow-lg border border-slate-800">
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-            <ShieldAlert className="w-3.5 h-3.5" />
-            Platform Governance Control
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      {/* Toast Notification Floating Banner */}
+      {toast && (
+        <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div
+            className={`px-4 py-3 rounded-2xl shadow-2xl border flex items-center gap-3 text-xs sm:text-sm font-bold backdrop-blur-xl ${
+              toast.type === 'success'
+                ? 'bg-emerald-950/90 text-emerald-200 border-emerald-700/80 shadow-emerald-900/30'
+                : toast.type === 'error'
+                ? 'bg-red-950/90 text-red-200 border-red-700/80 shadow-red-900/30'
+                : 'bg-slate-900/95 text-slate-100 border-slate-700 shadow-slate-900/50'
+            }`}
+          >
+            {toast.type === 'success' && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
+            {toast.type === 'error' && <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />}
+            {toast.type === 'info' && <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />}
+            <span>{toast.message}</span>
+            <button
+              onClick={() => setToast(null)}
+              className="ml-2 text-slate-400 hover:text-white p-1"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black">
-            Administrator Dashboard
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-200 pb-5">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-black text-gray-900 flex items-center gap-2">
+            <span>🛡️</span>
+            <span>Platform Governance & Admin</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
-            Approve seller accounts, moderate livestock classifieds, and inspect buyer reports.
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+            Real-time management for Ethiopian livestock, verified sellers, and platform health.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs bg-slate-800 text-slate-300 px-3 py-1.5 rounded-xl border border-slate-700">
-            Port: <strong>3000</strong> (Unified / Web)
-          </span>
-          <Link
-            href="/"
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-xl border border-slate-700 transition"
+          <button
+            onClick={() => setPostModalOpen(true)}
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-green-700 to-emerald-600 hover:from-green-600 hover:to-emerald-500 text-white text-xs font-black shadow-md transition flex items-center gap-1.5 active:scale-95 cursor-pointer"
           >
-            Public Site
-          </Link>
+            <Plus className="w-4 h-4" />
+            <span>+ Post Livestock</span>
+          </button>
+          <button
+            onClick={() => {
+              fetchAdminData();
+              showToast('Refreshed latest data! ✓', 'info');
+            }}
+            className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition cursor-pointer"
+            title="Refresh"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
-        {/* Pending Sellers Card */}
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-amber-300 shadow-sm bg-amber-50/40">
-          <span className="text-xs text-amber-800 font-bold uppercase tracking-wider flex items-center gap-1.5">
-            <UserPlus className="w-3.5 h-3.5 text-amber-600" />
-            Seller Approvals
-          </span>
-          <div className="text-2xl sm:text-3xl font-black text-amber-900 mt-1">
-            {stats.pendingSellersCount}
-          </div>
+      {/* INTERACTIVE KPI SUMMARY CARDS (Click card to jump and filter instantly!) */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between text-xs font-bold text-gray-500 uppercase tracking-wider">
+          <span>Quick Metric Filters (Click card to view)</span>
+          <span className="text-green-700 font-semibold hidden sm:inline">⚡ 1-Click Navigation</span>
         </div>
 
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm">
-          <span className="text-xs text-gray-500 font-semibold uppercase tracking-wider flex items-center gap-1.5">
-            <Users className="w-3.5 h-3.5 text-blue-600" />
-            Approved Sellers
-          </span>
-          <div className="text-2xl sm:text-3xl font-black text-gray-900 mt-1">
-            {stats.totalSellers}
-          </div>
-        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {/* 1. Pending Sellers */}
+          <button
+            onClick={() => setActiveTab('seller_approvals')}
+            className={`text-left p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+              activeTab === 'seller_approvals'
+                ? 'bg-amber-50 border-amber-400 shadow-md ring-2 ring-amber-400/40'
+                : 'bg-white border-gray-200 hover:border-amber-400 hover:-translate-y-0.5 shadow-sm'
+            }`}
+          >
+            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 flex items-center justify-between w-full">
+              <span>Pending Sellers</span>
+              <Clock className="w-3.5 h-3.5 text-amber-500" />
+            </div>
+            <div className="text-2xl font-black text-amber-600 my-1">{stats.pendingSellersCount}</div>
+            <div className="text-[10px] text-gray-500 flex items-center justify-between w-full">
+              <span>Awaiting review</span>
+              <ArrowRight className="w-3 h-3 text-amber-500" />
+            </div>
+          </button>
 
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-green-200 shadow-sm bg-green-50/30">
-          <span className="text-xs text-green-700 font-semibold uppercase tracking-wider flex items-center gap-1.5">
-            <CheckCircle className="w-3.5 h-3.5" />
-            Active Listings
-          </span>
-          <div className="text-2xl sm:text-3xl font-black text-green-700 mt-1">
-            {stats.activeListings}
-          </div>
-        </div>
+          {/* 2. Pending Animals */}
+          <button
+            onClick={() => setActiveTab('moderation')}
+            className={`text-left p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+              activeTab === 'moderation'
+                ? 'bg-amber-50 border-amber-400 shadow-md ring-2 ring-amber-400/40'
+                : 'bg-white border-gray-200 hover:border-amber-400 hover:-translate-y-0.5 shadow-sm'
+            }`}
+          >
+            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 flex items-center justify-between w-full">
+              <span>Pending Animals</span>
+              <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
+            </div>
+            <div className="text-2xl font-black text-amber-600 my-1">{stats.pendingListings}</div>
+            <div className="text-[10px] text-gray-500 flex items-center justify-between w-full">
+              <span>3-photo review</span>
+              <ArrowRight className="w-3 h-3 text-amber-500" />
+            </div>
+          </button>
 
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-amber-200 shadow-sm bg-amber-50/30">
-          <span className="text-xs text-amber-700 font-semibold uppercase tracking-wider flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5" />
-            Pending Listings
-          </span>
-          <div className="text-2xl sm:text-3xl font-black text-amber-700 mt-1">
-            {stats.pendingListings}
-          </div>
-        </div>
+          {/* 3. Live Livestock */}
+          <button
+            onClick={() => {
+              setActiveTab('all_listings');
+              setListingStatusFilter('ACTIVE');
+            }}
+            className={`text-left p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+              activeTab === 'all_listings' && listingStatusFilter === 'ACTIVE'
+                ? 'bg-green-50 border-green-500 shadow-md ring-2 ring-green-500/40'
+                : 'bg-white border-gray-200 hover:border-green-500 hover:-translate-y-0.5 shadow-sm'
+            }`}
+          >
+            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 flex items-center justify-between w-full">
+              <span>Live Animals</span>
+              <CheckCircle className="w-3.5 h-3.5 text-green-600" />
+            </div>
+            <div className="text-2xl font-black text-green-700 my-1">{stats.activeListings}</div>
+            <div className="text-[10px] text-gray-500 flex items-center justify-between w-full">
+              <span>Active on site</span>
+              <ArrowRight className="w-3 h-3 text-green-600" />
+            </div>
+          </button>
 
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-red-200 shadow-sm bg-red-50/30">
-          <span className="text-xs text-red-700 font-semibold uppercase tracking-wider flex items-center gap-1.5">
-            <Flag className="w-3.5 h-3.5" />
-            Reports
-          </span>
-          <div className="text-2xl sm:text-3xl font-black text-red-700 mt-1">
-            {stats.totalReports}
-          </div>
+          {/* 4. Sold Animals */}
+          <button
+            onClick={() => {
+              setActiveTab('all_listings');
+              setListingStatusFilter('SOLD');
+            }}
+            className={`text-left p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+              activeTab === 'all_listings' && listingStatusFilter === 'SOLD'
+                ? 'bg-blue-50 border-blue-500 shadow-md ring-2 ring-blue-500/40'
+                : 'bg-white border-gray-200 hover:border-blue-500 hover:-translate-y-0.5 shadow-sm'
+            }`}
+          >
+            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 flex items-center justify-between w-full">
+              <span>Sold (የተሸጡ)</span>
+              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+            </div>
+            <div className="text-2xl font-black text-blue-700 my-1">{stats.soldListings}</div>
+            <div className="text-[10px] text-gray-500 flex items-center justify-between w-full">
+              <span>Completed sales</span>
+              <ArrowRight className="w-3 h-3 text-blue-600" />
+            </div>
+          </button>
+
+          {/* 5. Sellers */}
+          <button
+            onClick={() => setActiveTab('sellers')}
+            className={`text-left p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+              activeTab === 'sellers'
+                ? 'bg-purple-50 border-purple-500 shadow-md ring-2 ring-purple-500/40'
+                : 'bg-white border-gray-200 hover:border-purple-500 hover:-translate-y-0.5 shadow-sm'
+            }`}
+          >
+            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 flex items-center justify-between w-full">
+              <span>All Sellers</span>
+              <Users className="w-3.5 h-3.5 text-purple-600" />
+            </div>
+            <div className="text-2xl font-black text-purple-700 my-1">{stats.totalSellers}</div>
+            <div className="text-[10px] text-gray-500 flex items-center justify-between w-full">
+              <span>Registered base</span>
+              <ArrowRight className="w-3 h-3 text-purple-600" />
+            </div>
+          </button>
+
+          {/* 6. Reports */}
+          <button
+            onClick={() => setActiveTab('reports')}
+            className={`text-left p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+              activeTab === 'reports'
+                ? 'bg-red-50 border-red-500 shadow-md ring-2 ring-red-500/40'
+                : 'bg-white border-gray-200 hover:border-red-500 hover:-translate-y-0.5 shadow-sm'
+            }`}
+          >
+            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 flex items-center justify-between w-full">
+              <span>Reports</span>
+              <Flag className="w-3.5 h-3.5 text-red-600" />
+            </div>
+            <div className="text-2xl font-black text-red-600 my-1">{stats.totalReports}</div>
+            <div className="text-[10px] text-gray-500 flex items-center justify-between w-full">
+              <span>Scam alerts</span>
+              <ArrowRight className="w-3 h-3 text-red-600" />
+            </div>
+          </button>
         </div>
       </div>
 
-      {/* Navigation Tabs */}
-      <div className="flex border-b border-gray-200 gap-2 sm:gap-4 overflow-x-auto no-scrollbar">
-        <button
-          onClick={() => setActiveTab('seller_approvals')}
-          className={`pb-3 text-xs sm:text-sm font-bold transition flex items-center gap-1.5 border-b-2 shrink-0 ${
-            activeTab === 'seller_approvals'
-              ? 'border-amber-600 text-amber-700 font-extrabold'
-              : 'border-transparent text-gray-500 hover:text-gray-900'
-          }`}
-        >
-          <UserPlus className="w-4 h-4" />
-          <span>Seller Approvals</span>
-          {pendingSellers.length > 0 && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-800 font-black">
-              {pendingSellers.length}
-            </span>
-          )}
-        </button>
-
-        <button
-          onClick={() => setActiveTab('moderation')}
-          className={`pb-3 text-xs sm:text-sm font-bold transition flex items-center gap-1.5 border-b-2 shrink-0 ${
-            activeTab === 'moderation'
-              ? 'border-green-600 text-green-700 font-extrabold'
-              : 'border-transparent text-gray-500 hover:text-gray-900'
-          }`}
-        >
-          <Clock className="w-4 h-4" />
-          <span>Listing Moderation ({pendingItems.length})</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('reports')}
-          className={`pb-3 text-xs sm:text-sm font-bold transition flex items-center gap-1.5 border-b-2 shrink-0 ${
-            activeTab === 'reports'
-              ? 'border-red-600 text-red-700 font-extrabold'
-              : 'border-transparent text-gray-500 hover:text-gray-900'
-          }`}
-        >
-          <Flag className="w-4 h-4" />
-          <span>User Reports ({reports.length})</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('sellers')}
-          className={`pb-3 text-xs sm:text-sm font-bold transition flex items-center gap-1.5 border-b-2 shrink-0 ${
-            activeTab === 'sellers'
-              ? 'border-blue-600 text-blue-700 font-extrabold'
-              : 'border-transparent text-gray-500 hover:text-gray-900'
-          }`}
-        >
-          <Users className="w-4 h-4" />
-          <span>All Sellers ({sellers.length})</span>
-        </button>
+      {/* Tabs */}
+      <div className="flex items-center gap-2 border-b border-gray-200 overflow-x-auto no-scrollbar">
+        {[
+          { id: 'seller_approvals', label: 'Seller Approvals', count: stats.pendingSellersCount },
+          { id: 'moderation', label: 'Listing Moderation', count: stats.pendingListings },
+          { id: 'all_listings', label: 'Livestock Inventory', count: allListings.length },
+          { id: 'categories', label: 'Categories & Breeds', count: categories.length },
+          { id: 'sellers', label: 'Sellers Directory', count: stats.totalSellers },
+          { id: 'reports', label: 'Reports', count: stats.totalReports },
+        ].map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`pb-3 px-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 whitespace-nowrap transition cursor-pointer ${
+                isActive
+                  ? 'border-green-700 text-green-700 font-black'
+                  : 'border-transparent text-gray-500 hover:text-gray-900'
+              }`}
+            >
+              <span>{tab.label}</span>
+              {tab.count !== undefined && tab.count > 0 && (
+                <span
+                  className={`text-[10px] font-black px-1.5 py-0.2 rounded-full ${
+                    isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                  }`}
+                >
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
-      {/* TAB 1: Seller Approvals Queue */}
+      {/* TAB 1: SELLER APPROVALS */}
       {activeTab === 'seller_approvals' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-gray-900">
-              New Seller Registrations Awaiting Verification
-            </h2>
-            <span className="text-xs text-gray-500">
-              {pendingSellers.length} pending approval
-            </span>
-          </div>
+          <h2 className="text-base font-bold text-gray-900">
+            Pending Seller Applications ({pendingSellers.length})
+          </h2>
 
           {pendingSellers.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-gray-200 p-12 text-center space-y-2">
-              <CheckCircle className="w-10 h-10 text-green-600 mx-auto" />
-              <h3 className="font-bold text-gray-800 text-base">
-                No pending seller registrations
-              </h3>
-              <p className="text-xs text-gray-500">
-                All registered sellers have been approved or reviewed.
-              </p>
+            <div className="text-center py-12 bg-white rounded-2xl border border-gray-200">
+              <CheckCircle className="w-10 h-10 text-green-600 mx-auto mb-2" />
+              <p className="font-bold text-gray-800">No pending seller registrations.</p>
+              <p className="text-xs text-gray-500">All applications have been processed.</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {pendingSellers.map((seller) => (
                 <div
                   key={seller.id}
-                  className="bg-white rounded-2xl border border-amber-200 p-5 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                  className="bg-white border border-gray-200 rounded-2xl p-5 space-y-4 shadow-sm hover:border-gray-300 transition"
                 >
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-0.5 rounded-full uppercase">
-                        Pending Approval
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                        Awaiting Approval
                       </span>
-                      <span className="text-xs text-gray-400">
-                        Registered: {new Date(seller.createdAt).toLocaleDateString()}
-                      </span>
+                      <h3 className="font-bold text-gray-900 text-base mt-1">{seller.fullName}</h3>
+                      <div className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                        <MapPin className="w-3 h-3 text-gray-400" />
+                        <span>
+                          {seller.city}, {seller.region} {seller.area ? `(${seller.area})` : ''}
+                        </span>
+                      </div>
                     </div>
-
-                    <h3 className="text-lg font-black text-gray-900">
-                      {seller.fullName}
-                    </h3>
-
-                    <div className="flex flex-wrap items-center gap-4 text-xs text-gray-600">
-                      <span className="flex items-center gap-1 font-mono">
-                        <Phone className="w-3.5 h-3.5 text-green-600" />
-                        {seller.phone}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Mail className="w-3.5 h-3.5 text-blue-600" />
-                        {seller.email}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-red-500" />
-                        {seller.city}, {seller.region} {seller.area ? `(${seller.area})` : ''}
-                      </span>
-                    </div>
+                    <span className="text-[10px] text-gray-400">
+                      {new Date(seller.createdAt).toLocaleDateString()}
+                    </span>
                   </div>
 
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <div className="p-3 bg-gray-50 rounded-xl space-y-2 text-xs">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5 font-bold text-gray-900">
+                        <Phone className="w-3.5 h-3.5 text-green-600" />
+                        <span>{seller.phone}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={(e) => handleCopyPhone(seller.phone, e)}
+                          className="px-2 py-0.5 bg-white border border-gray-200 rounded text-[10px] font-bold hover:bg-gray-100"
+                        >
+                          {copiedPhone === seller.phone ? '✓ Copied' : 'Copy'}
+                        </button>
+                        <a
+                          href={`tel:${seller.phone}`}
+                          className="px-2 py-0.5 bg-green-700 text-white rounded text-[10px] font-bold hover:bg-green-600"
+                        >
+                          Call
+                        </a>
+                        <a
+                          href={`https://wa.me/${seller.phone.replace(/[^0-9]/g, '')}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-2 py-0.5 bg-emerald-600 text-white rounded text-[10px] font-bold hover:bg-emerald-500"
+                        >
+                          WhatsApp
+                        </a>
+                      </div>
+                    </div>
+                    <div className="text-gray-500 truncate">{seller.email}</div>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-1">
                     <button
                       onClick={() => handleSellerApproval(seller.id, 'APPROVE')}
                       disabled={actionLoading === seller.id}
-                      className="flex-1 sm:flex-none px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center justify-center gap-1.5"
+                      className="flex-1 py-2 px-3 rounded-xl bg-green-700 hover:bg-green-800 active:scale-95 text-white font-bold text-xs shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer"
                     >
-                      <UserCheck className="w-4 h-4" />
+                      <CheckCircle className="w-3.5 h-3.5" />
                       <span>Approve Seller</span>
                     </button>
                     <button
                       onClick={() => handleSellerApproval(seller.id, 'REJECT')}
                       disabled={actionLoading === seller.id}
-                      className="flex-1 sm:flex-none px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs rounded-xl border border-red-200 transition"
+                      className="py-2 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold text-xs transition cursor-pointer"
                     >
                       Decline
                     </button>
@@ -440,139 +1002,117 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* TAB 2: Listing Moderation Queue */}
+      {/* TAB 2: LISTING MODERATION */}
       {activeTab === 'moderation' && (
         <div className="space-y-4">
+          <h2 className="text-base font-bold text-gray-900">
+            Pending Livestock Moderation ({pendingItems.length})
+          </h2>
+
           {pendingItems.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-gray-200 p-12 text-center space-y-2">
-              <CheckCircle className="w-10 h-10 text-green-600 mx-auto" />
-              <h3 className="font-bold text-gray-800 text-base">
-                Moderation queue is empty
-              </h3>
-              <p className="text-xs text-gray-500">
-                All submitted livestock listings have been reviewed and processed.
-              </p>
+            <div className="text-center py-12 bg-white rounded-2xl border border-gray-200">
+              <CheckCircle className="w-10 h-10 text-green-600 mx-auto mb-2" />
+              <p className="font-bold text-gray-800">No pending listings.</p>
+              <p className="text-xs text-gray-500">All submitted animals are up to date.</p>
             </div>
           ) : (
-            pendingItems.map((item) => {
-              const front = item.images.find((i) => i.imageType === 'FRONT') || item.images[0];
-              return (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {pendingItems.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white rounded-3xl border border-gray-200 p-5 sm:p-6 shadow-sm space-y-4"
+                  className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between hover:border-gray-300 transition"
                 >
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3.5">
-                      <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-gray-100 shrink-0">
-                        {front && (
-                          <Image
-                            src={front.imageUrl}
-                            alt={item.title}
-                            fill
-                            className="object-cover"
-                          />
-                        )}
-                      </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">
-                            Pending Review
-                          </span>
-                          <span className="text-gray-500">
-                            {item.category.name} {item.breed ? `• ${item.breed.name}` : ''}
-                          </span>
-                        </div>
-                        <h3 className="font-bold text-base text-gray-900">{item.title}</h3>
-                        <div className="text-xs text-gray-500 flex items-center gap-3">
-                          <span className="font-black text-green-700 text-sm">
-                            {formatPriceETB(item.price)}
-                          </span>
-                          <span>•</span>
-                          <span>Seller: {item.seller.fullName} ({item.seller.phone})</span>
-                          <span>•</span>
-                          <span>Location: {item.city}, {item.region}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 w-full sm:w-auto">
-                      <button
-                        onClick={() => handleModerate(item.id, 'APPROVE')}
-                        disabled={actionLoading === item.id}
-                        className="flex-1 sm:flex-none px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white font-bold text-xs rounded-xl shadow-sm transition"
-                      >
-                        Approve Listing
-                      </button>
-                      <button
-                        onClick={() => handleModerate(item.id, 'REJECT')}
-                        disabled={actionLoading === item.id}
-                        className="flex-1 sm:flex-none px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs rounded-xl border border-red-200 transition"
-                      >
-                        Reject
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* 3 Photos Inspection strip */}
-                  <div className="grid grid-cols-3 gap-3 border-t border-gray-100 pt-3">
-                    {item.images.map((img, idx) => (
-                      <div key={idx} className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
-                        <Image src={img.imageUrl} alt={img.imageType} fill className="object-cover" />
-                        <span className="absolute bottom-1.5 left-1.5 bg-black/70 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                          {img.imageType}
+                  <div className="p-4 space-y-3">
+                    {/* 3 Photos Thumbnails (Clickable to inspect) */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-[11px] text-gray-500 font-semibold">
+                        <span>3-Angle Photos</span>
+                        <span className="text-green-700 text-[10px] flex items-center gap-0.5">
+                          <Maximize2 className="w-3 h-3" /> Click to inspect
                         </span>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-      )}
-
-      {/* TAB 3: User Reports */}
-      {activeTab === 'reports' && (
-        <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden p-5 space-y-4">
-          <h2 className="text-base font-bold text-gray-900 border-b border-gray-100 pb-3">
-            Buyer Safety Reports
-          </h2>
-          {reports.length === 0 ? (
-            <p className="text-center py-8 text-xs text-gray-500">
-              No reports have been submitted.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {reports.map((r) => (
-                <div
-                  key={r.id}
-                  className="p-4 rounded-2xl border border-gray-200 bg-gray-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="bg-red-100 text-red-800 text-xs font-bold px-2.5 py-0.5 rounded-full">
-                        Reason: {r.reason}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        Listing: {r.listing.title} ({formatPriceETB(r.listing.price)})
-                      </span>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {item.images?.map((img, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => openInspectionModal(item, img.imageType as any)}
+                            className="relative aspect-[4/3] rounded-lg overflow-hidden bg-gray-100 group border border-gray-200 hover:border-green-600 transition cursor-pointer"
+                          >
+                            <Image
+                              src={img.imageUrl}
+                              alt={img.imageType}
+                              fill
+                              sizes="120px"
+                              className="object-cover group-hover:scale-105 transition"
+                            />
+                            <span className="absolute bottom-1 left-1 bg-black/70 text-white text-[9px] font-bold px-1 rounded">
+                              {img.imageType}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                    {r.description && (
-                      <p className="text-xs text-gray-700 bg-white p-2.5 rounded-xl border border-gray-200">
-                        &ldquo;{r.description}&rdquo;
-                      </p>
-                    )}
-                    <p className="text-[11px] text-gray-400">
-                      Seller: {r.listing.seller.fullName} ({r.listing.seller.phone}) • Reporter Contact: {r.reporterContact || 'Anonymous'}
-                    </p>
+
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <div className="text-base font-black text-green-800">
+                          {formatPriceETB(item.price)}
+                        </div>
+                        {item.weightKg && (
+                          <span className="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                            <span>⚖️</span>
+                            <span>{item.weightKg} kg</span>
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="font-bold text-gray-900 text-sm line-clamp-1">{item.title}</h3>
+                      <div className="text-xs text-gray-500 mt-0.5">
+                        {item.category?.name} {item.breed && `• ${item.breed.name}`} • {item.gender} • {item.age}
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 bg-gray-50 rounded-xl text-xs space-y-1 text-gray-600">
+                      <div className="flex items-center justify-between">
+                        <span>Seller: <strong className="text-gray-900">{item.seller?.fullName}</strong></span>
+                        <span className="text-gray-400">{item.city}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-green-700 font-mono text-[11px] pt-0.5">
+                        <span>{item.contactPhone}</span>
+                        <button
+                          onClick={(e) => handleCopyPhone(item.contactPhone, e)}
+                          className="text-[10px] px-1.5 py-0.2 bg-white border border-gray-200 rounded font-sans"
+                        >
+                          {copiedPhone === item.contactPhone ? '✓' : 'Copy'}
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
-                  <Link
-                    href={`/listings/${r.listing.id}`}
-                    className="px-3 py-1.5 bg-white hover:bg-gray-100 text-gray-700 text-xs font-semibold rounded-lg border border-gray-300 transition shrink-0"
-                  >
-                    View Listing
-                  </Link>
+                  <div className="p-4 pt-0 flex items-center gap-2">
+                    <button
+                      onClick={() => openInspectionModal(item)}
+                      className="py-2 px-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs transition flex items-center gap-1 cursor-pointer"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>Inspect</span>
+                    </button>
+                    <button
+                      onClick={() => handleModerate(item.id, 'APPROVE')}
+                      disabled={actionLoading === item.id}
+                      className="flex-1 py-2 px-3 rounded-xl bg-green-700 hover:bg-green-800 text-white font-bold text-xs shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      <span>Publish Live</span>
+                    </button>
+                    <button
+                      onClick={() => handleModerate(item.id, 'REJECT')}
+                      disabled={actionLoading === item.id}
+                      className="py-2 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold text-xs transition cursor-pointer"
+                    >
+                      Reject
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -580,63 +1120,1244 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* TAB 4: Sellers Directory */}
-      {activeTab === 'sellers' && (
-        <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden p-5 space-y-4">
-          <h2 className="text-base font-bold text-gray-900 border-b border-gray-100 pb-3">
-            Active & Verified Livestock Sellers
-          </h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs sm:text-sm">
-              <thead>
-                <tr className="text-gray-500 border-b border-gray-200">
-                  <th className="pb-3 font-semibold">Seller</th>
-                  <th className="pb-3 font-semibold">Phone</th>
-                  <th className="pb-3 font-semibold">Location</th>
-                  <th className="pb-3 font-semibold">Listings</th>
-                  <th className="pb-3 font-semibold">Status</th>
-                  <th className="pb-3 font-semibold text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {sellers.map((s) => (
-                  <tr key={s.id} className="hover:bg-gray-50 transition">
-                    <td className="py-3 font-bold text-gray-900">{s.fullName}</td>
-                    <td className="py-3 text-gray-600 font-mono">{s.phone}</td>
-                    <td className="py-3 text-gray-600">
-                      {s.city || 'Sululta'}, {s.region || 'Oromia'}
-                    </td>
-                    <td className="py-3 font-semibold text-gray-900">
-                      {s._count.listings}
-                    </td>
-                    <td className="py-3">
-                      <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                          s.status === 'ACTIVE'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}
-                      >
-                        {s.status}
-                      </span>
-                    </td>
-                    <td className="py-3 text-right">
-                      <button
-                        onClick={() => handleSellerStatus(s.id, s.status)}
-                        disabled={actionLoading === s.id}
-                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
-                          s.status === 'ACTIVE'
-                            ? 'bg-red-50 text-red-700 hover:bg-red-100 border border-red-200'
-                            : 'bg-green-50 text-green-700 hover:bg-green-100 border border-green-200'
-                        }`}
-                      >
-                        {s.status === 'ACTIVE' ? 'Suspend' : 'Reactivate'}
-                      </button>
-                    </td>
-                  </tr>
+      {/* TAB 3: LIVESTOCK INVENTORY */}
+      {activeTab === 'all_listings' && (
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-base sm:text-lg font-black text-gray-900">
+                Full Livestock Inventory ({filteredInventoryListings.length})
+              </h2>
+              <p className="text-xs text-gray-500">
+                Search, inline edit prices, update status (Active/Sold/Removed), or delete.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => setPostModalOpen(true)}
+                className="px-3.5 py-2 bg-green-700 hover:bg-green-600 text-white text-xs font-black rounded-xl shadow-sm transition flex items-center gap-1.5 active:scale-95 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>+ Create Livestock</span>
+              </button>
+
+              {/* Status Filter Tabs */}
+              <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl text-xs">
+                {['ALL', 'ACTIVE', 'SOLD', 'PENDING', 'REJECTED'].map((st) => (
+                  <button
+                    key={st}
+                    onClick={() => setListingStatusFilter(st)}
+                    className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition cursor-pointer ${
+                      listingStatusFilter === st
+                        ? 'bg-white text-green-800 shadow-sm'
+                        : 'text-gray-500 hover:text-gray-900'
+                    }`}
+                  >
+                    {st}
+                  </button>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </div>
+          </div>
+
+          {/* Species / Category Quick Filter Chips */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+            <span className="text-[11px] font-bold text-gray-500 shrink-0 mr-1 flex items-center gap-1">
+              <Filter className="w-3 h-3 text-green-700" /> Species:
+            </span>
+            <button
+              onClick={() => setListingCategoryFilter('ALL')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
+                listingCategoryFilter === 'ALL'
+                  ? 'bg-green-700 text-white shadow'
+                  : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              🐾 All Animals ({allListings.length})
+            </button>
+            {categories.map((cat) => {
+              const count = allListings.filter((l) => l.category?.id === cat.id).length;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setListingCategoryFilter(cat.id)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer flex items-center gap-1 ${
+                    listingCategoryFilter === cat.id
+                      ? 'bg-green-700 text-white shadow'
+                      : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <span>{cat.icon || '🐾'}</span>
+                  <span>{cat.name}</span>
+                  <span className="text-[10px] opacity-70">({count})</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3.5 top-3 text-gray-400" />
+            <input
+              type="text"
+              value={listingSearchQuery}
+              onChange={(e) => setListingSearchQuery(e.target.value)}
+              placeholder="Search inventory by title, seller name, phone, city, or breed..."
+              className="w-full bg-white border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-xs sm:text-sm text-gray-900 focus:outline-none focus:border-green-600 shadow-sm"
+            />
+          </div>
+
+          {filteredInventoryListings.length === 0 ? (
+            <div className="bg-white border border-gray-200 rounded-3xl p-12 text-center space-y-2">
+              <Search className="w-8 h-8 text-gray-400 mx-auto" />
+              <h3 className="font-bold text-gray-800 text-base">No Matching Livestock Found</h3>
+              <p className="text-xs text-gray-500">Try adjusting your filters or search keywords.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {filteredInventoryListings.map((listing) => {
+                const frontImg = listing.images?.find((img) => img.imageType === 'FRONT') || listing.images?.[0];
+                const isEditingThisPrice = editingPriceId === listing.id;
+
+                return (
+                  <div
+                    key={listing.id}
+                    className="bg-white border border-gray-200 rounded-2xl p-4 space-y-3 flex flex-col justify-between hover:border-gray-300 shadow-sm transition"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex gap-3">
+                        {frontImg ? (
+                          <button
+                            type="button"
+                            onClick={() => openInspectionModal(listing)}
+                            className="relative w-20 h-20 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 shrink-0 group cursor-pointer"
+                            title="Click to inspect all angles"
+                          >
+                            <Image
+                              src={frontImg.imageUrl}
+                              alt={listing.title}
+                              fill
+                              sizes="80px"
+                              className="object-cover group-hover:scale-105 transition"
+                            />
+                            <span className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition">
+                              <Maximize2 className="w-4 h-4" />
+                            </span>
+                          </button>
+                        ) : (
+                          <div className="w-20 h-20 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center shrink-0 text-gray-400 text-xs">
+                            No image
+                          </div>
+                        )}
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-1">
+                            <span
+                              className={`text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider ${
+                                listing.status === 'ACTIVE'
+                                  ? 'bg-green-100 text-green-800 border border-green-200'
+                                  : listing.status === 'SOLD'
+                                  ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                                  : listing.status === 'PENDING'
+                                  ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                                  : 'bg-red-100 text-red-800 border border-red-200'
+                              }`}
+                            >
+                              {listing.status}
+                            </span>
+                            <span className="text-[10px] text-gray-400">
+                              {new Date(listing.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+
+                          {/* INLINE PRICE EDITOR */}
+                          <div className="mt-1">
+                            {isEditingThisPrice ? (
+                              <form
+                                onSubmit={(e) => handleSaveInlinePrice(listing.id, e)}
+                                className="flex items-center gap-1"
+                              >
+                                <input
+                                  type="number"
+                                  value={editingPriceValue}
+                                  onChange={(e) => setEditingPriceValue(e.target.value)}
+                                  className="w-24 bg-white border border-green-600 text-green-800 font-black text-xs px-2 py-1 rounded outline-none"
+                                  autoFocus
+                                />
+                                <button
+                                  type="submit"
+                                  className="p-1 bg-green-700 hover:bg-green-600 text-white rounded text-xs"
+                                  title="Save Price"
+                                >
+                                  <Check className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingPriceId(null)}
+                                  className="p-1 bg-gray-200 text-gray-600 rounded text-xs"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              </form>
+                            ) : (
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-base font-black text-green-800">
+                                  {formatPriceETB(listing.price)}
+                                </span>
+                                <button
+                                  onClick={(e) => handleStartEditPrice(listing, e)}
+                                  className="p-1 text-gray-400 hover:text-green-700 rounded transition cursor-pointer"
+                                  title="Edit Price"
+                                >
+                                  <Edit className="w-3 h-3" />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+
+                          {listing.weightKg && (
+                            <div className="mt-0.5">
+                              <span className="bg-amber-100 text-amber-800 border border-amber-200 text-[10px] font-bold px-1.5 py-0.2 rounded inline-flex items-center gap-0.5">
+                                <span>⚖️</span>
+                                <span>{listing.weightKg} kg</span>
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <h4 className="font-bold text-gray-900 text-sm line-clamp-1">{listing.title}</h4>
+
+                      <div className="text-[11px] text-gray-600 space-y-0.5 bg-gray-50 p-2 rounded-xl border border-gray-100">
+                        <div>Category: <strong className="text-gray-900">{listing.category?.name}</strong> {listing.breed && `(${listing.breed.name})`}</div>
+                        <div className="flex items-center justify-between">
+                          <span>Seller: <strong className="text-gray-900">{listing.seller?.fullName}</strong></span>
+                          <button
+                            onClick={(e) => handleCopyPhone(listing.contactPhone || listing.seller?.phone, e)}
+                            className="text-[10px] font-mono text-green-700 hover:underline flex items-center gap-0.5"
+                          >
+                            <Phone className="w-2.5 h-2.5" />
+                            <span>{listing.contactPhone || listing.seller?.phone}</span>
+                          </button>
+                        </div>
+                        <div>Location: {listing.city}, {listing.region}</div>
+                      </div>
+                    </div>
+
+                    {/* Actions row */}
+                    <div className="pt-2 border-t border-gray-100 flex items-center gap-1.5 flex-wrap">
+                      <button
+                        onClick={() => openInspectionModal(listing)}
+                        className="py-1.5 px-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-[11px] transition flex items-center gap-1 cursor-pointer"
+                      >
+                        <Eye className="w-3 h-3" />
+                        <span>Inspect</span>
+                      </button>
+
+                      {listing.status !== 'ACTIVE' && (
+                        <button
+                          onClick={() => handleUpdateListingStatus(listing.id, 'ACTIVE')}
+                          className="py-1.5 px-2.5 rounded-lg bg-green-100 hover:bg-green-200 text-green-800 font-bold text-[11px] transition cursor-pointer"
+                        >
+                          Set Active
+                        </button>
+                      )}
+
+                      {listing.status !== 'SOLD' && (
+                        <button
+                          onClick={() => handleUpdateListingStatus(listing.id, 'SOLD')}
+                          className="py-1.5 px-2.5 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold text-[11px] transition cursor-pointer"
+                        >
+                          Mark Sold
+                        </button>
+                      )}
+
+                      {listing.status !== 'REJECTED' && (
+                        <button
+                          onClick={() => handleUpdateListingStatus(listing.id, 'REJECTED')}
+                          className="py-1.5 px-2.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold text-[11px] transition cursor-pointer"
+                        >
+                          Reject
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => handleDeleteListing(listing.id)}
+                        className="py-1.5 px-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-bold text-[11px] transition ml-auto flex items-center gap-1 cursor-pointer"
+                        title="Delete listing"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>Delete</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB 4: CATEGORIES & BREEDS */}
+      {activeTab === 'categories' && (
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-base sm:text-lg font-black text-gray-900">
+                Livestock Taxonomy & Breeds
+              </h2>
+              <p className="text-xs text-gray-500">
+                Manage animal categories and verified Ethiopian breeds.
+              </p>
+            </div>
+
+            <button
+              onClick={() => setCategoryFormOpen(!categoryFormOpen)}
+              className="py-2 px-3.5 bg-green-700 hover:bg-green-800 text-white font-black text-xs rounded-xl shadow-sm transition flex items-center gap-1.5 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Category</span>
+            </button>
+          </div>
+
+          {categoryFormOpen && (
+            <form
+              onSubmit={handleCreateCategory}
+              className="bg-white border border-green-600 rounded-2xl p-4 sm:p-5 space-y-3 shadow-md"
+            >
+              <h3 className="font-black text-sm text-gray-900">Add New Livestock Category</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 mb-1">Category Name</label>
+                  <input
+                    type="text"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    placeholder="e.g. Camels (ግመሎች)"
+                    required
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-green-600"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 mb-1">Emoji Icon</label>
+                  <input
+                    type="text"
+                    value={newCategoryIcon}
+                    onChange={(e) => setNewCategoryIcon(e.target.value)}
+                    placeholder="e.g. 🐪, 🐴, 🐔"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-green-600"
+                  />
+                  <div className="flex items-center gap-1.5 mt-1.5">
+                    {['🐄', '🐂', '🐑', '🐐', '🐪', '🐴', '🐔'].map((em) => (
+                      <button
+                        key={em}
+                        type="button"
+                        onClick={() => setNewCategoryIcon(em)}
+                        className="px-1.5 py-0.5 bg-gray-100 hover:bg-gray-200 rounded text-xs"
+                      >
+                        {em}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-end gap-2">
+                  <button
+                    type="submit"
+                    className="py-2 px-4 bg-green-700 hover:bg-green-800 text-white font-black text-xs rounded-xl transition cursor-pointer"
+                  >
+                    Save Category
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCategoryFormOpen(false)}
+                    className="py-2 px-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-xs rounded-xl transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </form>
+          )}
+
+          {/* Add Breed Form */}
+          <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-5 space-y-3 shadow-sm">
+            <h3 className="font-black text-sm text-gray-900 flex items-center gap-1.5">
+              <Tag className="w-4 h-4 text-green-700" />
+              <span>Add Ethiopian Breed to Category</span>
+            </h3>
+            <form onSubmit={handleCreateBreed} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+              <select
+                value={selectedCategoryIdForBreed}
+                onChange={(e) => setSelectedCategoryIdForBreed(e.target.value)}
+                className="bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none"
+              >
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.icon} {c.name}
+                  </option>
+                ))}
+              </select>
+
+              <input
+                type="text"
+                value={newBreedName}
+                onChange={(e) => setNewBreedName(e.target.value)}
+                placeholder="Breed name, e.g. 'Hararghe Highland', 'Arsi'"
+                className="flex-1 bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none"
+                required
+              />
+
+              <button
+                type="submit"
+                className="py-2 px-4 bg-green-700 hover:bg-green-800 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+              >
+                + Add Breed
+              </button>
+            </form>
+          </div>
+
+          {/* Categories Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {categories.map((cat) => (
+              <div
+                key={cat.id}
+                className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-5 space-y-3 shadow-sm"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="text-2xl">{cat.icon || '🐾'}</span>
+                  <div>
+                    <h4 className="font-black text-gray-900 text-base">{cat.name}</h4>
+                    <span className="text-[10px] text-gray-400">
+                      {cat._count?.listings || 0} active marketplace listings
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 pt-2 border-t border-gray-100">
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
+                    Registered Breeds ({cat.breeds?.length || 0}):
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {cat.breeds?.map((b) => (
+                      <span
+                        key={b.id}
+                        className="bg-gray-100 text-gray-700 border border-gray-200 text-[11px] font-medium py-0.5 pl-2 pr-1 rounded-lg flex items-center gap-1"
+                      >
+                        <span>{b.name}</span>
+                        <button
+                          onClick={() => handleDeleteBreed(b.id, cat.id)}
+                          className="p-0.5 hover:text-red-600 text-gray-400 rounded"
+                        >
+                          <XCircle className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                    {(!cat.breeds || cat.breeds.length === 0) && (
+                      <span className="text-xs text-gray-400 italic">No specific breeds registered yet.</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 5: SELLERS DIRECTORY */}
+      {activeTab === 'sellers' && (
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-base sm:text-lg font-black text-gray-900">
+                Sellers & Traders Directory ({filteredSellers.length})
+              </h2>
+              <p className="text-xs text-gray-500">
+                Manage accounts, toggle suspension, or view direct contact information.
+              </p>
+            </div>
+
+            <div className="relative w-full sm:w-72">
+              <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
+              <input
+                type="text"
+                value={sellerSearchQuery}
+                onChange={(e) => setSellerSearchQuery(e.target.value)}
+                placeholder="Search sellers by name, phone, city..."
+                className="w-full bg-white border border-gray-200 rounded-xl py-2 pl-9 pr-4 text-xs text-gray-900 outline-none focus:border-green-600"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredSellers.map((seller) => (
+              <div
+                key={seller.id}
+                className="bg-white border border-gray-200 rounded-2xl p-4 space-y-3 shadow-sm hover:border-gray-300 transition"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <h4 className="font-bold text-gray-900 text-sm">{seller.fullName}</h4>
+                    <span className="text-[10px] text-gray-400 block">
+                      Registered {new Date(seller.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <span
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
+                      seller.status === 'ACTIVE'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}
+                  >
+                    {seller.status}
+                  </span>
+                </div>
+
+                <div className="bg-gray-50 p-2.5 rounded-xl text-xs space-y-1.5 text-gray-600">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-gray-900 font-mono">
+                      <Phone className="w-3.5 h-3.5 text-green-600" />
+                      <span>{seller.phone}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={(e) => handleCopyPhone(seller.phone, e)}
+                        className="px-1.5 py-0.5 bg-white border border-gray-200 text-gray-600 rounded text-[10px]"
+                      >
+                        {copiedPhone === seller.phone ? '✓' : 'Copy'}
+                      </button>
+                      <a
+                        href={`tel:${seller.phone}`}
+                        className="px-1.5 py-0.5 bg-green-700 text-white rounded text-[10px]"
+                      >
+                        Call
+                      </a>
+                    </div>
+                  </div>
+                  <div className="text-gray-500 truncate">{seller.email}</div>
+                  <div className="text-gray-500">
+                    {seller.city || 'Ethiopia'}, {seller.region || 'Nationwide'}
+                  </div>
+                  <div className="text-[10px] text-green-800 font-bold pt-0.5">
+                    📊 {seller._count?.listings || 0} Total Listings
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-gray-100 flex items-center gap-2">
+                  <button
+                    onClick={() => handleSellerStatus(seller.id, seller.status)}
+                    disabled={actionLoading === seller.id}
+                    className={`py-1.5 px-3 rounded-lg text-xs font-bold transition cursor-pointer ${
+                      seller.status === 'ACTIVE'
+                        ? 'bg-amber-100 text-amber-800 hover:bg-amber-200'
+                        : 'bg-green-700 text-white hover:bg-green-800'
+                    }`}
+                  >
+                    {seller.status === 'ACTIVE' ? 'Suspend' : 'Reactivate'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 6: REPORTS */}
+      {activeTab === 'reports' && (
+        <div className="space-y-4">
+          <h2 className="text-base font-bold text-gray-900">
+            Safety & Scam Reports ({reports.length})
+          </h2>
+
+          {reports.length === 0 ? (
+            <div className="text-center py-12 bg-white rounded-2xl border border-gray-200">
+              <CheckCircle className="w-10 h-10 text-green-600 mx-auto mb-2" />
+              <p className="font-bold text-gray-800">No active reports.</p>
+              <p className="text-xs text-gray-500">Marketplace is running smoothly.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {reports.map((rep) => (
+                <div
+                  key={rep.id}
+                  className="bg-white border border-red-200 rounded-2xl p-5 space-y-3 shadow-sm"
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-red-100 text-red-800 rounded">
+                        {rep.reason}
+                      </span>
+                      <h4 className="font-bold text-gray-900 text-sm mt-1">
+                        Listing: {rep.listing?.title || 'Unknown'}
+                      </h4>
+                    </div>
+                    <span className="text-[10px] text-gray-400">
+                      {new Date(rep.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  <div className="p-3 bg-gray-50 rounded-xl text-xs space-y-1">
+                    <p className="text-gray-700 italic">
+                      &quot;{rep.description || 'No notes provided.'}&quot;
+                    </p>
+                    {rep.reporterContact && (
+                      <p className="text-gray-500 text-[11px]">
+                        Reporter Contact: {rep.reporterContact}
+                      </p>
+                    )}
+                  </div>
+
+                  {rep.listing && (
+                    <div className="flex items-center justify-between text-xs text-gray-600 bg-gray-100 p-2.5 rounded-xl">
+                      <span>Price: {formatPriceETB(rep.listing.price)}</span>
+                      <span>Seller: {rep.listing.seller?.fullName}</span>
+                    </div>
+                  )}
+
+                  <div className="pt-2 border-t border-gray-100 flex items-center gap-2">
+                    {rep.listing && (
+                      <button
+                        onClick={() => handleDeleteListing(rep.listing.id)}
+                        className="py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition cursor-pointer"
+                      >
+                        Delete Listing
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* =================================================================== */}
+      {/* INTERACTIVE INSPECTION LIGHTBOX MODAL */}
+      {/* =================================================================== */}
+      {inspectListing && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
+          <div className="max-w-4xl w-full bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
+            <div className="p-4 sm:p-5 border-b border-gray-200 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <span className="p-1.5 bg-green-100 text-green-800 rounded-lg">
+                  <Eye className="w-4 h-4" />
+                </span>
+                <div>
+                  <h3 className="font-black text-gray-900 text-base line-clamp-1">{inspectListing.title}</h3>
+                  <div className="text-xs text-gray-500 flex items-center gap-2">
+                    <span>{inspectListing.category?.name}</span>
+                    {inspectListing.breed && <span>• {inspectListing.breed.name}</span>}
+                    <span>• {inspectListing.gender}</span>
+                    <span>• Age: {inspectListing.age}</span>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setInspectListing(null)}
+                className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-900 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5">
+              {/* Left: 3-Angle Full Viewer */}
+              <div className="lg:col-span-8 space-y-3">
+                <div className="flex items-center gap-2">
+                  {(['FRONT', 'LEFT', 'RIGHT'] as const).map((ang) => {
+                    const img = inspectListing.images?.find((i: any) => i.imageType === ang);
+                    const isSelected = inspectAngle === ang;
+                    return (
+                      <button
+                        key={ang}
+                        onClick={() => setInspectAngle(ang)}
+                        className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer border ${
+                          isSelected
+                            ? 'bg-green-700 text-white border-green-700 font-black shadow'
+                            : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
+                        }`}
+                      >
+                        <Camera className="w-3.5 h-3.5" />
+                        <span>{ang === 'FRONT' ? '1. Front' : ang === 'LEFT' ? '2. Left Flank' : '3. Right Flank'}</span>
+                        {img && <span className="text-[10px] opacity-80">✓</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-black border border-gray-200 shadow-inner flex items-center justify-center">
+                  {(() => {
+                    const currentImg = inspectListing.images?.find((i: any) => i.imageType === inspectAngle);
+                    if (currentImg) {
+                      return (
+                        <Image
+                          src={currentImg.imageUrl}
+                          alt={`${inspectListing.title} ${inspectAngle}`}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 800px"
+                          className="object-contain"
+                          priority
+                        />
+                      );
+                    }
+                    return (
+                      <div className="text-center text-gray-400 space-y-1">
+                        <ImageIcon className="w-8 h-8 mx-auto text-gray-500" />
+                        <span className="text-xs">No {inspectAngle} photo uploaded</span>
+                      </div>
+                    );
+                  })()}
+
+                  {inspectListing.weightKg && (
+                    <div className="absolute top-3 left-3 bg-amber-500 text-slate-950 font-black text-xs px-2.5 py-1 rounded-xl shadow-lg flex items-center gap-1">
+                      <span>⚖️</span>
+                      <span>{inspectListing.weightKg} kg (ኪ.ግ)</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Right: Specifications & 1-Click Verification */}
+              <div className="lg:col-span-4 space-y-4 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-200 space-y-2">
+                    <div className="text-xl font-black text-green-800">
+                      {formatPriceETB(inspectListing.price)}
+                    </div>
+                    <div className="text-xs text-gray-600 space-y-1">
+                      <div className="flex justify-between">
+                        <span>Status:</span>
+                        <strong className="text-gray-900">{inspectListing.status}</strong>
+                      </div>
+                      {inspectListing.weightKg && (
+                        <div className="flex justify-between text-amber-700 font-bold">
+                          <span>Live Weight:</span>
+                          <span>⚖️ {inspectListing.weightKg} kg</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between">
+                        <span>Location:</span>
+                        <strong className="text-gray-900">{inspectListing.city}, {inspectListing.region}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-200 space-y-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 block">
+                      Seller Verification:
+                    </span>
+                    <div className="font-bold text-gray-900 text-sm">
+                      {inspectListing.seller?.fullName}
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-green-800 font-mono">
+                      <span>{inspectListing.contactPhone || inspectListing.seller?.phone}</span>
+                      <button
+                        onClick={(e) => handleCopyPhone(inspectListing.contactPhone || inspectListing.seller?.phone, e)}
+                        className="px-2 py-0.5 bg-white border border-gray-200 text-gray-700 rounded text-[10px] font-sans font-bold"
+                      >
+                        {copiedPhone === (inspectListing.contactPhone || inspectListing.seller?.phone) ? 'Copied' : 'Copy'}
+                      </button>
+                    </div>
+                    <div className="flex gap-2 pt-1">
+                      <a
+                        href={`tel:${inspectListing.contactPhone || inspectListing.seller?.phone}`}
+                        className="flex-1 py-1.5 bg-green-700 hover:bg-green-600 text-white rounded-xl text-center text-xs font-bold transition flex items-center justify-center gap-1"
+                      >
+                        <Phone className="w-3 h-3" />
+                        <span>Call</span>
+                      </a>
+                      <a
+                        href={`https://wa.me/${(inspectListing.contactPhone || inspectListing.seller?.phone || '').replace(/[^0-9]/g, '')}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-center text-xs font-bold transition flex items-center justify-center gap-1"
+                      >
+                        <MessageCircle className="w-3 h-3" />
+                        <span>WhatsApp</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2 pt-2 border-t border-gray-200">
+                  {inspectListing.status === 'PENDING' ? (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleModerate(inspectListing.id, 'APPROVE')}
+                        className="flex-1 py-2.5 bg-green-700 hover:bg-green-600 text-white font-black text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                        <span>Approve & Publish Live</span>
+                      </button>
+                      <button
+                        onClick={() => handleModerate(inspectListing.id, 'REJECT')}
+                        className="py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <XCircle className="w-4 h-4" />
+                        <span>Reject</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      {inspectListing.status !== 'SOLD' && (
+                        <button
+                          onClick={() => handleUpdateListingStatus(inspectListing.id, 'SOLD')}
+                          className="flex-1 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                        >
+                          Mark as Sold
+                        </button>
+                      )}
+                      {inspectListing.status !== 'ACTIVE' && (
+                        <button
+                          onClick={() => handleUpdateListingStatus(inspectListing.id, 'ACTIVE')}
+                          className="flex-1 py-2 bg-green-700 hover:bg-green-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                        >
+                          Set Active
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleDeleteListing(inspectListing.id)}
+                        className="py-2 px-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =================================================================== */}
+      {/* POST LIVESTOCK MODAL */}
+      {/* =================================================================== */}
+      {postModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <div className="max-w-4xl w-full bg-white rounded-3xl p-5 sm:p-7 shadow-2xl my-auto space-y-6">
+            <div className="flex items-center justify-between border-b border-gray-200 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-green-100 text-green-800">
+                  <Plus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-black text-gray-900">
+                    Create & Publish Livestock
+                  </h2>
+                  <p className="text-xs text-gray-500">
+                    Post directly to the live marketplace with instant verified approval.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setPostModalOpen(false)}
+                className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-900 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handlePostLivestock} className="space-y-5">
+              {postFormError && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
+                  <span>{postFormError}</span>
+                </div>
+              )}
+
+              {postFormSuccess && (
+                <div className="p-3 bg-green-50 border border-green-200 rounded-xl text-xs text-green-800 flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-green-600" />
+                  <span>{postFormSuccess}</span>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+                <div className="md:col-span-8 space-y-4">
+                  {/* Seller attribution */}
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">
+                      Seller Attribution
+                    </label>
+                    <select
+                      value={postSellerId}
+                      onChange={(e) => setPostSellerId(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-green-600"
+                    >
+                      <option value="self">AxumMarket Direct (Admin account)</option>
+                      {sellers.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.fullName} ({s.phone}) - {s.city || 'Seller'}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Title */}
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">
+                      Animal Title / ስም *
+                    </label>
+                    <input
+                      type="text"
+                      value={postTitle}
+                      onChange={(e) => setPostTitle(e.target.value)}
+                      placeholder="e.g. Prime Borana Fattened Bull (የቦረና ሰንጋ በሬ)"
+                      required
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-green-600"
+                    />
+                  </div>
+
+                  {/* Price & Weight in KG */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">
+                        Price in ETB (ዋጋ) *
+                      </label>
+                      <input
+                        type="number"
+                        value={postPrice}
+                        onChange={(e) => setPostPrice(e.target.value)}
+                        placeholder="e.g. 185000"
+                        required
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-green-600"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">
+                        Live Weight (kg) / ክብደት (ኪ.ግ)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        value={postWeightKg}
+                        onChange={(e) => setPostWeightKg(e.target.value)}
+                        placeholder="e.g. 460"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-green-600"
+                      />
+                      <div className="flex items-center gap-1 mt-1.5">
+                        <span className="text-[10px] text-gray-400">Presets:</span>
+                        {[280, 350, 420, 460, 520].map((kg) => (
+                          <button
+                            key={kg}
+                            type="button"
+                            onClick={() => setPostWeightKg(kg.toString())}
+                            className="px-1.5 py-0.5 bg-gray-100 hover:bg-gray-200 text-amber-800 rounded text-[10px] font-bold"
+                          >
+                            {kg}kg
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Category & Breed */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">
+                        Category *
+                      </label>
+                      <select
+                        value={postCategoryId}
+                        onChange={(e) => {
+                          setPostCategoryId(e.target.value);
+                          setPostBreedId('');
+                        }}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-green-600"
+                      >
+                        {categories.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.icon} {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">
+                        Breed (ዝርያ)
+                      </label>
+                      <select
+                        value={postBreedId}
+                        onChange={(e) => setPostBreedId(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-green-600"
+                      >
+                        <option value="">Select breed (optional)</option>
+                        {categories
+                          .find((c) => c.id === postCategoryId)
+                          ?.breeds?.map((b) => (
+                            <option key={b.id} value={b.id}>
+                              {b.name}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Age, Gender, Contact */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-bold text-gray-700 mb-1">Age</label>
+                      <input
+                        type="text"
+                        value={postAge}
+                        onChange={(e) => setPostAge(e.target.value)}
+                        placeholder="e.g. 4 years"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-gray-700 mb-1">Gender</label>
+                      <select
+                        value={postGender}
+                        onChange={(e) => setPostGender(e.target.value as any)}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none"
+                      >
+                        <option value="MALE">Male (ተባዕት / በሬ)</option>
+                        <option value="FEMALE">Female (አንስታይ / ላም)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-gray-700 mb-1">Contact Phone</label>
+                      <input
+                        type="text"
+                        value={postContactPhone}
+                        onChange={(e) => setPostContactPhone(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Live Buyer Preview */}
+                <div className="md:col-span-4 space-y-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-green-700 block">
+                    Live Buyer Card Preview:
+                  </span>
+                  <div className="bg-gray-50 border border-gray-200 rounded-2xl p-3.5 space-y-2.5 shadow-sm">
+                    <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-200 border border-gray-300 flex items-center justify-center">
+                      {postFrontUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={postFrontUrl} alt="Preview" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="text-center text-gray-400 text-xs">
+                          <ImageIcon className="w-6 h-6 mx-auto mb-1 text-gray-400" />
+                          Front photo preview
+                        </div>
+                      )}
+                      {postWeightKg && (
+                        <span className="absolute top-2 left-2 bg-amber-500 text-slate-950 font-black text-[10px] px-2 py-0.5 rounded-lg shadow">
+                          ⚖️ {postWeightKg} kg
+                        </span>
+                      )}
+                    </div>
+
+                    <div>
+                      <div className="text-base font-black text-green-800">
+                        {postPrice ? formatPriceETB(parseFloat(postPrice)) : '0 ETB'}
+                      </div>
+                      <h4 className="font-bold text-gray-900 text-xs line-clamp-1">
+                        {postTitle || 'Livestock Title'}
+                      </h4>
+                      <div className="text-[10px] text-gray-500 mt-0.5">
+                        {categories.find((c) => c.id === postCategoryId)?.name || 'Livestock'} • {postCity}, {postRegion}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3 Photos Upload Section */}
+              <div className="space-y-2 pt-2 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-gray-800">
+                    Mandatory 3 Photos (Front, Left Flank, Right Flank)
+                  </span>
+                  <span className="text-[10px] text-amber-700">* All 3 required</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Angle 1: FRONT */}
+                  <div className="bg-gray-50 border border-gray-200 rounded-2xl p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-900">1. Front View</span>
+                      {postFrontUrl ? (
+                        <span className="text-[10px] font-bold text-green-700">✓ Ready</span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-amber-700">* Required</span>
+                      )}
+                    </div>
+                    {postFrontUrl ? (
+                      <div className="relative aspect-[4/3] rounded-xl overflow-hidden border border-gray-300">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={postFrontUrl} alt="Front View" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setPostFrontUrl('')}
+                          className="absolute top-1 right-1 p-1 bg-black/60 rounded-lg text-white hover:bg-black"
+                        >
+                          <XCircle className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="aspect-[4/3] rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-2 text-center text-gray-400">
+                        <ImageIcon className="w-6 h-6 mb-1 text-gray-400" />
+                        <span className="text-[10px]">Upload or paste URL</span>
+                      </div>
+                    )}
+                    <div className="space-y-1.5">
+                      <label className="w-full py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer transition">
+                        <Upload className="w-3 h-3" />
+                        <span>{uploadingAngle === 'FRONT' ? 'Uploading...' : 'Upload File'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleUploadPhoto(f, 'FRONT');
+                          }}
+                        />
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Or paste image URL"
+                        value={postFrontUrl}
+                        onChange={(e) => setPostFrontUrl(e.target.value)}
+                        className="w-full bg-white border border-gray-200 rounded-lg py-1 px-2 text-[11px] text-gray-900 outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Angle 2: LEFT */}
+                  <div className="bg-gray-50 border border-gray-200 rounded-2xl p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-900">2. Left Flank</span>
+                      {postLeftUrl ? (
+                        <span className="text-[10px] font-bold text-green-700">✓ Ready</span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-amber-700">* Required</span>
+                      )}
+                    </div>
+                    {postLeftUrl ? (
+                      <div className="relative aspect-[4/3] rounded-xl overflow-hidden border border-gray-300">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={postLeftUrl} alt="Left Flank" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setPostLeftUrl('')}
+                          className="absolute top-1 right-1 p-1 bg-black/60 rounded-lg text-white hover:bg-black"
+                        >
+                          <XCircle className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="aspect-[4/3] rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-2 text-center text-gray-400">
+                        <ImageIcon className="w-6 h-6 mb-1 text-gray-400" />
+                        <span className="text-[10px]">Upload or paste URL</span>
+                      </div>
+                    )}
+                    <div className="space-y-1.5">
+                      <label className="w-full py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer transition">
+                        <Upload className="w-3 h-3" />
+                        <span>{uploadingAngle === 'LEFT' ? 'Uploading...' : 'Upload File'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleUploadPhoto(f, 'LEFT');
+                          }}
+                        />
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Or paste image URL"
+                        value={postLeftUrl}
+                        onChange={(e) => setPostLeftUrl(e.target.value)}
+                        className="w-full bg-white border border-gray-200 rounded-lg py-1 px-2 text-[11px] text-gray-900 outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Angle 3: RIGHT */}
+                  <div className="bg-gray-50 border border-gray-200 rounded-2xl p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-900">3. Right Flank</span>
+                      {postRightUrl ? (
+                        <span className="text-[10px] font-bold text-green-700">✓ Ready</span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-amber-700">* Required</span>
+                      )}
+                    </div>
+                    {postRightUrl ? (
+                      <div className="relative aspect-[4/3] rounded-xl overflow-hidden border border-gray-300">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={postRightUrl} alt="Right Flank" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setPostRightUrl('')}
+                          className="absolute top-1 right-1 p-1 bg-black/60 rounded-lg text-white hover:bg-black"
+                        >
+                          <XCircle className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="aspect-[4/3] rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-2 text-center text-gray-400">
+                        <ImageIcon className="w-6 h-6 mb-1 text-gray-400" />
+                        <span className="text-[10px]">Upload or paste URL</span>
+                      </div>
+                    )}
+                    <div className="space-y-1.5">
+                      <label className="w-full py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer transition">
+                        <Upload className="w-3 h-3" />
+                        <span>{uploadingAngle === 'RIGHT' ? 'Uploading...' : 'Upload File'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleUploadPhoto(f, 'RIGHT');
+                          }}
+                        />
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Or paste image URL"
+                        value={postRightUrl}
+                        onChange={(e) => setPostRightUrl(e.target.value)}
+                        className="w-full bg-white border border-gray-200 rounded-lg py-1 px-2 text-[11px] text-gray-900 outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Form Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+                <button
+                  type="button"
+                  onClick={() => setPostModalOpen(false)}
+                  className="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={postSubmitting}
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-green-700 to-emerald-600 hover:from-green-600 hover:to-emerald-500 text-white font-black text-xs shadow-lg transition flex items-center gap-2 active:scale-98 disabled:opacity-60 cursor-pointer"
+                >
+                  {postSubmitting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                  <span>{postSubmitting ? 'Publishing...' : 'Publish Livestock Listing'}</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

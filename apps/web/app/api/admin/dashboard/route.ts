@@ -9,14 +9,26 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized: Admin role required' }, { status: 403 });
     }
 
-    const [totalSellers, pendingSellersCount, activeListings, pendingListings, totalReports] =
-      await Promise.all([
-        prisma.user.count({ where: { role: 'SELLER' } }),
-        prisma.user.count({ where: { role: 'SELLER', status: 'PENDING' } }),
-        prisma.listing.count({ where: { status: 'ACTIVE' } }),
-        prisma.listing.count({ where: { status: 'PENDING' } }),
-        prisma.report.count({ where: { status: 'PENDING' } }),
-      ]);
+    const [
+      totalSellers,
+      pendingSellersCount,
+      activeListings,
+      pendingListings,
+      soldListings,
+      totalReports,
+      activeValueAggregate,
+    ] = await Promise.all([
+      prisma.user.count({ where: { role: 'SELLER' } }),
+      prisma.user.count({ where: { role: 'SELLER', status: 'PENDING' } }),
+      prisma.listing.count({ where: { status: 'ACTIVE' } }),
+      prisma.listing.count({ where: { status: 'PENDING' } }),
+      prisma.listing.count({ where: { status: 'SOLD' } }),
+      prisma.report.count({ where: { status: 'PENDING' } }),
+      prisma.listing.aggregate({
+        where: { status: 'ACTIVE' },
+        _sum: { price: true },
+      }),
+    ]);
 
     // Pending sellers awaiting admin approval
     const pendingSellers = await prisma.user.findMany({
@@ -46,7 +58,7 @@ export async function GET() {
         images: true,
       },
       orderBy: { createdAt: 'desc' },
-      take: 20,
+      take: 30,
     });
 
     // Recent reports
@@ -63,17 +75,18 @@ export async function GET() {
         },
       },
       orderBy: { createdAt: 'desc' },
-      take: 20,
+      take: 30,
     });
 
-    // All approved/active sellers list
+    // All registered sellers list
     const sellers = await prisma.user.findMany({
-      where: { role: 'SELLER', status: { not: 'PENDING' } },
+      where: { status: { not: 'PENDING' } },
       select: {
         id: true,
         fullName: true,
         email: true,
         phone: true,
+        role: true,
         status: true,
         region: true,
         city: true,
@@ -83,7 +96,28 @@ export async function GET() {
         },
       },
       orderBy: { createdAt: 'desc' },
-      take: 50,
+      take: 100,
+    });
+
+    // All listings for full inventory management
+    const allListings = await prisma.listing.findMany({
+      include: {
+        category: { select: { id: true, name: true, icon: true } },
+        breed: { select: { id: true, name: true } },
+        seller: { select: { id: true, fullName: true, phone: true, email: true } },
+        images: { select: { id: true, imageUrl: true, imageType: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+    });
+
+    // Categories with Breeds
+    const categories = await prisma.category.findMany({
+      include: {
+        breeds: true,
+        _count: { select: { listings: true } },
+      },
+      orderBy: { name: 'asc' },
     });
 
     return NextResponse.json({
@@ -92,12 +126,16 @@ export async function GET() {
         pendingSellersCount,
         activeListings,
         pendingListings,
+        soldListings,
         totalReports,
+        totalInventoryValueETB: activeValueAggregate._sum.price || 0,
       },
       pendingSellers,
       pendingItems,
       reports,
       sellers,
+      allListings,
+      categories,
     });
   } catch (error) {
     console.error('Admin dashboard error:', error);

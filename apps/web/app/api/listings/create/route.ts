@@ -65,7 +65,10 @@ export async function POST(req: Request) {
 
     const listing = await prisma.listing.create({
       data: {
-        sellerId: session.userId,
+        sellerId:
+          session.role === 'ADMIN' && body.sellerId && body.sellerId !== 'self'
+            ? body.sellerId
+            : session.userId,
         categoryId,
         breedId: breedId || null,
         title: title.trim(),
