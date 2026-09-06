@@ -52,15 +52,18 @@ if (typeof window !== 'undefined') {
     (event: ErrorEvent) => {
       const isChunkLoad =
         event.error?.name === 'ChunkLoadError' ||
+        (event.filename && event.filename.includes('_next/static/chunks') && event.error?.name === 'SyntaxError') ||
         (typeof event.message === 'string' &&
-          (event.message.includes('Loading chunk') || event.message.includes('ChunkLoadError')));
+          (event.message.includes('Loading chunk') ||
+            event.message.includes('ChunkLoadError') ||
+            (event.message.includes('SyntaxError') && (event.filename || '').includes('layout.js'))));
 
       if (isChunkLoad) {
         event.stopImmediatePropagation();
         event.preventDefault();
         const lastReload = sessionStorage.getItem('admin_chunk_reload_ts');
         const now = Date.now();
-        if (!lastReload || now - parseInt(lastReload, 10) > 10000) {
+        if (!lastReload || now - parseInt(lastReload, 10) > 8000) {
           sessionStorage.setItem('admin_chunk_reload_ts', now.toString());
           window.location.reload();
         }
