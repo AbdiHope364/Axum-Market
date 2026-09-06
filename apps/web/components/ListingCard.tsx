@@ -56,8 +56,7 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
 
         {/* Top Badges */}
         <div className="absolute top-1.5 left-1.5 sm:top-2.5 sm:left-2.5 flex flex-wrap gap-1">
-          <span className="bg-black/70 backdrop-blur-md text-white text-[9px] sm:text-[11px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-full flex items-center gap-1">
-            <span>{listing.category.icon || '🐾'}</span>
+          <span className="bg-black/70 backdrop-blur-md text-white text-[9px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-md sm:rounded-full flex items-center">
             <span className="truncate max-w-[70px] sm:max-w-none">{listing.category.name}</span>
           </span>
           {listing.weightKg && (

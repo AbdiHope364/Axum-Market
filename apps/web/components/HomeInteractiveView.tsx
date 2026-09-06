@@ -282,13 +282,12 @@ export default function HomeInteractiveView({
             {/* "All" button */}
             <button
               onClick={() => setSelectedCategory('all')}
-              className={`flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl border text-left transition-all shadow-xs active:scale-95 shrink-0 cursor-pointer whitespace-nowrap ${
+              className={`flex items-center px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl border text-left transition-all shadow-xs active:scale-95 shrink-0 cursor-pointer whitespace-nowrap ${
                 selectedCategory === 'all'
                   ? 'bg-green-700 text-white border-green-700 shadow-green-700/20'
                   : 'bg-white text-gray-700 border-gray-200 hover:border-green-300 hover:bg-gray-50/60'
               }`}
             >
-              <span className="text-base sm:text-lg shrink-0">🐾</span>
               <div className="flex flex-col min-w-0">
                 <span className="text-xs font-black">
                   All Animals
@@ -313,13 +312,12 @@ export default function HomeInteractiveView({
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(isSelected ? 'all' : cat.name)}
-                  className={`flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl border text-left transition-all shadow-xs active:scale-95 shrink-0 cursor-pointer whitespace-nowrap ${
+                  className={`flex items-center px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl border text-left transition-all shadow-xs active:scale-95 shrink-0 cursor-pointer whitespace-nowrap ${
                     isSelected
                       ? 'bg-green-700 text-white border-green-700 shadow-green-700/20'
                       : 'bg-white text-gray-700 border-gray-200 hover:border-green-300 hover:bg-gray-50/60'
                   }`}
                 >
-                  <span className="text-base sm:text-lg shrink-0">{cat.icon || '🐮'}</span>
                   <div className="flex flex-col min-w-0">
                     <span className="text-xs font-black">
                       {primary}
@@ -344,24 +342,23 @@ export default function HomeInteractiveView({
         <section className="bg-slate-100/90 p-1 rounded-xl sm:rounded-2xl max-w-full overflow-hidden">
           <div className="flex items-center gap-1 overflow-x-auto no-scrollbar snap-x">
             {[
-              { id: 'all', label: 'All', amharic: 'ሁሉም', icon: '📋' },
-              { id: 'dairy', label: 'Dairy', amharic: 'የወተት', icon: '🥛' },
-              { id: 'beef', label: 'Beef Cattle', amharic: 'የስጋ', icon: '🥩' },
-              { id: 'sheep_goat', label: 'Sheep & Goats', amharic: 'በጎች', icon: '🐑' },
-              { id: 'budget', label: '< 60k ETB', amharic: 'ቅናሽ', icon: '💰' },
+              { id: 'all', label: 'All', amharic: 'ሁሉም' },
+              { id: 'dairy', label: 'Dairy', amharic: 'የወተት' },
+              { id: 'beef', label: 'Beef Cattle', amharic: 'የስጋ' },
+              { id: 'sheep_goat', label: 'Sheep & Goats', amharic: 'በጎች' },
+              { id: 'budget', label: '< 60k ETB', amharic: 'ቅናሽ' },
             ].map((tab) => {
               const isActive = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`shrink-0 sm:flex-1 snap-start py-1.5 px-2 sm:px-3 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition flex items-center justify-center gap-1 whitespace-nowrap cursor-pointer ${
+                  className={`shrink-0 sm:flex-1 snap-start py-1.5 px-2.5 sm:px-3 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition flex items-center justify-center gap-1 whitespace-nowrap cursor-pointer ${
                     isActive
                       ? 'bg-white text-green-800 shadow-xs'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
                   }`}
                 >
-                  <span>{tab.icon}</span>
                   <span>{tab.label}</span>
                   <span className="text-[9px] opacity-75">({tab.amharic})</span>
                 </button>

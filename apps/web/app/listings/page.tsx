@@ -266,7 +266,7 @@ function ListingsContent() {
               : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
           }`}
         >
-          🐾 All Livestock
+          All Livestock
         </button>
         {categories.map((cat) => {
           const isSelected = category === cat.slug || category === cat.id;
@@ -278,13 +278,12 @@ function ListingsContent() {
                 setCategory(isSelected ? '' : cat.slug);
                 setBreed('');
               }}
-              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+              className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1 whitespace-nowrap cursor-pointer ${
                 isSelected
                   ? 'bg-green-600 text-white shadow-xs'
                   : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
               }`}
             >
-              <span>{cat.icon || '🐾'}</span>
               <span className="hidden sm:inline">{cat.name}</span>
               <span className="sm:hidden">{shortName}</span>
             </button>
@@ -672,13 +671,12 @@ function ListingsContent() {
                           setCategory(isSelected ? '' : c.slug);
                           setBreed('');
                         }}
-                        className={`flex items-center gap-2 p-2.5 sm:p-3 rounded-2xl border text-left transition-all active:scale-95 min-w-0 overflow-hidden ${
+                        className={`flex items-center justify-between p-2.5 sm:p-3 rounded-2xl border text-left transition-all active:scale-95 min-w-0 overflow-hidden ${
                           isSelected
                             ? 'bg-green-50 border-green-600 text-green-900 shadow-xs'
                             : 'bg-white border-gray-200 text-gray-800 hover:bg-gray-50'
                         }`}
                       >
-                        <span className="text-xl sm:text-2xl shrink-0">{c.icon || '🐾'}</span>
                         <div className="flex-1 min-w-0">
                           <div className="text-xs font-black truncate">{c.name}</div>
                           <div className="text-[10px] text-gray-400 font-medium truncate">

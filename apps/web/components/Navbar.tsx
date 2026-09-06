@@ -364,10 +364,7 @@ export default function Navbar() {
                       onClick={() => setMobileMenuOpen(false)}
                       className="flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-gray-50 border border-transparent hover:border-gray-200 text-sm font-semibold text-gray-700 active:scale-95 transition"
                     >
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-base">{cat.icon}</span>
-                        <span>{cat.name}</span>
-                      </div>
+                      <span>{cat.name}</span>
                       <ChevronRight className="w-4 h-4 text-gray-300" />
                     </Link>
                   ))}
