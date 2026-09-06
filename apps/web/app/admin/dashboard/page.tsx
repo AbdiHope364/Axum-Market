@@ -259,7 +259,7 @@ export default function AdminDashboardPage() {
   const [postRegion, setPostRegion] = useState('Oromia');
   const [postCity, setPostCity] = useState('Sululta');
   const [postArea, setPostArea] = useState('');
-  const [postContactPhone, setPostContactPhone] = useState('+251911000000');
+  const [postContactPhone, setPostContactPhone] = useState('');
   const [postStatus, setPostStatus] = useState<'ACTIVE' | 'PENDING'>('ACTIVE');
   const [postFrontUrl, setPostFrontUrl] = useState('');
   const [postLeftUrl, setPostLeftUrl] = useState('');
@@ -2366,13 +2366,13 @@ export default function AdminDashboardPage() {
                       </div>
                     </div>
                     <div className="col-span-2 sm:col-span-1 min-w-0">
-                      <label className="block text-[11px] font-bold text-gray-700 mb-1">Contact Phone</label>
+                      <label className="block text-[11px] font-bold text-gray-700 mb-1">Contact Phone *</label>
                       <input
-                        type="text"
+                        type="tel"
                         value={postContactPhone}
                         onChange={(e) => setPostContactPhone(e.target.value)}
-                        placeholder="0911..."
-                        className="w-full max-w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 sm:py-2 px-3 text-base sm:text-xs text-gray-900 outline-none font-mono focus:border-green-600"
+                        placeholder="e.g. 0911 234 567 or +251 91 123 4567"
+                        className="w-full max-w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 sm:py-2 px-3 text-base sm:text-xs text-gray-900 outline-none font-mono focus:border-green-600 placeholder:text-gray-400"
                       />
                     </div>
                   </div>
