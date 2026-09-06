@@ -369,7 +369,7 @@ export default function CreateListingPage() {
           {/* Category & Breed */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label className="block text-xs font-black text-gray-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+              <label className="text-xs font-black text-gray-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
                 <Tag className="w-3.5 h-3.5 text-green-600" />
                 <span>Animal Category *</span>
               </label>
@@ -391,7 +391,7 @@ export default function CreateListingPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-black text-gray-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+              <label className="text-xs font-black text-gray-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
                 <span>Breed (Optional)</span>
               </label>
               <select
@@ -473,7 +473,7 @@ export default function CreateListingPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-black text-gray-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+              <label className="text-xs font-black text-gray-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
                 <span>Weight (kg)</span>
                 <span className="text-[10px] text-amber-700 font-semibold bg-amber-50 px-1.5 py-0.2 rounded">Optional</span>
               </label>
@@ -498,7 +498,7 @@ export default function CreateListingPage() {
           {/* Price & Contact Phone */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label className="block text-xs font-black text-gray-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+              <label className="text-xs font-black text-gray-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
                 <Coins className="w-3.5 h-3.5 text-green-600" />
                 <span>Price (ETB) *</span>
               </label>
@@ -519,7 +519,7 @@ export default function CreateListingPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-black text-gray-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+              <label className="text-xs font-black text-gray-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
                 <Phone className="w-3.5 h-3.5 text-green-600" />
                 <span>Contact Phone *</span>
               </label>
@@ -537,7 +537,7 @@ export default function CreateListingPage() {
           {/* Structured Location */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5">
             <div>
-              <label className="block text-xs font-black text-gray-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+              <label className="text-xs font-black text-gray-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5 text-green-600" />
                 <span>Region *</span>
               </label>
