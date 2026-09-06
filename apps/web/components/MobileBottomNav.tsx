@@ -8,10 +8,11 @@ import { Home, Search, PlusCircle, User } from 'lucide-react';
 export default function MobileBottomNav() {
   const pathname = usePathname();
 
-  // Don't show bottom nav on single listing detail page if sticky call seller button is active
+  // Don't show bottom nav on single listing detail page or admin portal
   const isListingDetail = pathname.startsWith('/listings/') && pathname.split('/').length === 3;
+  const isAdmin = pathname.startsWith('/admin');
 
-  if (isListingDetail) {
+  if (isListingDetail || isAdmin) {
     return null;
   }
 

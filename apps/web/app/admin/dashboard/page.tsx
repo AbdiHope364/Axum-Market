@@ -737,30 +737,31 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* INTERACTIVE KPI SUMMARY CARDS (Click card to jump and filter instantly!) */}
+      {/* INTERACTIVE KPI SUMMARY CARDS (Swipeable carousel on mobile, grid on desktop) */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs font-bold text-gray-500 uppercase tracking-wider">
           <span>Quick Metric Filters (Click card to view)</span>
+          <span className="text-green-700 font-semibold sm:hidden">👉 Swipe cards</span>
           <span className="text-green-700 font-semibold hidden sm:inline">⚡ 1-Click Navigation</span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
+        <div className="flex sm:grid sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 overflow-x-auto no-scrollbar snap-x -mx-3 px-3 sm:mx-0 sm:px-0 py-1">
           {/* 1. Pending Sellers */}
           <button
             onClick={() => setActiveTab('seller_approvals')}
-            className={`text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+            className={`min-w-[130px] max-w-[155px] sm:min-w-0 sm:max-w-none shrink-0 sm:shrink snap-start text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
               activeTab === 'seller_approvals'
                 ? 'bg-amber-50 border-amber-400 shadow-md ring-2 ring-amber-400/40'
                 : 'bg-white border-gray-200 hover:border-amber-400 hover:-translate-y-0.5 shadow-sm'
             }`}
           >
             <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 flex items-center justify-between w-full">
-              <span>Pending Sellers</span>
+              <span>Sellers</span>
               <Clock className="w-3.5 h-3.5 text-amber-500" />
             </div>
             <div className="text-xl sm:text-2xl font-black text-amber-600 my-1">{stats.pendingSellersCount}</div>
             <div className="text-[9px] sm:text-[10px] text-gray-500 flex items-center justify-between w-full">
-              <span>Awaiting review</span>
+              <span>Awaiting</span>
               <ArrowRight className="w-3 h-3 text-amber-500" />
             </div>
           </button>
@@ -768,19 +769,19 @@ export default function AdminDashboardPage() {
           {/* 2. Pending Animals */}
           <button
             onClick={() => setActiveTab('moderation')}
-            className={`text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+            className={`min-w-[130px] max-w-[155px] sm:min-w-0 sm:max-w-none shrink-0 sm:shrink snap-start text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
               activeTab === 'moderation'
                 ? 'bg-amber-50 border-amber-400 shadow-md ring-2 ring-amber-400/40'
                 : 'bg-white border-gray-200 hover:border-amber-400 hover:-translate-y-0.5 shadow-sm'
             }`}
           >
             <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 flex items-center justify-between w-full">
-              <span>Pending Animals</span>
+              <span>Animals</span>
               <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
             </div>
             <div className="text-xl sm:text-2xl font-black text-amber-600 my-1">{stats.pendingListings}</div>
             <div className="text-[9px] sm:text-[10px] text-gray-500 flex items-center justify-between w-full">
-              <span>3-photo review</span>
+              <span>3-photo</span>
               <ArrowRight className="w-3 h-3 text-amber-500" />
             </div>
           </button>
@@ -791,19 +792,19 @@ export default function AdminDashboardPage() {
               setActiveTab('all_listings');
               setListingStatusFilter('ACTIVE');
             }}
-            className={`text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+            className={`min-w-[130px] max-w-[155px] sm:min-w-0 sm:max-w-none shrink-0 sm:shrink snap-start text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
               activeTab === 'all_listings' && listingStatusFilter === 'ACTIVE'
                 ? 'bg-green-50 border-green-500 shadow-md ring-2 ring-green-500/40'
                 : 'bg-white border-gray-200 hover:border-green-500 hover:-translate-y-0.5 shadow-sm'
             }`}
           >
             <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 flex items-center justify-between w-full">
-              <span>Live Animals</span>
+              <span>Live</span>
               <CheckCircle className="w-3.5 h-3.5 text-green-600" />
             </div>
             <div className="text-xl sm:text-2xl font-black text-green-700 my-1">{stats.activeListings}</div>
             <div className="text-[9px] sm:text-[10px] text-gray-500 flex items-center justify-between w-full">
-              <span>Active on site</span>
+              <span>Active</span>
               <ArrowRight className="w-3 h-3 text-green-600" />
             </div>
           </button>
@@ -814,19 +815,19 @@ export default function AdminDashboardPage() {
               setActiveTab('all_listings');
               setListingStatusFilter('SOLD');
             }}
-            className={`text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+            className={`min-w-[130px] max-w-[155px] sm:min-w-0 sm:max-w-none shrink-0 sm:shrink snap-start text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
               activeTab === 'all_listings' && listingStatusFilter === 'SOLD'
                 ? 'bg-blue-50 border-blue-500 shadow-md ring-2 ring-blue-500/40'
                 : 'bg-white border-gray-200 hover:border-blue-500 hover:-translate-y-0.5 shadow-sm'
             }`}
           >
             <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 flex items-center justify-between w-full">
-              <span>Sold (የተሸጡ)</span>
+              <span>Sold</span>
               <Sparkles className="w-3.5 h-3.5 text-blue-600" />
             </div>
             <div className="text-xl sm:text-2xl font-black text-blue-700 my-1">{stats.soldListings}</div>
             <div className="text-[9px] sm:text-[10px] text-gray-500 flex items-center justify-between w-full">
-              <span>Completed sales</span>
+              <span>Completed</span>
               <ArrowRight className="w-3 h-3 text-blue-600" />
             </div>
           </button>
@@ -834,19 +835,19 @@ export default function AdminDashboardPage() {
           {/* 5. Sellers */}
           <button
             onClick={() => setActiveTab('sellers')}
-            className={`text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+            className={`min-w-[130px] max-w-[155px] sm:min-w-0 sm:max-w-none shrink-0 sm:shrink snap-start text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
               activeTab === 'sellers'
                 ? 'bg-purple-50 border-purple-500 shadow-md ring-2 ring-purple-500/40'
                 : 'bg-white border-gray-200 hover:border-purple-500 hover:-translate-y-0.5 shadow-sm'
             }`}
           >
             <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 flex items-center justify-between w-full">
-              <span>All Sellers</span>
+              <span>Directory</span>
               <Users className="w-3.5 h-3.5 text-purple-600" />
             </div>
             <div className="text-xl sm:text-2xl font-black text-purple-700 my-1">{stats.totalSellers}</div>
             <div className="text-[9px] sm:text-[10px] text-gray-500 flex items-center justify-between w-full">
-              <span>Registered base</span>
+              <span>Base</span>
               <ArrowRight className="w-3 h-3 text-purple-600" />
             </div>
           </button>
@@ -854,7 +855,7 @@ export default function AdminDashboardPage() {
           {/* 6. Reports */}
           <button
             onClick={() => setActiveTab('reports')}
-            className={`text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+            className={`min-w-[130px] max-w-[155px] sm:min-w-0 sm:max-w-none shrink-0 sm:shrink snap-start text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
               activeTab === 'reports'
                 ? 'bg-red-50 border-red-500 shadow-md ring-2 ring-red-500/40'
                 : 'bg-white border-gray-200 hover:border-red-500 hover:-translate-y-0.5 shadow-sm'
@@ -873,8 +874,26 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-gray-200 overflow-x-auto no-scrollbar">
+      {/* Mobile Active Section Indicator (md:hidden) */}
+      <div className="md:hidden flex items-center justify-between bg-white border border-gray-200 rounded-2xl px-3.5 py-2.5 shadow-sm">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-green-600 animate-pulse" />
+          <span className="text-xs font-black text-gray-900 uppercase tracking-wider">
+            {activeTab === 'seller_approvals' && `Seller Approvals (${pendingSellers.length})`}
+            {activeTab === 'moderation' && `Listing Moderation (${pendingItems.length})`}
+            {activeTab === 'all_listings' && `Livestock Inventory (${filteredInventoryListings.length})`}
+            {activeTab === 'categories' && `Categories & Breeds (${categories.length})`}
+            {activeTab === 'sellers' && `Sellers Directory (${filteredSellers.length})`}
+            {activeTab === 'reports' && `Safety Reports (${reports.length})`}
+          </span>
+        </div>
+        <span className="text-[10px] font-bold text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">
+          Managing
+        </span>
+      </div>
+
+      {/* Desktop Tabs (hidden md:flex) */}
+      <div className="hidden md:flex items-center gap-2 border-b border-gray-200 overflow-x-auto no-scrollbar">
         {[
           { id: 'seller_approvals', label: 'Seller Approvals', count: stats.pendingSellersCount },
           { id: 'moderation', label: 'Listing Moderation', count: stats.pendingListings },
@@ -1758,7 +1777,7 @@ export default function AdminDashboardPage() {
             <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
               {/* Left: 3-Angle Full Viewer */}
               <div className="lg:col-span-8 space-y-3">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2">
                   {(['FRONT', 'LEFT', 'RIGHT'] as const).map((ang) => {
                     const img = inspectListing.images?.find((i: any) => i.imageType === ang);
                     const isSelected = inspectAngle === ang;
@@ -1766,14 +1785,19 @@ export default function AdminDashboardPage() {
                       <button
                         key={ang}
                         onClick={() => setInspectAngle(ang)}
-                        className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer border ${
+                        className={`flex-1 py-2 px-2 sm:px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer border ${
                           isSelected
                             ? 'bg-green-700 text-white border-green-700 font-black shadow'
                             : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
                         }`}
                       >
                         <Camera className="w-3.5 h-3.5" />
-                        <span>{ang === 'FRONT' ? '1. Front' : ang === 'LEFT' ? '2. Left Flank' : '3. Right Flank'}</span>
+                        <span className="hidden sm:inline">
+                          {ang === 'FRONT' ? '1. Front' : ang === 'LEFT' ? '2. Left Flank' : '3. Right Flank'}
+                        </span>
+                        <span className="sm:hidden">
+                          {ang === 'FRONT' ? 'Front' : ang === 'LEFT' ? 'Left' : 'Right'}
+                        </span>
                         {img && <span className="text-[10px] opacity-80">✓</span>}
                       </button>
                     );
@@ -1959,7 +1983,107 @@ export default function AdminDashboardPage() {
                 </div>
               )}
 
+              {/* 3 Photos Upload Section (Top of form for fast mobile camera/gallery access) */}
+              <div className="space-y-2.5 pb-4 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <Camera className="w-4 h-4 text-green-700" />
+                    <span className="text-xs font-black text-gray-900">
+                      Mandatory 3 Photos (Front, Left Flank, Right Flank)
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-amber-700 font-bold">* All 3 required</span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                  {[
+                    {
+                      angle: 'FRONT' as const,
+                      label: '1. Front View',
+                      shortLabel: 'Front',
+                      url: postFrontUrl,
+                      setUrl: setPostFrontUrl,
+                    },
+                    {
+                      angle: 'LEFT' as const,
+                      label: '2. Left Flank',
+                      shortLabel: 'Left Flank',
+                      url: postLeftUrl,
+                      setUrl: setPostLeftUrl,
+                    },
+                    {
+                      angle: 'RIGHT' as const,
+                      label: '3. Right Flank',
+                      shortLabel: 'Right Flank',
+                      url: postRightUrl,
+                      setUrl: setPostRightUrl,
+                    },
+                  ].map((item) => (
+                    <div
+                      key={item.angle}
+                      className="bg-gray-50 border border-gray-200 rounded-2xl p-2 sm:p-3 space-y-2 flex flex-col justify-between"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] sm:text-xs font-bold text-gray-900 truncate">
+                          <span className="hidden sm:inline">{item.label}</span>
+                          <span className="sm:hidden">{item.shortLabel}</span>
+                        </span>
+                        {item.url ? (
+                          <span className="text-[9px] sm:text-[10px] font-bold text-green-700">✓ Ready</span>
+                        ) : (
+                          <span className="text-[9px] sm:text-[10px] font-bold text-amber-700">* Req</span>
+                        )}
+                      </div>
+
+                      {item.url ? (
+                        <div className="relative aspect-[4/3] rounded-xl overflow-hidden border border-gray-300 group">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={item.url} alt={item.label} className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => item.setUrl('')}
+                            className="absolute top-1 right-1 p-1 bg-black/70 hover:bg-red-600 rounded-lg text-white transition cursor-pointer"
+                            title="Remove photo"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="aspect-[4/3] rounded-xl border-2 border-dashed border-gray-300 hover:border-green-600 bg-white flex flex-col items-center justify-center p-2 text-center text-gray-400 cursor-pointer transition hover:bg-gray-50">
+                          {uploadingAngle === item.angle ? (
+                            <RefreshCw className="w-5 h-5 text-green-600 animate-spin" />
+                          ) : (
+                            <Camera className="w-5 h-5 mb-1 text-gray-500" />
+                          )}
+                          <span className="text-[10px] font-bold text-gray-600">
+                            {uploadingAngle === item.angle ? 'Uploading...' : 'Tap to Add'}
+                          </span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const f = e.target.files?.[0];
+                              if (f) handleUploadPhoto(f, item.angle);
+                            }}
+                          />
+                        </label>
+                      )}
+
+                      <input
+                        type="text"
+                        placeholder="or URL..."
+                        value={item.url}
+                        onChange={(e) => item.setUrl(e.target.value)}
+                        className="w-full bg-white border border-gray-200 rounded-lg py-1 px-1.5 text-[10px] text-gray-900 outline-none focus:border-green-600"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+                {/* Form inputs: full width on mobile, 8 cols on desktop */}
                 <div className="md:col-span-8 space-y-4">
                   {/* Seller attribution */}
                   <div>
@@ -2023,14 +2147,14 @@ export default function AdminDashboardPage() {
                         placeholder="e.g. 460"
                         className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-green-600"
                       />
-                      <div className="flex items-center gap-1 mt-1.5">
-                        <span className="text-[10px] text-gray-400">Presets:</span>
+                      <div className="flex items-center gap-1 mt-1.5 overflow-x-auto no-scrollbar py-0.5">
+                        <span className="text-[10px] text-gray-400 shrink-0">Presets:</span>
                         {[280, 350, 420, 460, 520].map((kg) => (
                           <button
                             key={kg}
                             type="button"
                             onClick={() => setPostWeightKg(kg.toString())}
-                            className="px-1.5 py-0.5 bg-gray-100 hover:bg-gray-200 text-amber-800 rounded text-[10px] font-bold"
+                            className="px-1.5 py-0.5 bg-gray-100 hover:bg-gray-200 text-amber-800 rounded text-[10px] font-bold shrink-0"
                           >
                             {kg}kg
                           </button>
@@ -2083,14 +2207,14 @@ export default function AdminDashboardPage() {
                   </div>
 
                   {/* Age, Gender, Contact */}
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3">
                     <div>
                       <label className="block text-[11px] font-bold text-gray-700 mb-1">Age</label>
                       <input
                         type="text"
                         value={postAge}
                         onChange={(e) => setPostAge(e.target.value)}
-                        placeholder="e.g. 4 years"
+                        placeholder="e.g. 4 yrs"
                         className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none"
                       />
                     </div>
@@ -2101,8 +2225,8 @@ export default function AdminDashboardPage() {
                         onChange={(e) => setPostGender(e.target.value as any)}
                         className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none"
                       >
-                        <option value="MALE">Male (ተባዕት / በሬ)</option>
-                        <option value="FEMALE">Female (አንስታይ / ላም)</option>
+                        <option value="MALE">Male (በሬ)</option>
+                        <option value="FEMALE">Female (ላም)</option>
                       </select>
                     </div>
                     <div>
@@ -2117,12 +2241,12 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
 
-                {/* Right: Live Buyer Preview */}
-                <div className="md:col-span-4 space-y-2">
+                {/* Right: Live Buyer Preview: hidden on mobile to avoid bloat, 4 cols on desktop */}
+                <div className="hidden md:block md:col-span-4 space-y-2">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-green-700 block">
                     Live Buyer Card Preview:
                   </span>
-                  <div className="bg-gray-50 border border-gray-200 rounded-2xl p-3.5 space-y-2.5 shadow-sm">
+                  <div className="bg-gray-50 border border-gray-200 rounded-2xl p-3.5 space-y-2.5 shadow-sm sticky top-4">
                     <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-200 border border-gray-300 flex items-center justify-center">
                       {postFrontUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -2155,190 +2279,22 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              {/* 3 Photos Upload Section */}
-              <div className="space-y-2 pt-2 border-t border-gray-200">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-gray-800">
-                    Mandatory 3 Photos (Front, Left Flank, Right Flank)
-                  </span>
-                  <span className="text-[10px] text-amber-700">* All 3 required</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {/* Angle 1: FRONT */}
-                  <div className="bg-gray-50 border border-gray-200 rounded-2xl p-3 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-gray-900">1. Front View</span>
-                      {postFrontUrl ? (
-                        <span className="text-[10px] font-bold text-green-700">✓ Ready</span>
-                      ) : (
-                        <span className="text-[10px] font-bold text-amber-700">* Required</span>
-                      )}
-                    </div>
-                    {postFrontUrl ? (
-                      <div className="relative aspect-[4/3] rounded-xl overflow-hidden border border-gray-300">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={postFrontUrl} alt="Front View" className="w-full h-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={() => setPostFrontUrl('')}
-                          className="absolute top-1 right-1 p-1 bg-black/60 rounded-lg text-white hover:bg-black"
-                        >
-                          <XCircle className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="aspect-[4/3] rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-2 text-center text-gray-400">
-                        <ImageIcon className="w-6 h-6 mb-1 text-gray-400" />
-                        <span className="text-[10px]">Upload or paste URL</span>
-                      </div>
-                    )}
-                    <div className="space-y-1.5">
-                      <label className="w-full py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer transition">
-                        <Upload className="w-3 h-3" />
-                        <span>{uploadingAngle === 'FRONT' ? 'Uploading...' : 'Upload File'}</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => {
-                            const f = e.target.files?.[0];
-                            if (f) handleUploadPhoto(f, 'FRONT');
-                          }}
-                        />
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Or paste image URL"
-                        value={postFrontUrl}
-                        onChange={(e) => setPostFrontUrl(e.target.value)}
-                        className="w-full bg-white border border-gray-200 rounded-lg py-1 px-2 text-[11px] text-gray-900 outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Angle 2: LEFT */}
-                  <div className="bg-gray-50 border border-gray-200 rounded-2xl p-3 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-gray-900">2. Left Flank</span>
-                      {postLeftUrl ? (
-                        <span className="text-[10px] font-bold text-green-700">✓ Ready</span>
-                      ) : (
-                        <span className="text-[10px] font-bold text-amber-700">* Required</span>
-                      )}
-                    </div>
-                    {postLeftUrl ? (
-                      <div className="relative aspect-[4/3] rounded-xl overflow-hidden border border-gray-300">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={postLeftUrl} alt="Left Flank" className="w-full h-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={() => setPostLeftUrl('')}
-                          className="absolute top-1 right-1 p-1 bg-black/60 rounded-lg text-white hover:bg-black"
-                        >
-                          <XCircle className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="aspect-[4/3] rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-2 text-center text-gray-400">
-                        <ImageIcon className="w-6 h-6 mb-1 text-gray-400" />
-                        <span className="text-[10px]">Upload or paste URL</span>
-                      </div>
-                    )}
-                    <div className="space-y-1.5">
-                      <label className="w-full py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer transition">
-                        <Upload className="w-3 h-3" />
-                        <span>{uploadingAngle === 'LEFT' ? 'Uploading...' : 'Upload File'}</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => {
-                            const f = e.target.files?.[0];
-                            if (f) handleUploadPhoto(f, 'LEFT');
-                          }}
-                        />
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Or paste image URL"
-                        value={postLeftUrl}
-                        onChange={(e) => setPostLeftUrl(e.target.value)}
-                        className="w-full bg-white border border-gray-200 rounded-lg py-1 px-2 text-[11px] text-gray-900 outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Angle 3: RIGHT */}
-                  <div className="bg-gray-50 border border-gray-200 rounded-2xl p-3 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-gray-900">3. Right Flank</span>
-                      {postRightUrl ? (
-                        <span className="text-[10px] font-bold text-green-700">✓ Ready</span>
-                      ) : (
-                        <span className="text-[10px] font-bold text-amber-700">* Required</span>
-                      )}
-                    </div>
-                    {postRightUrl ? (
-                      <div className="relative aspect-[4/3] rounded-xl overflow-hidden border border-gray-300">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={postRightUrl} alt="Right Flank" className="w-full h-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={() => setPostRightUrl('')}
-                          className="absolute top-1 right-1 p-1 bg-black/60 rounded-lg text-white hover:bg-black"
-                        >
-                          <XCircle className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="aspect-[4/3] rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-2 text-center text-gray-400">
-                        <ImageIcon className="w-6 h-6 mb-1 text-gray-400" />
-                        <span className="text-[10px]">Upload or paste URL</span>
-                      </div>
-                    )}
-                    <div className="space-y-1.5">
-                      <label className="w-full py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer transition">
-                        <Upload className="w-3 h-3" />
-                        <span>{uploadingAngle === 'RIGHT' ? 'Uploading...' : 'Upload File'}</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => {
-                            const f = e.target.files?.[0];
-                            if (f) handleUploadPhoto(f, 'RIGHT');
-                          }}
-                        />
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Or paste image URL"
-                        value={postRightUrl}
-                        onChange={(e) => setPostRightUrl(e.target.value)}
-                        className="w-full bg-white border border-gray-200 rounded-lg py-1 px-2 text-[11px] text-gray-900 outline-none"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               {/* Form Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+              <div className="flex items-center justify-end gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200">
                 <button
                   type="button"
                   onClick={() => setPostModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs transition cursor-pointer"
+                  className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs transition cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={postSubmitting}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-green-700 to-emerald-600 hover:from-green-600 hover:to-emerald-500 text-white font-black text-xs shadow-lg transition flex items-center gap-2 active:scale-98 disabled:opacity-60 cursor-pointer"
+                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-gradient-to-r from-green-700 to-emerald-600 hover:from-green-600 hover:to-emerald-500 text-white font-black text-xs shadow-lg transition flex items-center justify-center gap-2 active:scale-98 disabled:opacity-60 cursor-pointer"
                 >
                   {postSubmitting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                  <span>{postSubmitting ? 'Publishing...' : 'Publish Livestock Listing'}</span>
+                  <span>{postSubmitting ? 'Publishing...' : 'Publish Listing'}</span>
                 </button>
               </div>
             </form>
