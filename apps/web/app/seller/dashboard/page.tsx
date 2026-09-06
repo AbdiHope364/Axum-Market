@@ -201,7 +201,7 @@ export default function SellerDashboardPage() {
                 item.images[0];
               const imgUrl =
                 frontImg?.imageUrl ||
-                'https://images.unsplash.com/photo-1546445317-29f4545e9d53?auto=format&fit=crop&w=400&q=80';
+                '/logo-emblem.png';
 
               return (
                 <div

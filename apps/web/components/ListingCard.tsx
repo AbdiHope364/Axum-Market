@@ -38,7 +38,7 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
     listing.images[0];
   const imageUrl =
     frontImage?.imageUrl ||
-    'https://images.unsplash.com/photo-1546445317-29f4545e9d53?auto=format&fit=crop&w=800&q=80';
+    '/logo-emblem.png';
 
   const isSold = listing.status === 'SOLD';
 

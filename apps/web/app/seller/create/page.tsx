@@ -545,20 +545,6 @@ export default function CreateListingPage() {
                 />
               </div>
             </div>
-
-            <div className="text-right">
-              <button
-                type="button"
-                onClick={() => {
-                  setFrontUrl('https://images.unsplash.com/photo-1546445317-29f4545e9d53?auto=format&fit=crop&w=800&q=80');
-                  setLeftUrl('https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?auto=format&fit=crop&w=800&q=80');
-                  setRightUrl('https://images.unsplash.com/photo-1527153857715-3908f2bae5e8?auto=format&fit=crop&w=800&q=80');
-                }}
-                className="text-xs text-green-700 hover:underline font-semibold"
-              >
-                + Fill Sample 3-Angle Demo Images
-              </button>
-            </div>
           </div>
 
           {/* Physical Inspection Agreement */}

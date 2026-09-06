@@ -148,7 +148,10 @@ async function main() {
     },
   });
 
-  const sellerHayiluu = await prisma.user.upsert({
+  if (process.env.SEED_MOCKUPS === 'true') {
+    console.log('Seeding demo sellers and sample mockup listings (SEED_MOCKUPS=true)...');
+
+    const sellerHayiluu = await prisma.user.upsert({
     where: { email: 'hayiluu@axummarket.et' },
     update: {},
     create: {
@@ -409,6 +412,9 @@ async function main() {
         });
       }
     }
+  }
+  } else {
+    console.log('Production mode: Skipping demo sellers and mock listings. Core taxonomy and admin account initialized.');
   }
 
   console.log('Seeding completed successfully!');

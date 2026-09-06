@@ -136,12 +136,6 @@ export default function SellerLoginPage() {
           </button>
         </form>
 
-        <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100 text-xs text-slate-600 space-y-1">
-          <p className="font-semibold text-slate-800">Demo Approved Seller Credentials:</p>
-          <p>Email: <span className="font-mono bg-white px-1 py-0.5 rounded border">hayiluu@axummarket.et</span></p>
-          <p>Password: <span className="font-mono bg-white px-1 py-0.5 rounded border">MarketPass123!</span></p>
-        </div>
-
         <div className="border-t border-gray-100 pt-4 text-center text-xs text-gray-500">
           Don&rsquo;t have a seller account yet?{' '}
           <Link href="/seller/register" className="font-bold text-green-700 hover:underline">

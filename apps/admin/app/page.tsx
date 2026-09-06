@@ -138,8 +138,8 @@ export default function AdminPortalPage() {
   const [authLoading, setAuthLoading] = useState(true);
 
   // Login form state
-  const [loginEmail, setLoginEmail] = useState('admin@axummarket.et');
-  const [loginPassword, setLoginPassword] = useState('AdminSecure2026!');
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
@@ -791,6 +791,7 @@ export default function AdminPortalPage() {
                 type="email"
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
+                placeholder="admin@axummarket.et"
                 required
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-amber-500 transition"
               />
@@ -803,6 +804,7 @@ export default function AdminPortalPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="••••••••"
                   required
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-3.5 pr-10 text-sm text-white focus:outline-none focus:border-amber-500 transition"
                 />

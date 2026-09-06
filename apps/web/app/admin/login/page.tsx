@@ -104,12 +104,6 @@ export default function AdminLoginPage() {
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
-
-        <div className="bg-slate-900/90 p-3.5 rounded-2xl border border-slate-700 text-xs text-slate-400 space-y-1">
-          <p className="font-semibold text-slate-200">Pre-seeded Admin Account:</p>
-          <p>Email: <span className="font-mono text-amber-300">admin@axummarket.et</span></p>
-          <p>Password: <span className="font-mono text-amber-300">AdminSecure2026!</span></p>
-        </div>
       </div>
     </div>
   );
