@@ -88,7 +88,7 @@ export default function SellerLoginPage() {
         )}
 
         {/* Minimalist Pure-Placeholder Form */}
-        <form onSubmit={handleLogin} className="space-y-3">
+        <form onSubmit={handleLogin} className="space-y-3" autoComplete="off">
           {/* Email Address Input */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
@@ -97,7 +97,7 @@ export default function SellerLoginPage() {
             <input
               type="email"
               required
-              autoComplete="email"
+              autoComplete="off"
               aria-label="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -114,7 +114,7 @@ export default function SellerLoginPage() {
             <input
               type={showPassword ? 'text' : 'password'}
               required
-              autoComplete="current-password"
+              autoComplete="new-password"
               aria-label="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

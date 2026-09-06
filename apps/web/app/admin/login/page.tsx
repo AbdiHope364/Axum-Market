@@ -60,12 +60,13 @@ export default function AdminLoginPage() {
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-3.5">
+        <form onSubmit={handleLogin} className="space-y-3.5" autoComplete="off">
           <div className="relative">
             <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="email"
               required
+              autoComplete="off"
               aria-label="Admin Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -79,6 +80,7 @@ export default function AdminLoginPage() {
             <input
               type="password"
               required
+              autoComplete="new-password"
               aria-label="Admin Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
