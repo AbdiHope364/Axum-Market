@@ -253,23 +253,24 @@ function ListingsContent() {
         </div>
       </div>
 
-      {/* Category Pills Slider (Fast mobile tap) */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+      {/* Category Pills Slider (Fast mobile tap, edge-to-edge scroll) */}
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 max-w-full -mx-4 px-4 sm:mx-0 sm:px-0 snap-x">
         <button
           onClick={() => {
             setCategory('');
             setBreed('');
           }}
-          className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition ${
+          className={`shrink-0 snap-start px-3.5 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap cursor-pointer ${
             !category
               ? 'bg-green-600 text-white shadow-sm'
               : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
           }`}
         >
-          All Livestock
+          🐾 All Livestock
         </button>
         {categories.map((cat) => {
           const isSelected = category === cat.slug || category === cat.id;
+          const shortName = cat.name.replace(/\s*\/.*$/, '').replace(/\(.*?\)/, '').trim() || cat.name;
           return (
             <button
               key={cat.id}
@@ -277,14 +278,15 @@ function ListingsContent() {
                 setCategory(isSelected ? '' : cat.slug);
                 setBreed('');
               }}
-              className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition flex items-center gap-1.5 ${
+              className={`shrink-0 snap-start px-3.5 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
                 isSelected
                   ? 'bg-green-600 text-white shadow-sm'
                   : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
               }`}
             >
               <span>{cat.icon || '🐾'}</span>
-              <span>{cat.name}</span>
+              <span className="hidden sm:inline">{cat.name}</span>
+              <span className="sm:hidden">{shortName}</span>
             </button>
           );
         })}

@@ -1174,13 +1174,13 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Species / Category Quick Filter Chips */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 max-w-full -mx-3 px-3 sm:mx-0 sm:px-0 snap-x">
             <span className="text-[11px] font-bold text-gray-500 shrink-0 mr-1 flex items-center gap-1">
               <Filter className="w-3 h-3 text-green-700" /> Species:
             </span>
             <button
               onClick={() => setListingCategoryFilter('ALL')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
+              className={`shrink-0 snap-start px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
                 listingCategoryFilter === 'ALL'
                   ? 'bg-green-700 text-white shadow'
                   : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
@@ -1190,18 +1190,20 @@ export default function AdminDashboardPage() {
             </button>
             {categories.map((cat) => {
               const count = allListings.filter((l) => l.category?.id === cat.id).length;
+              const shortCatName = cat.name.replace(/\s*\/.*$/, '').replace(/\(.*?\)/, '').trim() || cat.name;
               return (
                 <button
                   key={cat.id}
                   onClick={() => setListingCategoryFilter(cat.id)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer flex items-center gap-1 ${
+                  className={`shrink-0 snap-start px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer flex items-center gap-1 ${
                     listingCategoryFilter === cat.id
                       ? 'bg-green-700 text-white shadow'
                       : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
                   }`}
                 >
                   <span>{cat.icon || '🐾'}</span>
-                  <span>{cat.name}</span>
+                  <span className="hidden sm:inline">{cat.name}</span>
+                  <span className="sm:hidden">{shortCatName}</span>
                   <span className="text-[10px] opacity-70">({count})</span>
                 </button>
               );

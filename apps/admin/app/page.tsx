@@ -1480,13 +1480,13 @@ export default function AdminPortalPage() {
             </div>
 
             {/* Species / Category Quick Filter Chips */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 max-w-full -mx-3 px-3 sm:mx-0 sm:px-0 snap-x">
               <span className="text-[11px] font-bold text-slate-400 shrink-0 mr-1 flex items-center gap-1">
                 <Filter className="w-3 h-3 text-amber-400" /> Species:
               </span>
               <button
                 onClick={() => setListingCategoryFilter('ALL')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
+                className={`shrink-0 snap-start px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
                   listingCategoryFilter === 'ALL'
                     ? 'bg-amber-500 text-slate-950 shadow'
                     : 'bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-700'
@@ -1496,18 +1496,20 @@ export default function AdminPortalPage() {
               </button>
               {categories.map((cat) => {
                 const count = allListings.filter((l) => l.category?.id === cat.id).length;
+                const shortCatName = cat.name.replace(/\s*\/.*$/, '').replace(/\(.*?\)/, '').trim() || cat.name;
                 return (
                   <button
                     key={cat.id}
                     onClick={() => setListingCategoryFilter(cat.id)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer flex items-center gap-1 ${
+                    className={`shrink-0 snap-start px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer flex items-center gap-1 ${
                       listingCategoryFilter === cat.id
                         ? 'bg-amber-500 text-slate-950 shadow'
                         : 'bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-700'
                     }`}
                   >
                     <span>{cat.icon || '🐾'}</span>
-                    <span>{cat.name}</span>
+                    <span className="hidden sm:inline">{cat.name}</span>
+                    <span className="sm:hidden">{shortCatName}</span>
                     <span className="text-[10px] opacity-70">({count})</span>
                   </button>
                 );

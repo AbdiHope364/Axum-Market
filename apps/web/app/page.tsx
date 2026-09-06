@@ -29,7 +29,7 @@ export default async function HomePage() {
   ]);
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen w-full max-w-full overflow-x-hidden">
       <HomeInteractiveView
         categories={categories}
         initialListings={listings as any}

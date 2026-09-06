@@ -37,6 +37,16 @@ interface HomeInteractiveViewProps {
   initialListings: ListingCardData[];
 }
 
+function parseCategory(name: string) {
+  const amharicMatch = name.match(/\((.*?)\)/);
+  const amharic = amharicMatch ? amharicMatch[1] : '';
+  const english = name.replace(/\(.*?\)/, '').replace(/\s*\/.*$/, '').trim();
+  return {
+    primary: english || name,
+    secondary: amharic,
+  };
+}
+
 export default function HomeInteractiveView({
   categories,
   initialListings,
@@ -248,7 +258,7 @@ export default function HomeInteractiveView({
 
       {/* Main Interactive Content */}
       <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 space-y-6 sm:space-y-10">
-        {/* 3. Interactive Touch Category Bar */}
+        {/* 3. Interactive Touch Category Bar (Responsive 3-column grid on mobile, horizontal row on desktop) */}
         <section className="space-y-2.5">
           <div className="flex items-center justify-between">
             <h2 className="text-sm sm:text-lg font-bold text-gray-900 flex items-center gap-1.5">
@@ -262,44 +272,70 @@ export default function HomeInteractiveView({
             {selectedCategory !== 'all' && (
               <button
                 onClick={() => setSelectedCategory('all')}
-                className="text-xs text-red-600 font-semibold hover:underline"
+                className="text-xs text-red-600 font-semibold hover:underline cursor-pointer"
               >
                 Show All
               </button>
             )}
           </div>
 
-          {/* Horizontal scrollable category touch cards */}
-          <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto no-scrollbar pb-1 pt-0.5">
+          {/* Responsive Category Cards: 3-column grid on mobile so Beef Cattle and all categories fit 100% on screen! */}
+          <div className="grid grid-cols-3 sm:flex sm:overflow-x-auto sm:no-scrollbar gap-2 sm:gap-3">
             {/* "All" button */}
             <button
               onClick={() => setSelectedCategory('all')}
-              className={`flex-shrink-0 flex items-center gap-2 px-3.5 py-2.5 rounded-2xl border text-xs sm:text-sm font-bold transition-all shadow-sm ${
+              className={`flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-2 p-2 sm:px-4 sm:py-2.5 rounded-2xl border text-center sm:text-left transition-all shadow-sm active:scale-95 shrink-0 cursor-pointer ${
                 selectedCategory === 'all'
                   ? 'bg-green-700 text-white border-green-700 shadow-green-700/20 ring-2 ring-green-600 ring-offset-1'
-                  : 'bg-white text-gray-700 border-gray-200 hover:border-green-300'
+                  : 'bg-white text-gray-700 border-gray-200 hover:border-green-300 hover:bg-gray-50/60'
               }`}
             >
-              <span className="text-base">🐾</span>
-              <span>All Livestock (ሁሉም ከብቶች)</span>
+              <span className="text-xl sm:text-lg shrink-0">🐾</span>
+              <div className="flex flex-col min-w-0">
+                <span className="text-xs sm:text-sm font-black truncate">
+                  All Animals
+                </span>
+                <span
+                  className={`text-[10px] leading-tight truncate ${
+                    selectedCategory === 'all' ? 'text-green-100' : 'text-gray-400'
+                  }`}
+                >
+                  ሁሉም ከብቶች
+                </span>
+              </div>
             </button>
 
             {categories.map((cat) => {
               const isSelected =
                 selectedCategory.toLowerCase() === cat.slug?.toLowerCase() ||
                 selectedCategory.toLowerCase() === cat.name?.toLowerCase();
+              const { primary, secondary } = parseCategory(cat.name);
+
               return (
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(isSelected ? 'all' : cat.name)}
-                  className={`flex-shrink-0 flex items-center gap-2 px-3.5 py-2.5 rounded-2xl border text-xs sm:text-sm font-bold transition-all shadow-sm ${
+                  className={`flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-2 p-2 sm:px-4 sm:py-2.5 rounded-2xl border text-center sm:text-left transition-all shadow-sm active:scale-95 shrink-0 cursor-pointer ${
                     isSelected
                       ? 'bg-green-700 text-white border-green-700 shadow-green-700/20 ring-2 ring-green-600 ring-offset-1'
-                      : 'bg-white text-gray-700 border-gray-200 hover:border-green-300'
+                      : 'bg-white text-gray-700 border-gray-200 hover:border-green-300 hover:bg-gray-50/60'
                   }`}
                 >
-                  <span className="text-lg">{cat.icon || '🐮'}</span>
-                  <span>{cat.name}</span>
+                  <span className="text-xl sm:text-lg shrink-0">{cat.icon || '🐮'}</span>
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-xs sm:text-sm font-black truncate">
+                      {primary}
+                    </span>
+                    {secondary && (
+                      <span
+                        className={`text-[10px] leading-tight truncate ${
+                          isSelected ? 'text-green-100' : 'text-gray-400'
+                        }`}
+                      >
+                        {secondary}
+                      </span>
+                    )}
+                  </div>
                 </button>
               );
             })}
@@ -307,29 +343,33 @@ export default function HomeInteractiveView({
         </section>
 
         {/* 4. Interactive Market Mood Tabs */}
-        <section className="bg-slate-100/80 p-1.5 rounded-2xl flex items-center gap-1 overflow-x-auto no-scrollbar">
-          {[
-            { id: 'all', label: 'All Listings (ሁሉም)', icon: '📋' },
-            { id: 'dairy', label: '🥛 Dairy (የወተት)', icon: '🥛' },
-            { id: 'beef', label: '🥩 Beef (የስጋ)', icon: '🥩' },
-            { id: 'sheep_goat', label: '🐑 Sheep & Goats (በጎችና ፍየሎች)', icon: '🐑' },
-            { id: 'budget', label: '💰 Under 60k ETB (ከ60ሺህ በታች)', icon: '💰' },
-          ].map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex-1 min-w-[110px] py-2 px-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 whitespace-nowrap ${
-                  isActive
-                    ? 'bg-white text-green-800 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
-                }`}
-              >
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
+        <section className="bg-slate-100/90 p-1 sm:p-1.5 rounded-2xl max-w-full overflow-hidden">
+          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar snap-x">
+            {[
+              { id: 'all', label: 'All', amharic: 'ሁሉም', icon: '📋' },
+              { id: 'dairy', label: 'Dairy', amharic: 'የወተት', icon: '🥛' },
+              { id: 'beef', label: 'Beef Cattle', amharic: 'የስጋ', icon: '🥩' },
+              { id: 'sheep_goat', label: 'Sheep & Goats', amharic: 'በጎች', icon: '🐑' },
+              { id: 'budget', label: '< 60k ETB', amharic: 'ቅናሽ', icon: '💰' },
+            ].map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`shrink-0 sm:flex-1 snap-start py-2 px-2.5 sm:px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap cursor-pointer ${
+                    isActive
+                      ? 'bg-white text-green-800 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
+                  }`}
+                >
+                  <span>{tab.icon}</span>
+                  <span>{tab.label}</span>
+                  <span className="text-[10px] opacity-75">({tab.amharic})</span>
+                </button>
+              );
+            })}
+          </div>
         </section>
 
         {/* 5. Live Listings Feed Header */}
