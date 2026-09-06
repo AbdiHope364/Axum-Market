@@ -43,6 +43,7 @@ import {
   AlertCircle,
   Eye,
   X,
+  ChevronDown,
 } from 'lucide-react';
 import { formatPriceETB } from '@/lib/constants';
 
@@ -1946,8 +1947,8 @@ export default function AdminDashboardPage() {
       {/* POST LIVESTOCK MODAL */}
       {/* =================================================================== */}
       {postModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-6 overflow-y-auto">
-          <div className="max-w-4xl w-full bg-white border-t sm:border border-gray-200 rounded-t-3xl sm:rounded-3xl p-4 sm:p-7 shadow-2xl my-0 sm:my-auto max-h-[92vh] overflow-y-auto space-y-4 sm:space-y-6">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-6 overflow-y-auto overflow-x-hidden">
+          <div className="max-w-4xl w-full bg-white border-t sm:border border-gray-200 rounded-t-3xl sm:rounded-3xl p-4 sm:p-7 shadow-2xl my-0 sm:my-auto max-h-[92vh] overflow-y-auto overflow-x-hidden space-y-4 sm:space-y-6">
             <div className="flex items-center justify-between border-b border-gray-200 pb-3 sm:pb-4">
               <div className="flex items-center gap-2 sm:gap-2.5">
                 <div className="p-1.5 sm:p-2 rounded-xl bg-green-100 text-green-800">
@@ -1970,7 +1971,7 @@ export default function AdminDashboardPage() {
               </button>
             </div>
 
-            <form onSubmit={handlePostLivestock} className="space-y-5">
+            <form onSubmit={handlePostLivestock} className="space-y-5 w-full max-w-full min-w-0">
               {postFormError && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
@@ -2031,9 +2032,9 @@ export default function AdminDashboardPage() {
                           <span className="sm:hidden">{item.shortLabel}</span>
                         </span>
                         {item.url ? (
-                          <span className="text-[9px] sm:text-[10px] font-bold text-green-700">✓ Ready</span>
+                          <span className="text-[9px] sm:text-[10px] font-bold text-green-600">✓ Ready</span>
                         ) : (
-                          <span className="text-[9px] sm:text-[10px] font-bold text-amber-700">* Req</span>
+                          <span className="text-[9px] sm:text-[10px] font-bold text-amber-600">* Req</span>
                         )}
                       </div>
 
@@ -2084,30 +2085,35 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-5 w-full max-w-full min-w-0">
                 {/* Form inputs: full width on mobile, 8 cols on desktop */}
-                <div className="md:col-span-8 space-y-4">
+                <div className="md:col-span-8 space-y-4 w-full max-w-full min-w-0">
                   {/* Seller attribution */}
-                  <div>
+                  <div className="min-w-0 max-w-full">
                     <label className="block text-xs font-bold text-gray-700 mb-1">
                       Seller Attribution
                     </label>
-                    <select
-                      value={postSellerId}
-                      onChange={(e) => setPostSellerId(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-green-600"
-                    >
-                      <option value="self">AxumMarket Direct (Admin account)</option>
-                      {sellers.map((s) => (
-                        <option key={s.id} value={s.id}>
-                          {s.fullName} ({s.phone}) - {s.city || 'Seller'}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="relative w-full min-w-0">
+                      <select
+                        value={postSellerId}
+                        onChange={(e) => setPostSellerId(e.target.value)}
+                        className="w-full max-w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 sm:py-2 px-3 pr-8 text-base sm:text-xs text-gray-900 outline-none focus:border-green-600 truncate appearance-none"
+                      >
+                        <option value="self">Axum Direct (Admin account)</option>
+                        {sellers.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.fullName} ({s.phone}) {s.city ? `• ${s.city}` : ''}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-gray-500">
+                        <ChevronDown className="w-4 h-4" />
+                      </div>
+                    </div>
                   </div>
 
                   {/* Title */}
-                  <div>
+                  <div className="min-w-0 max-w-full">
                     <label className="block text-xs font-bold text-gray-700 mb-1">
                       Animal Title / ስም *
                     </label>
@@ -2117,13 +2123,13 @@ export default function AdminDashboardPage() {
                       onChange={(e) => setPostTitle(e.target.value)}
                       placeholder="e.g. Prime Borana Fattened Bull (የቦረና ሰንጋ በሬ)"
                       required
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-green-600"
+                      className="w-full max-w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 sm:py-2 px-3 text-base sm:text-xs text-gray-900 outline-none focus:border-green-600"
                     />
                   </div>
 
                   {/* Price & Weight in KG */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 max-w-full">
+                    <div className="min-w-0">
                       <label className="block text-xs font-bold text-gray-700 mb-1">
                         Price in ETB (ዋጋ) *
                       </label>
@@ -2133,11 +2139,11 @@ export default function AdminDashboardPage() {
                         onChange={(e) => setPostPrice(e.target.value)}
                         placeholder="e.g. 185000"
                         required
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-green-600"
+                        className="w-full max-w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 sm:py-2 px-3 text-base sm:text-xs text-gray-900 outline-none focus:border-green-600"
                       />
                     </div>
 
-                    <div>
+                    <div className="min-w-0">
                       <label className="block text-xs font-bold text-gray-700 mb-1">
                         Live Weight (kg) / ክብደት (ኪ.ግ)
                       </label>
@@ -2147,7 +2153,7 @@ export default function AdminDashboardPage() {
                         value={postWeightKg}
                         onChange={(e) => setPostWeightKg(e.target.value)}
                         placeholder="e.g. 460"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-green-600"
+                        className="w-full max-w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 sm:py-2 px-3 text-base sm:text-xs text-gray-900 outline-none focus:border-green-600"
                       />
                       <div className="flex items-center gap-1 mt-1.5 overflow-x-auto no-scrollbar py-0.5">
                         <span className="text-[10px] text-gray-400 shrink-0">Presets:</span>
@@ -2166,78 +2172,94 @@ export default function AdminDashboardPage() {
                   </div>
 
                   {/* Category & Breed */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 max-w-full">
+                    <div className="min-w-0">
                       <label className="block text-xs font-bold text-gray-700 mb-1">
                         Category *
                       </label>
-                      <select
-                        value={postCategoryId}
-                        onChange={(e) => {
-                          setPostCategoryId(e.target.value);
-                          setPostBreedId('');
-                        }}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-green-600"
-                      >
-                        {categories.map((c) => (
-                          <option key={c.id} value={c.id}>
-                            {c.icon} {c.name}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="relative w-full min-w-0">
+                        <select
+                          value={postCategoryId}
+                          onChange={(e) => {
+                            setPostCategoryId(e.target.value);
+                            setPostBreedId('');
+                          }}
+                          className="w-full max-w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 sm:py-2 px-3 pr-8 text-base sm:text-xs text-gray-900 outline-none focus:border-green-600 truncate appearance-none"
+                        >
+                          {categories.map((c) => (
+                            <option key={c.id} value={c.id}>
+                              {c.icon} {c.name.split('/')[0].trim()}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-gray-500">
+                          <ChevronDown className="w-4 h-4" />
+                        </div>
+                      </div>
                     </div>
 
-                    <div>
+                    <div className="min-w-0">
                       <label className="block text-xs font-bold text-gray-700 mb-1">
                         Breed (ዝርያ)
                       </label>
-                      <select
-                        value={postBreedId}
-                        onChange={(e) => setPostBreedId(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-green-600"
-                      >
-                        <option value="">Select breed (optional)</option>
-                        {categories
-                          .find((c) => c.id === postCategoryId)
-                          ?.breeds?.map((b) => (
-                            <option key={b.id} value={b.id}>
-                              {b.name}
-                            </option>
-                          ))}
-                      </select>
+                      <div className="relative w-full min-w-0">
+                        <select
+                          value={postBreedId}
+                          onChange={(e) => setPostBreedId(e.target.value)}
+                          className="w-full max-w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 sm:py-2 px-3 pr-8 text-base sm:text-xs text-gray-900 outline-none focus:border-green-600 truncate appearance-none"
+                        >
+                          <option value="">Select breed (optional)</option>
+                          {categories
+                            .find((c) => c.id === postCategoryId)
+                            ?.breeds?.map((b) => (
+                              <option key={b.id} value={b.id}>
+                                {b.name}
+                              </option>
+                            ))}
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-gray-500">
+                          <ChevronDown className="w-4 h-4" />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
                   {/* Age, Gender, Contact */}
-                  <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                    <div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3 min-w-0 max-w-full">
+                    <div className="col-span-1 min-w-0">
                       <label className="block text-[11px] font-bold text-gray-700 mb-1">Age</label>
                       <input
                         type="text"
                         value={postAge}
                         onChange={(e) => setPostAge(e.target.value)}
                         placeholder="e.g. 4 yrs"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none"
+                        className="w-full max-w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 sm:py-2 px-3 text-base sm:text-xs text-gray-900 outline-none focus:border-green-600"
                       />
                     </div>
-                    <div>
+                    <div className="col-span-1 min-w-0">
                       <label className="block text-[11px] font-bold text-gray-700 mb-1">Gender</label>
-                      <select
-                        value={postGender}
-                        onChange={(e) => setPostGender(e.target.value as any)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none"
-                      >
-                        <option value="MALE">Male (በሬ)</option>
-                        <option value="FEMALE">Female (ላም)</option>
-                      </select>
+                      <div className="relative w-full min-w-0">
+                        <select
+                          value={postGender}
+                          onChange={(e) => setPostGender(e.target.value as any)}
+                          className="w-full max-w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 sm:py-2 px-3 pr-7 text-base sm:text-xs text-gray-900 outline-none focus:border-green-600 truncate appearance-none"
+                        >
+                          <option value="MALE">Male (በሬ)</option>
+                          <option value="FEMALE">Female (ላም)</option>
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                          <ChevronDown className="w-3.5 h-3.5" />
+                        </div>
+                      </div>
                     </div>
-                    <div>
+                    <div className="col-span-2 sm:col-span-1 min-w-0">
                       <label className="block text-[11px] font-bold text-gray-700 mb-1">Contact Phone</label>
                       <input
                         type="text"
                         value={postContactPhone}
                         onChange={(e) => setPostContactPhone(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none font-mono"
+                        placeholder="0911..."
+                        className="w-full max-w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 sm:py-2 px-3 text-base sm:text-xs text-gray-900 outline-none font-mono focus:border-green-600"
                       />
                     </div>
                   </div>
