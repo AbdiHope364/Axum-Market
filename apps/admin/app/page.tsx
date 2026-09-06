@@ -829,37 +829,38 @@ export default function AdminPortalPage() {
               </div>
             )}
 
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-300">Admin Email</label>
+            <div className="relative">
+              <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="email"
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
-                placeholder="admin@axummarket.et"
+                placeholder="Admin Email"
+                aria-label="Admin Email"
                 required
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-amber-500 transition"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-10 pr-3.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500 transition"
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-300">Master Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-3.5 pr-10 text-sm text-white focus:outline-none focus:border-amber-500 transition"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 text-slate-500 hover:text-slate-300"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
+            <div className="relative">
+              <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                placeholder="Master Password"
+                aria-label="Master Password"
+                required
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-10 pr-10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500 transition"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
 
             <button

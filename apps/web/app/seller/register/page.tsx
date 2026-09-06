@@ -165,7 +165,7 @@ export default function SellerRegisterPage() {
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="e.g. Hayiluu Asaffaa"
+                placeholder="Full Name / ሙሉ ስም"
                 className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
@@ -182,7 +182,7 @@ export default function SellerRegisterPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
+                placeholder="Email Address"
                 className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
@@ -199,7 +199,7 @@ export default function SellerRegisterPage() {
                 required
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+251 911 123456"
+                placeholder="+251 9... (Phone for buyer calls)"
                 className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
@@ -233,7 +233,7 @@ export default function SellerRegisterPage() {
                 required
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                placeholder="Sululta, Bishoftu..."
+                placeholder="City or Town (ከተማ)"
                 className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
@@ -247,7 +247,7 @@ export default function SellerRegisterPage() {
               type="text"
               value={area}
               onChange={(e) => setArea(e.target.value)}
-              placeholder="e.g. Chancho, Babogaya"
+              placeholder="Area / Kebele / ሰፈር (Optional)"
               className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
@@ -265,7 +265,7 @@ export default function SellerRegisterPage() {
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="Create Password (min 6 chars)"
                 className="w-full pl-10 pr-10 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
               />
               <button
@@ -292,7 +292,7 @@ export default function SellerRegisterPage() {
                 minLength={6}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="Repeat password to confirm"
                 className="w-full pl-10 pr-10 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
               />
               <button
