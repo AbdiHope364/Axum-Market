@@ -53,8 +53,8 @@ export default function SellerLoginPage() {
       <div className="max-w-md w-full bg-white rounded-3xl border border-gray-200/90 p-5 sm:p-7 shadow-lg shadow-gray-200/50 space-y-5">
         {/* Header Header */}
         <div className="text-center space-y-1.5">
-          <div className="w-11 h-11 rounded-2xl bg-green-100/80 text-green-700 flex items-center justify-center mx-auto text-xl shadow-xs">
-            🔐
+          <div className="w-11 h-11 rounded-2xl bg-green-100/80 text-green-700 flex items-center justify-center mx-auto shadow-xs">
+            <Lock className="w-5 h-5 stroke-[2.2]" />
           </div>
           <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
             Seller Dashboard Login

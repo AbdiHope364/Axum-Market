@@ -15,6 +15,7 @@ import {
   Clock,
   ShieldCheck,
   CheckCircle2,
+  UserPlus,
 } from 'lucide-react';
 
 export default function SellerRegisterPage() {
@@ -135,8 +136,8 @@ export default function SellerRegisterPage() {
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full bg-white rounded-3xl border border-gray-200 p-6 sm:p-8 shadow-sm space-y-6">
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-green-100 text-green-700 flex items-center justify-center mx-auto text-2xl">
-            🐄
+          <div className="w-12 h-12 rounded-2xl bg-green-100 text-green-700 flex items-center justify-center mx-auto shadow-xs">
+            <UserPlus className="w-6 h-6 stroke-[2.2]" />
           </div>
           <h1 className="text-2xl font-black text-gray-900 tracking-tight">
             Register as a Livestock Seller

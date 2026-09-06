@@ -1,13 +1,13 @@
 import React from 'react';
 import Link from 'next/link';
-import { Search, Home, ArrowLeft } from 'lucide-react';
+import { Search, Home, ArrowLeft, Compass } from 'lucide-react';
 
 export default function NotFound() {
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
       <div className="max-w-md w-full text-center space-y-6 bg-white p-8 rounded-3xl border border-gray-200 shadow-sm">
-        <div className="w-16 h-16 rounded-2xl bg-green-50 text-green-700 flex items-center justify-center mx-auto text-3xl font-black">
-          🐮
+        <div className="w-16 h-16 rounded-2xl bg-green-50 text-green-700 flex items-center justify-center mx-auto shadow-xs">
+          <Compass className="w-8 h-8 stroke-[2]" />
         </div>
 
         <div className="space-y-2">
