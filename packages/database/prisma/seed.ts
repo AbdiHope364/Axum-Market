@@ -131,14 +131,18 @@ async function main() {
 
   // 4. Users (Admin + Sellers)
   const passwordHash = await bcrypt.hash('MarketPass123!', 10);
-  const adminPasswordHash = await bcrypt.hash('AdminSecure2026!', 10);
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@axummarket.et';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'AdminSecure2026!';
+  const adminPasswordHash = await bcrypt.hash(adminPassword, 10);
 
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@axummarket.et' },
-    update: {},
+    where: { email: adminEmail },
+    update: {
+      passwordHash: adminPasswordHash,
+    },
     create: {
       fullName: 'System Administrator',
-      email: 'admin@axummarket.et',
+      email: adminEmail,
       passwordHash: adminPasswordHash,
       phone: '+251911000001',
       role: 'ADMIN',

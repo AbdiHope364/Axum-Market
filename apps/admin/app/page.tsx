@@ -276,6 +276,14 @@ export default function AdminPortalPage() {
   const [postFormSuccess, setPostFormSuccess] = useState('');
   const [postSubmitting, setPostSubmitting] = useState(false);
 
+  // Change Admin Password Modal State
+  const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
+  const [newAdminPassword, setNewAdminPassword] = useState('');
+  const [confirmAdminPassword, setConfirmAdminPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [passwordChangeError, setPasswordChangeError] = useState('');
+
   const checkSession = useCallback(async () => {
     try {
       const res = await fetch('/api/auth/me');
@@ -456,6 +464,42 @@ export default function AdminPortalPage() {
     await fetch('/api/auth/logout', { method: 'POST' });
     setSessionUser(null);
     showToast('Signed out of admin session', 'info');
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAdminPassword || newAdminPassword.trim().length < 6) {
+      setPasswordChangeError('Password must be at least 6 characters.');
+      return;
+    }
+    if (newAdminPassword !== confirmAdminPassword) {
+      setPasswordChangeError('Passwords do not match.');
+      return;
+    }
+    if (!sessionUser) return;
+
+    setChangingPassword(true);
+    setPasswordChangeError('');
+    try {
+      const res = await fetch(`/api/sellers/${sessionUser.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newPassword: newAdminPassword.trim() }),
+      });
+      if (res.ok) {
+        showToast('Admin password updated successfully! ✓', 'success');
+        setChangePasswordModalOpen(false);
+        setNewAdminPassword('');
+        setConfirmAdminPassword('');
+      } else {
+        const data = await res.json();
+        setPasswordChangeError(data.error || 'Failed to update password.');
+      }
+    } catch {
+      setPasswordChangeError('Network error while updating password.');
+    } finally {
+      setChangingPassword(false);
+    }
   };
 
   // Seller Approval Action
@@ -938,6 +982,19 @@ export default function AdminPortalPage() {
             className="p-1.5 sm:p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition cursor-pointer active:scale-95"
           >
             <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </button>
+          <button
+            onClick={() => {
+              setPasswordChangeError('');
+              setNewAdminPassword('');
+              setConfirmAdminPassword('');
+              setChangePasswordModalOpen(true);
+            }}
+            title="Change Admin Password"
+            className="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1 cursor-pointer active:scale-95"
+          >
+            <Lock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400" />
+            <span className="hidden sm:inline">Password</span>
           </button>
           <button
             onClick={handleLogout}
@@ -2814,6 +2871,92 @@ export default function AdminPortalPage() {
                   >
                     {postSubmitting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                     <span>{postSubmitting ? 'Publishing...' : 'Publish Listing'}</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* CHANGE ADMIN PASSWORD MODAL */}
+        {changePasswordModalOpen && (
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+              <button
+                onClick={() => setChangePasswordModalOpen(false)}
+                className="absolute top-4 right-4 p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                  <Lock className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-white">Change Admin Password</h3>
+                  <p className="text-xs text-slate-400">Update master security credentials</p>
+                </div>
+              </div>
+
+              {passwordChangeError && (
+                <div className="p-3 mb-4 bg-red-950/60 border border-red-800/80 rounded-xl text-xs text-red-200 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
+                  <span>{passwordChangeError}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleChangePassword} className="space-y-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-300">New Password</label>
+                  <div className="relative">
+                    <input
+                      type={showNewPassword ? 'text' : 'password'}
+                      value={newAdminPassword}
+                      onChange={(e) => setNewAdminPassword(e.target.value)}
+                      placeholder="Minimum 6 characters"
+                      required
+                      minLength={6}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-3.5 pr-10 text-sm text-white focus:outline-none focus:border-amber-500 transition"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-3 top-3 text-slate-500 hover:text-slate-300"
+                    >
+                      {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-300">Confirm New Password</label>
+                  <input
+                    type={showNewPassword ? 'text' : 'password'}
+                    value={confirmAdminPassword}
+                    onChange={(e) => setConfirmAdminPassword(e.target.value)}
+                    placeholder="Repeat new password"
+                    required
+                    minLength={6}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-amber-500 transition"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setChangePasswordModalOpen(false)}
+                    className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={changingPassword}
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2 active:scale-95 disabled:opacity-60 cursor-pointer"
+                  >
+                    {changingPassword ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
+                    <span>{changingPassword ? 'Updating...' : 'Update Password'}</span>
                   </button>
                 </div>
               </form>
