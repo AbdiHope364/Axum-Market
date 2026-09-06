@@ -213,13 +213,13 @@ export default function HomeInteractiveView({
             </div>
 
             {/* Region selector & action row */}
-            <div className="flex items-center gap-1.5 pt-1 border-t border-gray-100">
-              <div className="relative flex items-center flex-1 bg-gray-50 hover:bg-gray-100/80 rounded-lg px-2 py-1 border border-gray-200 transition">
+            <div className="flex items-center gap-1.5 pt-1 border-t border-gray-100 max-w-full">
+              <div className="relative flex items-center flex-1 min-w-0 bg-gray-50 hover:bg-gray-100/80 rounded-lg px-2 py-1 border border-gray-200 transition">
                 <MapPin className="w-3.5 h-3.5 text-green-600 shrink-0 mr-1" />
                 <select
                   value={selectedRegion}
                   onChange={(e) => setSelectedRegion(e.target.value)}
-                  className="w-full bg-transparent text-[11px] sm:text-xs text-gray-800 font-semibold outline-none cursor-pointer"
+                  className="w-full bg-transparent text-[11px] sm:text-xs text-gray-800 font-semibold outline-none cursor-pointer truncate"
                 >
                   {quickRegions.map((reg) => (
                     <option key={reg.value} value={reg.value}>
@@ -240,7 +240,7 @@ export default function HomeInteractiveView({
           </div>
 
           {/* Quick Search Tag Chips */}
-          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 text-xs">
+          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 text-xs max-w-full">
             <span className="text-green-300/80 font-semibold shrink-0 text-[10px]">Quick:</span>
             {['Friesian Cow', 'Borana Bull', 'Bishoftu', 'Sululta', 'Dorper Sheep'].map((tag) => (
               <button
@@ -256,9 +256,9 @@ export default function HomeInteractiveView({
       </section>
 
       {/* Main Interactive Content */}
-      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 space-y-4 sm:space-y-6">
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 space-y-4 sm:space-y-6 max-w-full overflow-hidden">
         {/* 3. Interactive Touch Category Bar (Responsive 3-column grid on mobile, horizontal row on desktop) */}
-        <section className="space-y-1.5 sm:space-y-2.5">
+        <section className="space-y-1.5 sm:space-y-2.5 max-w-full">
           <div className="flex items-center justify-between">
             <h2 className="text-xs sm:text-base font-black text-gray-900 flex items-center gap-1.5">
               <span>Choose Animal Category</span>
@@ -279,23 +279,23 @@ export default function HomeInteractiveView({
           </div>
 
           {/* Responsive Category Cards: 3-column grid on mobile */}
-          <div className="grid grid-cols-3 sm:flex sm:overflow-x-auto sm:no-scrollbar gap-1.5 sm:gap-2.5">
+          <div className="grid grid-cols-3 sm:flex sm:overflow-x-auto sm:no-scrollbar gap-1.5 sm:gap-2.5 max-w-full">
             {/* "All" button */}
             <button
               onClick={() => setSelectedCategory('all')}
-              className={`flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-0.5 sm:gap-2 p-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl border text-center sm:text-left transition-all shadow-xs active:scale-95 shrink-0 cursor-pointer ${
+              className={`flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-0.5 sm:gap-2 p-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl border text-center sm:text-left transition-all shadow-xs active:scale-95 min-w-0 w-full sm:w-auto sm:shrink-0 overflow-hidden cursor-pointer ${
                 selectedCategory === 'all'
                   ? 'bg-green-700 text-white border-green-700 shadow-green-700/20 ring-1 ring-green-600'
                   : 'bg-white text-gray-700 border-gray-200 hover:border-green-300 hover:bg-gray-50/60'
               }`}
             >
               <span className="text-base sm:text-lg shrink-0">🐾</span>
-              <div className="flex flex-col min-w-0">
-                <span className="text-[11px] sm:text-xs font-black truncate">
+              <div className="flex flex-col min-w-0 w-full overflow-hidden">
+                <span className="text-[11px] sm:text-xs font-black truncate w-full block">
                   All Animals
                 </span>
                 <span
-                  className={`text-[9px] sm:text-[10px] leading-none truncate ${
+                  className={`text-[9px] sm:text-[10px] leading-none truncate w-full block ${
                     selectedCategory === 'all' ? 'text-green-100' : 'text-gray-400'
                   }`}
                 >
@@ -314,20 +314,20 @@ export default function HomeInteractiveView({
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(isSelected ? 'all' : cat.name)}
-                  className={`flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-0.5 sm:gap-2 p-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl border text-center sm:text-left transition-all shadow-xs active:scale-95 shrink-0 cursor-pointer ${
+                  className={`flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-0.5 sm:gap-2 p-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl border text-center sm:text-left transition-all shadow-xs active:scale-95 min-w-0 w-full sm:w-auto sm:shrink-0 overflow-hidden cursor-pointer ${
                     isSelected
                       ? 'bg-green-700 text-white border-green-700 shadow-green-700/20 ring-1 ring-green-600'
                       : 'bg-white text-gray-700 border-gray-200 hover:border-green-300 hover:bg-gray-50/60'
                   }`}
                 >
                   <span className="text-base sm:text-lg shrink-0">{cat.icon || '🐮'}</span>
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-[11px] sm:text-xs font-black truncate">
+                  <div className="flex flex-col min-w-0 w-full overflow-hidden">
+                    <span className="text-[11px] sm:text-xs font-black truncate w-full block">
                       {primary}
                     </span>
                     {secondary && (
                       <span
-                        className={`text-[9px] sm:text-[10px] leading-none truncate ${
+                        className={`text-[9px] sm:text-[10px] leading-none truncate w-full block ${
                           isSelected ? 'text-green-100' : 'text-gray-400'
                         }`}
                       >
@@ -394,40 +394,40 @@ export default function HomeInteractiveView({
 
           {/* Active Filter Chips Bar */}
           {hasActiveFilters && (
-            <div className="flex flex-wrap items-center gap-1 pt-0.5 text-[11px] sm:text-xs">
-              <span className="text-gray-500 font-medium text-[10px]">Filtering by:</span>
+            <div className="flex flex-wrap items-center gap-1.5 pt-0.5 text-[11px] sm:text-xs max-w-full overflow-hidden">
+              <span className="text-gray-500 font-medium text-[10px] shrink-0">Filtering by:</span>
 
               {searchQuery && (
-                <span className="bg-green-50 text-green-800 font-semibold px-2 py-0.5 rounded border border-green-200 flex items-center gap-1">
-                  <span>&ldquo;{searchQuery}&rdquo;</span>
-                  <button onClick={() => setSearchQuery('')}>
+                <span className="bg-green-50 text-green-800 font-semibold px-2 py-0.5 rounded-lg border border-green-200 flex items-center gap-1 max-w-[75vw] sm:max-w-xs">
+                  <span className="truncate">&ldquo;{searchQuery}&rdquo;</span>
+                  <button onClick={() => setSearchQuery('')} className="shrink-0 p-0.5">
                     <X className="w-3 h-3 hover:text-green-950" />
                   </button>
                 </span>
               )}
 
               {selectedCategory !== 'all' && (
-                <span className="bg-green-50 text-green-800 font-semibold px-2 py-0.5 rounded border border-green-200 flex items-center gap-1">
-                  <span>Category: {selectedCategory}</span>
-                  <button onClick={() => setSelectedCategory('all')}>
+                <span className="bg-green-50 text-green-800 font-semibold px-2 py-0.5 rounded-lg border border-green-200 flex items-center gap-1 max-w-[75vw] sm:max-w-xs">
+                  <span className="truncate">Category: {selectedCategory}</span>
+                  <button onClick={() => setSelectedCategory('all')} className="shrink-0 p-0.5">
                     <X className="w-3 h-3 hover:text-green-950" />
                   </button>
                 </span>
               )}
 
               {selectedRegion !== 'all' && (
-                <span className="bg-green-50 text-green-800 font-semibold px-2 py-0.5 rounded border border-green-200 flex items-center gap-1">
-                  <span>Region: {selectedRegion}</span>
-                  <button onClick={() => setSelectedRegion('all')}>
+                <span className="bg-green-50 text-green-800 font-semibold px-2 py-0.5 rounded-lg border border-green-200 flex items-center gap-1 max-w-[75vw] sm:max-w-xs">
+                  <span className="truncate">Region: {selectedRegion}</span>
+                  <button onClick={() => setSelectedRegion('all')} className="shrink-0 p-0.5">
                     <X className="w-3 h-3 hover:text-green-950" />
                   </button>
                 </span>
               )}
 
               {activeTab !== 'all' && (
-                <span className="bg-green-50 text-green-800 font-semibold px-2 py-0.5 rounded border border-green-200 flex items-center gap-1">
-                  <span>Tab: {activeTab}</span>
-                  <button onClick={() => setActiveTab('all')}>
+                <span className="bg-green-50 text-green-800 font-semibold px-2 py-0.5 rounded-lg border border-green-200 flex items-center gap-1 max-w-[75vw] sm:max-w-xs">
+                  <span className="truncate">Tab: {activeTab}</span>
+                  <button onClick={() => setActiveTab('all')} className="shrink-0 p-0.5">
                     <X className="w-3 h-3 hover:text-green-950" />
                   </button>
                 </span>
@@ -435,7 +435,7 @@ export default function HomeInteractiveView({
 
               <button
                 onClick={handleResetFilters}
-                className="text-red-600 hover:text-red-800 font-bold ml-1 hover:underline text-[10px]"
+                className="text-red-600 hover:text-red-800 font-bold ml-1 hover:underline text-[10px] shrink-0"
               >
                 Clear all
               </button>

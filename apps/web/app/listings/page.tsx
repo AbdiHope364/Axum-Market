@@ -254,7 +254,7 @@ function ListingsContent() {
       </div>
 
       {/* Category Pills Slider (Fast mobile tap, edge-to-edge scroll) */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 max-w-full -mx-4 px-4 sm:mx-0 sm:px-0 snap-x">
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 w-full max-w-full snap-x">
         <button
           onClick={() => {
             setCategory('');
@@ -278,15 +278,15 @@ function ListingsContent() {
                 setCategory(isSelected ? '' : cat.slug);
                 setBreed('');
               }}
-              className={`shrink-0 snap-start px-3.5 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+              className={`shrink-0 snap-start px-3.5 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer max-w-[85vw] ${
                 isSelected
-                  ? 'bg-green-600 text-white shadow-sm'
+                  ? 'bg-green-600 text-white shadow-sm ring-1 ring-green-600'
                   : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
               }`}
             >
               <span>{cat.icon || '🐾'}</span>
-              <span className="hidden sm:inline">{cat.name}</span>
-              <span className="sm:hidden">{shortName}</span>
+              <span className="hidden sm:inline truncate">{cat.name}</span>
+              <span className="sm:hidden truncate">{shortName}</span>
             </button>
           );
         })}
@@ -294,62 +294,62 @@ function ListingsContent() {
 
       {/* Active Filter Chips (Instant tap-to-remove) */}
       {activeFilterCount > 0 && (
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 text-xs animate-fadeIn">
-          <span className="text-gray-500 font-bold shrink-0 flex items-center gap-1">
-            <Filter className="w-3.5 h-3.5 text-green-600" /> Active:
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 text-xs animate-fadeIn w-full max-w-full">
+          <span className="text-gray-500 font-bold shrink-0 flex items-center gap-1 text-[11px]">
+            <Filter className="w-3.5 h-3.5 text-green-600 shrink-0" /> Active:
           </span>
           {category && (
             <button
               onClick={() => removeFilter('category')}
-              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs"
+              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs max-w-[70vw] sm:max-w-xs"
             >
-              <span>{selectedCategoryObj?.icon || '🐾'} {selectedCategoryObj?.name || category}</span>
-              <X className="w-3 h-3 text-green-700" />
+              <span className="truncate">{selectedCategoryObj?.icon || '🐾'} {selectedCategoryObj?.name || category}</span>
+              <X className="w-3 h-3 text-green-700 shrink-0" />
             </button>
           )}
           {breed && (
             <button
               onClick={() => removeFilter('breed')}
-              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs"
+              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs max-w-[70vw] sm:max-w-xs"
             >
-              <span>Breed: {availableBreeds.find((b) => b.id === breed)?.name || breed}</span>
-              <X className="w-3 h-3 text-green-700" />
+              <span className="truncate">Breed: {availableBreeds.find((b) => b.id === breed)?.name || breed}</span>
+              <X className="w-3 h-3 text-green-700 shrink-0" />
             </button>
           )}
           {region && (
             <button
               onClick={() => removeFilter('region')}
-              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs"
+              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs max-w-[70vw] sm:max-w-xs"
             >
-              <span>Region: {region}</span>
-              <X className="w-3 h-3 text-green-700" />
+              <span className="truncate">Region: {region}</span>
+              <X className="w-3 h-3 text-green-700 shrink-0" />
             </button>
           )}
           {city && (
             <button
               onClick={() => removeFilter('city')}
-              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs"
+              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs max-w-[70vw] sm:max-w-xs"
             >
-              <span>City: {city}</span>
-              <X className="w-3 h-3 text-green-700" />
+              <span className="truncate">City: {city}</span>
+              <X className="w-3 h-3 text-green-700 shrink-0" />
             </button>
           )}
           {gender && (
             <button
               onClick={() => removeFilter('gender')}
-              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs"
+              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs max-w-[70vw] sm:max-w-xs"
             >
-              <span>{gender === 'FEMALE' ? 'Female ♀' : 'Male ♂'}</span>
-              <X className="w-3 h-3 text-green-700" />
+              <span className="truncate">{gender === 'FEMALE' ? 'Female ♀' : 'Male ♂'}</span>
+              <X className="w-3 h-3 text-green-700 shrink-0" />
             </button>
           )}
           {(minPrice || maxPrice) && (
             <button
               onClick={() => removeFilter('price')}
-              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs"
+              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs max-w-[70vw] sm:max-w-xs"
             >
-              <span>Price: {minPrice ? `${Number(minPrice).toLocaleString()} ETB` : '0'} – {maxPrice ? `${Number(maxPrice).toLocaleString()} ETB` : 'Any'}</span>
-              <X className="w-3 h-3 text-green-700" />
+              <span className="truncate">Price: {minPrice ? `${Number(minPrice).toLocaleString()} ETB` : '0'} – {maxPrice ? `${Number(maxPrice).toLocaleString()} ETB` : 'Any'}</span>
+              <X className="w-3 h-3 text-green-700 shrink-0" />
             </button>
           )}
           <button
@@ -608,7 +608,7 @@ function ListingsContent() {
           />
 
           {/* Slide-over Filter Panel */}
-          <div className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col justify-between overflow-hidden animate-slideLeft z-10">
+          <div className="relative w-full max-w-md bg-white h-[100dvh] max-h-[100dvh] shadow-2xl flex flex-col justify-between overflow-hidden animate-slideLeft z-10">
             {/* Sticky Header */}
             <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-green-50/60 to-white shrink-0">
               <div className="flex items-center gap-2.5">
@@ -649,9 +649,9 @@ function ListingsContent() {
             </div>
 
             {/* Scrollable Filter Options Body */}
-            <div className="p-4 space-y-5 overflow-y-auto flex-1">
+            <div className="p-4 space-y-5 overflow-y-auto flex-1 max-w-full">
               {/* 1. Animal Category (Interactive Visual Cards) */}
-              <div className="space-y-2">
+              <div className="space-y-2 max-w-full">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-black text-gray-800 uppercase tracking-wider flex items-center gap-1.5">
                     <span>Animal Category</span>
@@ -670,7 +670,7 @@ function ListingsContent() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 max-w-full">
                   {categories.map((c) => {
                     const isSelected = category === c.slug || category === c.id;
                     return (
@@ -681,22 +681,22 @@ function ListingsContent() {
                           setCategory(isSelected ? '' : c.slug);
                           setBreed('');
                         }}
-                        className={`flex items-center gap-2.5 p-3 rounded-2xl border text-left transition-all active:scale-95 ${
+                        className={`flex items-center gap-2 p-2.5 sm:p-3 rounded-2xl border text-left transition-all active:scale-95 min-w-0 overflow-hidden ${
                           isSelected
                             ? 'bg-green-50/90 border-green-500 text-green-900 shadow-xs ring-1 ring-green-500'
                             : 'bg-white border-gray-200 text-gray-800 hover:bg-gray-50'
                         }`}
                       >
-                        <span className="text-2xl">{c.icon || '🐾'}</span>
+                        <span className="text-xl sm:text-2xl shrink-0">{c.icon || '🐾'}</span>
                         <div className="flex-1 min-w-0">
                           <div className="text-xs font-black truncate">{c.name}</div>
-                          <div className="text-[10px] text-gray-400 font-medium">
+                          <div className="text-[10px] text-gray-400 font-medium truncate">
                             {c.breeds?.length || 0} Breeds
                           </div>
                         </div>
                         {isSelected && (
-                          <div className="w-5 h-5 rounded-full bg-green-600 text-white flex items-center justify-center shrink-0">
-                            <Check className="w-3 h-3 stroke-[3]" />
+                          <div className="w-4 h-4 rounded-full bg-green-600 text-white flex items-center justify-center shrink-0">
+                            <Check className="w-2.5 h-2.5 stroke-[3]" />
                           </div>
                         )}
                       </button>
@@ -777,14 +777,14 @@ function ListingsContent() {
                     </button>
                   )}
                 </div>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-1.5 max-w-full">
                   <button
                     type="button"
                     onClick={() => {
                       setRegion('');
                       setCity('');
                     }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition active:scale-95 ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition active:scale-95 shrink-0 ${
                       !region
                         ? 'bg-green-600 text-white shadow-xs font-bold'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -802,14 +802,14 @@ function ListingsContent() {
                           setRegion(isSel ? '' : loc.region);
                           setCity('');
                         }}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition active:scale-95 flex items-center gap-1 ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition active:scale-95 flex items-center gap-1 shrink-0 ${
                           isSel
                             ? 'bg-green-600 text-white shadow-xs font-bold'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
-                        <span>{loc.region}</span>
-                        {isSel && <Check className="w-3 h-3 text-white" />}
+                        <span className="truncate max-w-[140px] sm:max-w-none">{loc.region}</span>
+                        {isSel && <Check className="w-3 h-3 text-white shrink-0" />}
                       </button>
                     );
                   })}
@@ -833,11 +833,11 @@ function ListingsContent() {
                       </button>
                     )}
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-1.5 max-w-full">
                     <button
                       type="button"
                       onClick={() => setCity('')}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition active:scale-95 ${
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition active:scale-95 shrink-0 ${
                         !city
                           ? 'bg-green-600 text-white shadow-xs font-bold'
                           : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'
@@ -852,14 +852,14 @@ function ListingsContent() {
                           key={c}
                           type="button"
                           onClick={() => setCity(isSel ? '' : c)}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition active:scale-95 flex items-center gap-1 ${
+                          className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition active:scale-95 flex items-center gap-1 shrink-0 ${
                             isSel
                               ? 'bg-green-600 text-white shadow-xs font-bold'
                               : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'
                           }`}
                         >
-                          <span>{c}</span>
-                          {isSel && <Check className="w-3 h-3 text-white" />}
+                          <span className="truncate max-w-[130px] sm:max-w-none">{c}</span>
+                          {isSel && <Check className="w-3 h-3 text-white shrink-0" />}
                         </button>
                       );
                     })}
@@ -984,7 +984,7 @@ function ListingsContent() {
             </div>
 
             {/* Sticky Bottom Action Bar */}
-            <div className="p-4 border-t border-gray-200 bg-white/95 backdrop-blur-md shrink-0 flex items-center gap-2.5 shadow-lg">
+            <div className="p-4 border-t border-gray-200 bg-white/95 backdrop-blur-md shrink-0 flex items-center gap-2.5 shadow-lg pb-safe">
               <button
                 type="button"
                 onClick={handleResetFilters}
