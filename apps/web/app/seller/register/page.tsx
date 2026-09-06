@@ -16,6 +16,8 @@ import {
   ShieldCheck,
   CheckCircle2,
   UserPlus,
+  Check,
+  MapPin,
 } from 'lucide-react';
 
 export default function SellerRegisterPage() {
@@ -28,7 +30,7 @@ export default function SellerRegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [region, setRegion] = useState('Oromia');
-  const [city, setCity] = useState('Sululta');
+  const [city, setCity] = useState('');
   const [area, setArea] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -134,7 +136,7 @@ export default function SellerRegisterPage() {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-3 sm:px-4 py-6 sm:py-12">
-      <div className="max-w-md w-full bg-white rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-8 shadow-sm space-y-5 sm:space-y-6">
+      <div className="max-w-md w-full bg-white rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-8 shadow-sm space-y-5 sm:space-y-6 overflow-hidden">
         <div className="text-center space-y-2">
           <div className="w-12 h-12 rounded-2xl bg-green-100 text-green-700 flex items-center justify-center mx-auto shadow-xs">
             <UserPlus className="w-6 h-6 stroke-[2.2]" />
@@ -206,36 +208,51 @@ export default function SellerRegisterPage() {
             />
           </div>
 
-          {/* Region & City */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-2.5">
-            <div className="relative">
-              <select
-                value={region}
-                onChange={(e) => setRegion(e.target.value)}
-                aria-label="Region"
-                className="w-full px-3.5 py-3 bg-white border border-gray-300 rounded-2xl text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition shadow-xs cursor-pointer"
-              >
-                <option value="Oromia">Oromia</option>
-                <option value="Addis Ababa">Addis Ababa</option>
-                <option value="Amhara">Amhara</option>
-                <option value="Sidama">Sidama</option>
-                <option value="Somali">Somali</option>
-                <option value="Tigray">Tigray</option>
-              </select>
+          {/* Region Selection (Touch-friendly responsive grid that stays 100% inside mobile bounds) */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs font-black text-gray-700 uppercase tracking-wider">
+              <span className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-green-600 shrink-0" />
+                <span>Select Region / ክልል *</span>
+              </span>
+              <span className="text-[11px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-md border border-green-200">
+                {region}
+              </span>
             </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 w-full">
+              {['Oromia', 'Addis Ababa', 'Amhara', 'Sidama', 'Somali', 'Tigray'].map((r) => {
+                const isSelected = region === r;
+                return (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setRegion(r)}
+                    className={`py-2.5 px-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between border cursor-pointer active:scale-95 text-left ${
+                      isSelected
+                        ? 'bg-green-50 border-green-600 text-green-900 shadow-xs ring-1 ring-green-600/30'
+                        : 'bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700'
+                    }`}
+                  >
+                    <span className="truncate">{r}</span>
+                    {isSelected && <Check className="w-3.5 h-3.5 text-green-600 shrink-0 ml-1" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-            <div className="relative">
-              <input
-                type="text"
-                required
-                autoComplete="off"
-                aria-label="City or Town"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="City or Town (ከተማ)"
-                className="w-full px-3.5 py-3 bg-white border border-gray-300 rounded-2xl text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition shadow-xs"
-              />
-            </div>
+          {/* City or Town Input */}
+          <div className="relative">
+            <input
+              type="text"
+              required
+              autoComplete="off"
+              aria-label="City or Town"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="City or Town / ከተማ (e.g. Sululta, Bishoftu, Hawassa)"
+              className="w-full px-3.5 py-3 bg-white border border-gray-300 rounded-2xl text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition shadow-xs"
+            />
           </div>
 
           {/* Area / Kebele */}
