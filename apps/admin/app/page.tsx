@@ -252,8 +252,11 @@ export default function AdminPortalPage() {
   // Admin Create Livestock State
   const [postModalOpen, setPostModalOpen] = useState(false);
   const [postSellerId, setPostSellerId] = useState('self');
+  const [postSellerDropdownOpen, setPostSellerDropdownOpen] = useState(false);
   const [postCategoryId, setPostCategoryId] = useState('');
+  const [postCategoryDropdownOpen, setPostCategoryDropdownOpen] = useState(false);
   const [postBreedId, setPostBreedId] = useState('');
+  const [postBreedDropdownOpen, setPostBreedDropdownOpen] = useState(false);
   const [postTitle, setPostTitle] = useState('');
   const [postDescription, setPostDescription] = useState('');
   const [postPrice, setPostPrice] = useState('');
@@ -2473,21 +2476,60 @@ export default function AdminPortalPage() {
                         Seller Attribution
                       </label>
                       <div className="relative w-full min-w-0">
-                        <select
-                          value={postSellerId}
-                          onChange={(e) => setPostSellerId(e.target.value)}
-                          className="w-full max-w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 sm:py-2 px-3 pr-8 text-base sm:text-xs text-white outline-none focus:border-amber-500 truncate appearance-none"
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPostSellerDropdownOpen(!postSellerDropdownOpen);
+                            setPostCategoryDropdownOpen(false);
+                            setPostBreedDropdownOpen(false);
+                          }}
+                          className="w-full max-w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 sm:py-2 px-3 text-xs text-white flex items-center justify-between outline-none focus:border-amber-500 transition text-left cursor-pointer"
                         >
-                          <option value="self">Axum Direct (Admin: {sessionUser?.fullName || 'Self'})</option>
-                          {sellers.map((s) => (
-                            <option key={s.id} value={s.id}>
-                              {s.fullName} ({s.phone}) {s.city ? `• ${s.city}` : ''}
-                            </option>
-                          ))}
-                        </select>
-                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
-                          <ChevronDown className="w-4 h-4" />
-                        </div>
+                          <span className="truncate pr-2">
+                            {postSellerId === 'self'
+                              ? `Axum Direct (Admin: ${sessionUser?.fullName || 'Self'})`
+                              : sellers.find((s) => s.id === postSellerId)?.fullName
+                                ? `${sellers.find((s) => s.id === postSellerId)?.fullName} (${sellers.find((s) => s.id === postSellerId)?.phone})`
+                                : 'Select Seller'}
+                          </span>
+                          <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 transition-transform ${postSellerDropdownOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                        {postSellerDropdownOpen && (
+                          <div className="absolute left-0 right-0 top-full mt-1 z-50 max-h-56 overflow-y-auto bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-1 space-y-0.5 w-full max-w-full">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setPostSellerId('self');
+                                setPostSellerDropdownOpen(false);
+                              }}
+                              className={`w-full text-left px-3 py-2 text-xs rounded-lg transition flex items-center justify-between cursor-pointer ${
+                                postSellerId === 'self' ? 'bg-amber-500/20 text-amber-300 font-bold' : 'text-slate-300 hover:bg-slate-800'
+                              }`}
+                            >
+                              <span className="truncate">Axum Direct (Admin: {sessionUser?.fullName || 'Self'})</span>
+                              {postSellerId === 'self' && <Check className="w-3.5 h-3.5 text-amber-400 shrink-0 ml-2" />}
+                            </button>
+                            {sellers.map((s) => {
+                              const isSelected = postSellerId === s.id;
+                              return (
+                                <button
+                                  key={s.id}
+                                  type="button"
+                                  onClick={() => {
+                                    setPostSellerId(s.id);
+                                    setPostSellerDropdownOpen(false);
+                                  }}
+                                  className={`w-full text-left px-3 py-2 text-xs rounded-lg transition flex items-center justify-between cursor-pointer ${
+                                    isSelected ? 'bg-amber-500/20 text-amber-300 font-bold' : 'text-slate-300 hover:bg-slate-800'
+                                  }`}
+                                >
+                                  <span className="truncate">{s.fullName} ({s.phone}) {s.city ? `• ${s.city}` : ''}</span>
+                                  {isSelected && <Check className="w-3.5 h-3.5 text-amber-400 shrink-0 ml-2" />}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -2558,23 +2600,46 @@ export default function AdminPortalPage() {
                           Category *
                         </label>
                         <div className="relative w-full min-w-0">
-                          <select
-                            value={postCategoryId}
-                            onChange={(e) => {
-                              setPostCategoryId(e.target.value);
-                              setPostBreedId('');
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPostCategoryDropdownOpen(!postCategoryDropdownOpen);
+                              setPostSellerDropdownOpen(false);
+                              setPostBreedDropdownOpen(false);
                             }}
-                            className="w-full max-w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 sm:py-2 px-3 pr-8 text-base sm:text-xs text-white outline-none focus:border-amber-500 truncate appearance-none"
+                            className="w-full max-w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 sm:py-2 px-3 text-xs text-white flex items-center justify-between outline-none focus:border-amber-500 transition text-left cursor-pointer"
                           >
-                            {categories.map((c) => (
-                              <option key={c.id} value={c.id}>
-                                {c.icon} {c.name.split('/')[0].trim()}
-                              </option>
-                            ))}
-                          </select>
-                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
-                            <ChevronDown className="w-4 h-4" />
-                          </div>
+                            <span className="truncate pr-2">
+                              {categories.find((c) => c.id === postCategoryId)
+                                ? `${categories.find((c) => c.id === postCategoryId)?.icon || '🏷️'} ${categories.find((c) => c.id === postCategoryId)?.name.split('/')[0].trim()}`
+                                : 'Select Category'}
+                            </span>
+                            <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 transition-transform ${postCategoryDropdownOpen ? 'rotate-180' : ''}`} />
+                          </button>
+                          {postCategoryDropdownOpen && (
+                            <div className="absolute left-0 right-0 top-full mt-1 z-50 max-h-56 overflow-y-auto bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-1 space-y-0.5 w-full max-w-full">
+                              {categories.map((c) => {
+                                const isSelected = postCategoryId === c.id;
+                                return (
+                                  <button
+                                    key={c.id}
+                                    type="button"
+                                    onClick={() => {
+                                      setPostCategoryId(c.id);
+                                      setPostBreedId('');
+                                      setPostCategoryDropdownOpen(false);
+                                    }}
+                                    className={`w-full text-left px-3 py-2 text-xs rounded-lg transition flex items-center justify-between cursor-pointer ${
+                                      isSelected ? 'bg-amber-500/20 text-amber-300 font-bold' : 'text-slate-300 hover:bg-slate-800'
+                                    }`}
+                                  >
+                                    <span className="truncate">{c.icon} {c.name.split('/')[0].trim()}</span>
+                                    {isSelected && <Check className="w-3.5 h-3.5 text-amber-400 shrink-0 ml-2" />}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -2583,23 +2648,58 @@ export default function AdminPortalPage() {
                           Breed (ዝርያ)
                         </label>
                         <div className="relative w-full min-w-0">
-                          <select
-                            value={postBreedId}
-                            onChange={(e) => setPostBreedId(e.target.value)}
-                            className="w-full max-w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 sm:py-2 px-3 pr-8 text-base sm:text-xs text-white outline-none focus:border-amber-500 truncate appearance-none"
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPostBreedDropdownOpen(!postBreedDropdownOpen);
+                              setPostCategoryDropdownOpen(false);
+                              setPostSellerDropdownOpen(false);
+                            }}
+                            className="w-full max-w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 sm:py-2 px-3 text-xs text-white flex items-center justify-between outline-none focus:border-amber-500 transition text-left cursor-pointer"
                           >
-                            <option value="">Select breed (optional)</option>
-                            {categories
-                              .find((c) => c.id === postCategoryId)
-                              ?.breeds?.map((b) => (
-                                <option key={b.id} value={b.id}>
-                                  {b.name}
-                                </option>
-                              ))}
-                          </select>
-                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
-                            <ChevronDown className="w-4 h-4" />
-                          </div>
+                            <span className="truncate pr-2">
+                              {categories.find((c) => c.id === postCategoryId)?.breeds?.find((b) => b.id === postBreedId)?.name || 'Select breed (optional)'}
+                            </span>
+                            <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 transition-transform ${postBreedDropdownOpen ? 'rotate-180' : ''}`} />
+                          </button>
+                          {postBreedDropdownOpen && (
+                            <div className="absolute left-0 right-0 top-full mt-1 z-50 max-h-56 overflow-y-auto bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-1 space-y-0.5 w-full max-w-full">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setPostBreedId('');
+                                  setPostBreedDropdownOpen(false);
+                                }}
+                                className={`w-full text-left px-3 py-2 text-xs rounded-lg transition flex items-center justify-between cursor-pointer ${
+                                  !postBreedId ? 'bg-amber-500/20 text-amber-300 font-bold' : 'text-slate-300 hover:bg-slate-800'
+                                }`}
+                              >
+                                <span className="truncate">None (Unspecified breed)</span>
+                                {!postBreedId && <Check className="w-3.5 h-3.5 text-amber-400 shrink-0 ml-2" />}
+                              </button>
+                              {categories
+                                .find((c) => c.id === postCategoryId)
+                                ?.breeds?.map((b) => {
+                                  const isSelected = postBreedId === b.id;
+                                  return (
+                                    <button
+                                      key={b.id}
+                                      type="button"
+                                      onClick={() => {
+                                        setPostBreedId(b.id);
+                                        setPostBreedDropdownOpen(false);
+                                      }}
+                                      className={`w-full text-left px-3 py-2 text-xs rounded-lg transition flex items-center justify-between cursor-pointer ${
+                                        isSelected ? 'bg-amber-500/20 text-amber-300 font-bold' : 'text-slate-300 hover:bg-slate-800'
+                                      }`}
+                                    >
+                                      <span className="truncate">{b.name}</span>
+                                      {isSelected && <Check className="w-3.5 h-3.5 text-amber-400 shrink-0 ml-2" />}
+                                    </button>
+                                  );
+                                })}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -2617,19 +2717,32 @@ export default function AdminPortalPage() {
                         />
                       </div>
                       <div className="col-span-1 min-w-0">
-                        <label className="block text-[11px] font-bold text-slate-300 mb-1">Gender</label>
-                        <div className="relative w-full min-w-0">
-                          <select
-                            value={postGender}
-                            onChange={(e) => setPostGender(e.target.value as any)}
-                            className="w-full max-w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 sm:py-2 px-3 pr-7 text-base sm:text-xs text-white outline-none focus:border-amber-500 truncate appearance-none"
+                        <label className="block text-[11px] font-bold text-slate-300 mb-1">Gender *</label>
+                        <div className="grid grid-cols-2 bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1 h-[42px] sm:h-[38px] items-center">
+                          <button
+                            type="button"
+                            onClick={() => setPostGender('MALE')}
+                            className={`h-full text-xs font-bold rounded-lg transition flex items-center justify-center gap-1 cursor-pointer ${
+                              postGender === 'MALE'
+                                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black shadow-sm'
+                                : 'text-slate-400 hover:text-white'
+                            }`}
                           >
-                            <option value="MALE">Male (በሬ)</option>
-                            <option value="FEMALE">Female (ላም)</option>
-                          </select>
-                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
-                            <ChevronDown className="w-3.5 h-3.5" />
-                          </div>
+                            <span>🐂</span>
+                            <span className="truncate">Male</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPostGender('FEMALE')}
+                            className={`h-full text-xs font-bold rounded-lg transition flex items-center justify-center gap-1 cursor-pointer ${
+                              postGender === 'FEMALE'
+                                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black shadow-sm'
+                                : 'text-slate-400 hover:text-white'
+                            }`}
+                          >
+                            <span>🐄</span>
+                            <span className="truncate">Female</span>
+                          </button>
                         </div>
                       </div>
                       <div className="col-span-2 sm:col-span-1 min-w-0">
