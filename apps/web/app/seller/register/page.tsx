@@ -154,67 +154,66 @@ export default function SellerRegisterPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
-              Full Name *
-            </label>
-            <div className="relative">
-              <User className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Full Name / ሙሉ ስም"
-                className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
+        <form onSubmit={handleSubmit} className="space-y-3.5" autoComplete="off">
+          {/* Full Name */}
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+              <User className="w-4 h-4" />
             </div>
+            <input
+              type="text"
+              required
+              autoComplete="off"
+              aria-label="Full Name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Full Name / ሙሉ ስም"
+              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-2xl text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition shadow-xs"
+            />
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
-              Email Address *
-            </label>
-            <div className="relative">
-              <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email Address"
-                className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
+          {/* Email Address */}
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+              <Mail className="w-4 h-4" />
             </div>
+            <input
+              type="email"
+              required
+              autoComplete="off"
+              aria-label="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email Address"
+              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-2xl text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition shadow-xs"
+            />
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
-              Phone Number (For buyers to call) *
-            </label>
-            <div className="relative">
-              <Phone className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="tel"
-                required
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+251 9... (Phone for buyer calls)"
-                className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
+          {/* Phone Number */}
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+              <Phone className="w-4 h-4" />
             </div>
+            <input
+              type="tel"
+              required
+              autoComplete="off"
+              aria-label="Phone Number"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Phone Number / ስልክ ቁጥር (+251...)"
+              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-2xl text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition shadow-xs"
+            />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
-                Region *
-              </label>
+          {/* Region & City */}
+          <div className="grid grid-cols-2 gap-2.5">
+            <div className="relative">
               <select
                 value={region}
                 onChange={(e) => setRegion(e.target.value)}
-                className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                aria-label="Region"
+                className="w-full px-3.5 py-3 bg-white border border-gray-300 rounded-2xl text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition shadow-xs"
               >
                 <option value="Oromia">Oromia</option>
                 <option value="Addis Ababa">Addis Ababa</option>
@@ -225,90 +224,87 @@ export default function SellerRegisterPage() {
               </select>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
-                City / Town *
-              </label>
+            <div className="relative">
               <input
                 type="text"
                 required
+                autoComplete="off"
+                aria-label="City or Town"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 placeholder="City or Town (ከተማ)"
-                className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3.5 py-3 bg-white border border-gray-300 rounded-2xl text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition shadow-xs"
               />
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
-              Area / Kebele (Optional)
-            </label>
+          {/* Area / Kebele */}
+          <div className="relative">
             <input
               type="text"
+              autoComplete="off"
+              aria-label="Area or Kebele"
               value={area}
               onChange={(e) => setArea(e.target.value)}
               placeholder="Area / Kebele / ሰፈር (Optional)"
-              className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3.5 py-3 bg-white border border-gray-300 rounded-2xl text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition shadow-xs"
             />
           </div>
 
-          {/* Password with See/Blind Eye Toggle */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
-              Create Password *
-            </label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Create Password (min 6 chars)"
-                className="w-full pl-10 pr-10 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 p-1"
-                aria-label={showPassword ? 'Blind/Hide password' : 'See/Show password'}
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+          {/* Password Input */}
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+              <Lock className="w-4 h-4" />
             </div>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              required
+              minLength={6}
+              autoComplete="new-password"
+              aria-label="Create Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Create Password (min 6 chars)"
+              className="w-full pl-10 pr-11 py-3 bg-white border border-gray-300 rounded-2xl text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition shadow-xs"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-700 transition cursor-pointer"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
           </div>
 
-          {/* Confirm Password with See/Blind Eye Toggle */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
-              Confirm Password *
-            </label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type={showConfirmPassword ? 'text' : 'password'}
-                required
-                minLength={6}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Repeat password to confirm"
-                className="w-full pl-10 pr-10 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 p-1"
-                aria-label={showConfirmPassword ? 'Blind/Hide password' : 'See/Show password'}
-              >
-                {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+          {/* Confirm Password Input */}
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+              <Lock className="w-4 h-4" />
             </div>
+            <input
+              type={showConfirmPassword ? 'text' : 'password'}
+              required
+              minLength={6}
+              autoComplete="new-password"
+              aria-label="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm Password"
+              className="w-full pl-10 pr-11 py-3 bg-white border border-gray-300 rounded-2xl text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition shadow-xs"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-700 transition cursor-pointer"
+              aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+            >
+              {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
           </div>
 
           {/* Admin Approval Notice Badge */}
-          <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-start gap-2">
+          <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-900 flex items-start gap-2">
             <Clock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <span>
               <strong>Admin Approval Required:</strong> Your seller account will be verified and approved by an administrator before you can publish animal listings.
@@ -318,7 +314,7 @@ export default function SellerRegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-sm shadow-md transition active:scale-98 disabled:opacity-60 flex items-center justify-center gap-2"
+            className="w-full py-3 bg-green-600 hover:bg-green-700 active:scale-[0.99] text-white font-bold rounded-2xl text-sm shadow-md shadow-green-600/20 transition flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
           >
             <span>{loading ? 'Submitting Registration...' : 'Register for Seller Approval'}</span>
             <ArrowRight className="w-4 h-4" />
