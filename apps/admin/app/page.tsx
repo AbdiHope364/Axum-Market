@@ -39,7 +39,6 @@ import {
   Camera,
   Image as ImageIcon,
   Copy,
-  MessageCircle,
   Maximize2,
   X,
   ChevronRight,
@@ -1234,21 +1233,11 @@ export default function AdminPortalPage() {
                           </button>
                           <a
                             href={`tel:${seller.phone}`}
-                            className="px-2 py-1 bg-green-700/80 hover:bg-green-600 text-white rounded text-[10px] font-bold flex items-center gap-1 transition"
+                            className="px-2.5 py-1 bg-green-700/80 hover:bg-green-600 text-white rounded text-[10px] font-bold flex items-center gap-1 transition"
                             title="Direct Call"
                           >
                             <Phone className="w-3 h-3" />
                             <span>Call</span>
-                          </a>
-                          <a
-                            href={`https://wa.me/${seller.phone.replace(/[^0-9]/g, '')}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="px-2 py-1 bg-emerald-800/80 hover:bg-emerald-700 text-emerald-100 rounded text-[10px] font-bold flex items-center gap-1 transition"
-                            title="Chat on WhatsApp"
-                          >
-                            <MessageCircle className="w-3 h-3" />
-                            <span>WhatsApp</span>
                           </a>
                         </div>
                       </div>
@@ -2240,22 +2229,13 @@ export default function AdminPortalPage() {
                           {copiedPhone === (inspectListing.contactPhone || inspectListing.seller?.phone) ? 'Copied' : 'Copy'}
                         </button>
                       </div>
-                      <div className="flex gap-2 pt-1">
+                      <div className="pt-1">
                         <a
                           href={`tel:${inspectListing.contactPhone || inspectListing.seller?.phone}`}
-                          className="flex-1 py-1.5 bg-green-700 hover:bg-green-600 text-white rounded-xl text-center text-xs font-bold transition flex items-center justify-center gap-1"
+                          className="w-full py-1.5 bg-green-700 hover:bg-green-600 text-white rounded-xl text-center text-xs font-bold transition flex items-center justify-center gap-1.5"
                         >
-                          <Phone className="w-3 h-3" />
-                          <span>Call</span>
-                        </a>
-                        <a
-                          href={`https://wa.me/${(inspectListing.contactPhone || inspectListing.seller?.phone || '').replace(/[^0-9]/g, '')}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="flex-1 py-1.5 bg-emerald-800 hover:bg-emerald-700 text-emerald-100 rounded-xl text-center text-xs font-bold transition flex items-center justify-center gap-1"
-                        >
-                          <MessageCircle className="w-3 h-3" />
-                          <span>WhatsApp</span>
+                          <Phone className="w-3.5 h-3.5" />
+                          <span>Call Seller Directly</span>
                         </a>
                       </div>
                     </div>
