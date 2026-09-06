@@ -254,15 +254,15 @@ function ListingsContent() {
       </div>
 
       {/* Category Pills Slider (Fast mobile tap, edge-to-edge scroll) */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 w-full max-w-full snap-x">
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 w-full max-w-full">
         <button
           onClick={() => {
             setCategory('');
             setBreed('');
           }}
-          className={`shrink-0 snap-start px-3.5 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap cursor-pointer ${
+          className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap cursor-pointer ${
             !category
-              ? 'bg-green-600 text-white shadow-sm'
+              ? 'bg-green-600 text-white shadow-xs'
               : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
           }`}
         >
@@ -278,83 +278,74 @@ function ListingsContent() {
                 setCategory(isSelected ? '' : cat.slug);
                 setBreed('');
               }}
-              className={`shrink-0 snap-start px-3.5 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer max-w-[85vw] ${
+              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
                 isSelected
-                  ? 'bg-green-600 text-white shadow-sm ring-1 ring-green-600'
+                  ? 'bg-green-600 text-white shadow-xs'
                   : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
               }`}
             >
               <span>{cat.icon || '🐾'}</span>
-              <span className="hidden sm:inline truncate">{cat.name}</span>
-              <span className="sm:hidden truncate">{shortName}</span>
+              <span className="hidden sm:inline">{cat.name}</span>
+              <span className="sm:hidden">{shortName}</span>
             </button>
           );
         })}
       </div>
 
-      {/* Active Filter Chips (Instant tap-to-remove) */}
-      {activeFilterCount > 0 && (
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 text-xs animate-fadeIn w-full max-w-full">
+      {/* Active Secondary Filter Chips (Only for Breed, Region, City, Gender, Price - Category is already highlighted above) */}
+      {(breed || region || city || gender || minPrice || maxPrice) && (
+        <div className="flex flex-wrap items-center gap-1.5 py-1 text-xs w-full max-w-full">
           <span className="text-gray-500 font-bold shrink-0 flex items-center gap-1 text-[11px]">
-            <Filter className="w-3.5 h-3.5 text-green-600 shrink-0" /> Active:
+            <Filter className="w-3.5 h-3.5 text-green-600 shrink-0" /> Filters:
           </span>
-          {category && (
-            <button
-              onClick={() => removeFilter('category')}
-              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs max-w-[70vw] sm:max-w-xs"
-            >
-              <span className="truncate">{selectedCategoryObj?.icon || '🐾'} {selectedCategoryObj?.name || category}</span>
-              <X className="w-3 h-3 text-green-700 shrink-0" />
-            </button>
-          )}
           {breed && (
             <button
               onClick={() => removeFilter('breed')}
-              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs max-w-[70vw] sm:max-w-xs"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs max-w-[150px] min-w-0"
             >
-              <span className="truncate">Breed: {availableBreeds.find((b) => b.id === breed)?.name || breed}</span>
+              <span className="truncate min-w-0">{availableBreeds.find((b) => b.id === breed)?.name || breed}</span>
               <X className="w-3 h-3 text-green-700 shrink-0" />
             </button>
           )}
           {region && (
             <button
               onClick={() => removeFilter('region')}
-              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs max-w-[70vw] sm:max-w-xs"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs max-w-[150px] min-w-0"
             >
-              <span className="truncate">Region: {region}</span>
+              <span className="truncate min-w-0">{region}</span>
               <X className="w-3 h-3 text-green-700 shrink-0" />
             </button>
           )}
           {city && (
             <button
               onClick={() => removeFilter('city')}
-              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs max-w-[70vw] sm:max-w-xs"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs max-w-[150px] min-w-0"
             >
-              <span className="truncate">City: {city}</span>
+              <span className="truncate min-w-0">{city}</span>
               <X className="w-3 h-3 text-green-700 shrink-0" />
             </button>
           )}
           {gender && (
             <button
               onClick={() => removeFilter('gender')}
-              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs max-w-[70vw] sm:max-w-xs"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs shrink-0"
             >
-              <span className="truncate">{gender === 'FEMALE' ? 'Female ♀' : 'Male ♂'}</span>
+              <span>{gender === 'FEMALE' ? 'Female ♀' : 'Male ♂'}</span>
               <X className="w-3 h-3 text-green-700 shrink-0" />
             </button>
           )}
           {(minPrice || maxPrice) && (
             <button
               onClick={() => removeFilter('price')}
-              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs max-w-[70vw] sm:max-w-xs"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-50 text-green-800 border border-green-300/80 font-bold hover:bg-green-100 active:scale-95 transition shadow-2xs max-w-[160px] min-w-0"
             >
-              <span className="truncate">Price: {minPrice ? `${Number(minPrice).toLocaleString()} ETB` : '0'} – {maxPrice ? `${Number(maxPrice).toLocaleString()} ETB` : 'Any'}</span>
+              <span className="truncate min-w-0">{minPrice ? `${Number(minPrice) / 1000}k` : '0'} – {maxPrice ? `${Number(maxPrice) / 1000}k` : 'Any'} ETB</span>
               <X className="w-3 h-3 text-green-700 shrink-0" />
             </button>
           )}
           <button
             onClick={handleResetFilters}
-            className="shrink-0 text-xs font-bold text-red-600 hover:text-red-700 hover:underline px-2 py-1 active:scale-95 transition"
+            className="shrink-0 text-xs font-bold text-red-600 hover:text-red-700 hover:underline px-2 py-0.5 active:scale-95 transition"
           >
             Clear All
           </button>

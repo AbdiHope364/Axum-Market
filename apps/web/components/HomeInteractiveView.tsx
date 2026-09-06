@@ -136,7 +136,6 @@ export default function HomeInteractiveView({
 
   const hasActiveFilters =
     searchQuery.trim() !== '' ||
-    selectedCategory !== 'all' ||
     selectedRegion !== 'all' ||
     activeTab !== 'all';
 
@@ -279,13 +278,13 @@ export default function HomeInteractiveView({
           </div>
 
           {/* Responsive Category Cards: Smooth horizontal scroll row on all screen sizes */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1.5 w-full max-w-full snap-x">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1.5 w-full max-w-full">
             {/* "All" button */}
             <button
               onClick={() => setSelectedCategory('all')}
-              className={`flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl border text-left transition-all shadow-xs active:scale-95 shrink-0 snap-start cursor-pointer whitespace-nowrap ${
+              className={`flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl border text-left transition-all shadow-xs active:scale-95 shrink-0 cursor-pointer whitespace-nowrap ${
                 selectedCategory === 'all'
-                  ? 'bg-green-700 text-white border-green-700 shadow-green-700/20 ring-1 ring-green-600'
+                  ? 'bg-green-700 text-white border-green-700 shadow-green-700/20'
                   : 'bg-white text-gray-700 border-gray-200 hover:border-green-300 hover:bg-gray-50/60'
               }`}
             >
@@ -314,9 +313,9 @@ export default function HomeInteractiveView({
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(isSelected ? 'all' : cat.name)}
-                  className={`flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl border text-left transition-all shadow-xs active:scale-95 shrink-0 snap-start cursor-pointer whitespace-nowrap ${
+                  className={`flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl border text-left transition-all shadow-xs active:scale-95 shrink-0 cursor-pointer whitespace-nowrap ${
                     isSelected
-                      ? 'bg-green-700 text-white border-green-700 shadow-green-700/20 ring-1 ring-green-600'
+                      ? 'bg-green-700 text-white border-green-700 shadow-green-700/20'
                       : 'bg-white text-gray-700 border-gray-200 hover:border-green-300 hover:bg-gray-50/60'
                   }`}
                 >
@@ -398,26 +397,17 @@ export default function HomeInteractiveView({
               <span className="text-gray-500 font-medium text-[10px] shrink-0">Filtering by:</span>
 
               {searchQuery && (
-                <span className="bg-green-50 text-green-800 font-semibold px-2 py-0.5 rounded-lg border border-green-200 flex items-center gap-1 max-w-[75vw] sm:max-w-xs">
-                  <span className="truncate">&ldquo;{searchQuery}&rdquo;</span>
+                <span className="bg-green-50 text-green-800 font-semibold px-2 py-0.5 rounded-lg border border-green-200 flex items-center gap-1 max-w-[140px] min-w-0">
+                  <span className="truncate min-w-0">&ldquo;{searchQuery}&rdquo;</span>
                   <button onClick={() => setSearchQuery('')} className="shrink-0 p-0.5">
                     <X className="w-3 h-3 hover:text-green-950" />
                   </button>
                 </span>
               )}
 
-              {selectedCategory !== 'all' && (
-                <span className="bg-green-50 text-green-800 font-semibold px-2 py-0.5 rounded-lg border border-green-200 flex items-center gap-1 max-w-[75vw] sm:max-w-xs">
-                  <span className="truncate">Category: {selectedCategory}</span>
-                  <button onClick={() => setSelectedCategory('all')} className="shrink-0 p-0.5">
-                    <X className="w-3 h-3 hover:text-green-950" />
-                  </button>
-                </span>
-              )}
-
               {selectedRegion !== 'all' && (
-                <span className="bg-green-50 text-green-800 font-semibold px-2 py-0.5 rounded-lg border border-green-200 flex items-center gap-1 max-w-[75vw] sm:max-w-xs">
-                  <span className="truncate">Region: {selectedRegion}</span>
+                <span className="bg-green-50 text-green-800 font-semibold px-2 py-0.5 rounded-lg border border-green-200 flex items-center gap-1 max-w-[140px] min-w-0">
+                  <span className="truncate min-w-0">Region: {selectedRegion}</span>
                   <button onClick={() => setSelectedRegion('all')} className="shrink-0 p-0.5">
                     <X className="w-3 h-3 hover:text-green-950" />
                   </button>
@@ -425,8 +415,8 @@ export default function HomeInteractiveView({
               )}
 
               {activeTab !== 'all' && (
-                <span className="bg-green-50 text-green-800 font-semibold px-2 py-0.5 rounded-lg border border-green-200 flex items-center gap-1 max-w-[75vw] sm:max-w-xs">
-                  <span className="truncate">Tab: {activeTab}</span>
+                <span className="bg-green-50 text-green-800 font-semibold px-2 py-0.5 rounded-lg border border-green-200 flex items-center gap-1 max-w-[140px] min-w-0">
+                  <span className="truncate min-w-0">Tab: {activeTab}</span>
                   <button onClick={() => setActiveTab('all')} className="shrink-0 p-0.5">
                     <X className="w-3 h-3 hover:text-green-950" />
                   </button>
