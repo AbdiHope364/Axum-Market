@@ -5,6 +5,11 @@ import GlobalErrorHandler from './GlobalErrorHandler';
 export const metadata: Metadata = {
   title: 'AxumMarket — Administrative Governance Portal (Port 3001)',
   description: 'Dedicated administrative portal for seller approvals, listing moderation, and platform safety.',
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/admin-logo.png',
+  },
 };
 
 export const viewport: Viewport = {

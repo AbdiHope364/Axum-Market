@@ -18,6 +18,11 @@ export const metadata: Metadata = {
     'livestock marketplace Ethiopia',
     'cattle classifieds',
   ],
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/logo.png',
+  },
 };
 
 export const viewport: Viewport = {
