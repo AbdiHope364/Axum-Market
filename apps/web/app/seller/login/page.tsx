@@ -49,8 +49,8 @@ export default function SellerLoginPage() {
   const isPendingApproval = error.toLowerCase().includes('awaiting administrator approval');
 
   return (
-    <div className="min-h-[75vh] flex items-center justify-center px-4 py-8 sm:py-12 bg-slate-50">
-      <div className="max-w-md w-full bg-white rounded-3xl border border-gray-200/90 p-5 sm:p-7 shadow-lg shadow-gray-200/50 space-y-5">
+    <div className="min-h-[75vh] flex items-center justify-center px-3 sm:px-4 py-6 sm:py-12 bg-slate-50">
+      <div className="max-w-md w-full bg-white rounded-2xl sm:rounded-3xl border border-gray-200/90 p-4 sm:p-7 shadow-lg shadow-gray-200/50 space-y-5">
         {/* Header Header */}
         <div className="text-center space-y-1.5">
           <div className="w-11 h-11 rounded-2xl bg-green-100/80 text-green-700 flex items-center justify-center mx-auto shadow-xs">

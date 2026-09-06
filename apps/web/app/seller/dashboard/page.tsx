@@ -104,14 +104,14 @@ export default function SellerDashboardPage() {
   const soldCount = listings.filter((l) => l.status === 'SOLD').length;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-4 sm:space-y-6 pb-20 md:pb-8">
       {/* Header with Welcome & Add Action */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-gray-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4 bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-gray-200 shadow-xs">
         <div className="space-y-1">
-          <span className="text-xs font-bold uppercase tracking-wider text-green-700 bg-green-50 px-2.5 py-0.5 rounded-full">
+          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-green-700 bg-green-50 px-2.5 py-0.5 rounded-full">
             Seller Dashboard
           </span>
-          <h1 className="text-2xl sm:text-3xl font-black text-gray-900">
+          <h1 className="text-xl sm:text-3xl font-black text-gray-900">
             Welcome, {user?.fullName || 'Seller'}
           </h1>
           <p className="text-xs sm:text-sm text-gray-500">
@@ -121,56 +121,56 @@ export default function SellerDashboardPage() {
 
         <Link
           href="/seller/create"
-          className="w-full sm:w-auto px-5 py-3 bg-green-600 hover:bg-green-700 text-white font-bold text-sm sm:text-base rounded-2xl shadow-md transition flex items-center justify-center gap-2 shrink-0"
+          className="w-full sm:w-auto px-4 sm:px-5 py-2.5 sm:py-3 bg-green-600 hover:bg-green-700 active:scale-98 text-white font-bold text-xs sm:text-base rounded-xl sm:rounded-2xl shadow-sm transition flex items-center justify-center gap-2 shrink-0"
         >
-          <PlusCircle className="w-5 h-5" />
+          <PlusCircle className="w-4 h-4 sm:w-5 sm:h-5" />
           <span>+ Add New Animal</span>
         </Link>
       </div>
 
       {/* KPI Stats Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm">
-          <span className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+        <div className="bg-white p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-gray-200 shadow-xs">
+          <span className="text-[10px] sm:text-xs text-gray-500 font-semibold uppercase tracking-wider">
             Total Listings
           </span>
-          <div className="text-2xl sm:text-3xl font-black text-gray-900 mt-1">
+          <div className="text-xl sm:text-3xl font-black text-gray-900 mt-0.5 sm:mt-1">
             {listings.length}
           </div>
         </div>
 
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-green-200 shadow-sm bg-green-50/30">
-          <span className="text-xs text-green-700 font-semibold uppercase tracking-wider flex items-center gap-1">
-            <CheckCircle className="w-3.5 h-3.5" />
+        <div className="bg-white p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-green-200 shadow-xs bg-green-50/30">
+          <span className="text-[10px] sm:text-xs text-green-700 font-semibold uppercase tracking-wider flex items-center gap-1">
+            <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             Active
           </span>
-          <div className="text-2xl sm:text-3xl font-black text-green-700 mt-1">
+          <div className="text-xl sm:text-3xl font-black text-green-700 mt-0.5 sm:mt-1">
             {activeCount}
           </div>
         </div>
 
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-amber-200 shadow-sm bg-amber-50/30">
-          <span className="text-xs text-amber-700 font-semibold uppercase tracking-wider flex items-center gap-1">
-            <Clock className="w-3.5 h-3.5" />
+        <div className="bg-white p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-amber-200 shadow-xs bg-amber-50/30">
+          <span className="text-[10px] sm:text-xs text-amber-700 font-semibold uppercase tracking-wider flex items-center gap-1">
+            <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             Pending
           </span>
-          <div className="text-2xl sm:text-3xl font-black text-amber-700 mt-1">
+          <div className="text-xl sm:text-3xl font-black text-amber-700 mt-0.5 sm:mt-1">
             {pendingCount}
           </div>
         </div>
 
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm">
-          <span className="text-xs text-gray-600 font-semibold uppercase tracking-wider">
+        <div className="bg-white p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-gray-200 shadow-xs">
+          <span className="text-[10px] sm:text-xs text-gray-600 font-semibold uppercase tracking-wider">
             Marked Sold
           </span>
-          <div className="text-2xl sm:text-3xl font-black text-gray-700 mt-1">
+          <div className="text-xl sm:text-3xl font-black text-gray-700 mt-0.5 sm:mt-1">
             {soldCount}
           </div>
         </div>
       </div>
 
       {/* Listings List */}
-      <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden p-5 sm:p-6 space-y-4">
+      <div className="bg-white rounded-2xl sm:rounded-3xl border border-gray-200 shadow-xs overflow-hidden p-3.5 sm:p-6 space-y-3 sm:space-y-4">
         <div className="flex items-center justify-between border-b border-gray-100 pb-4">
           <h2 className="text-lg font-bold text-gray-900">My Livestock Listings</h2>
           <span className="text-xs text-gray-500 font-medium">

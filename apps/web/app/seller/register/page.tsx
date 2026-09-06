@@ -83,8 +83,8 @@ export default function SellerRegisterPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-        <div className="max-w-md w-full bg-white rounded-3xl border border-gray-200 p-8 shadow-md text-center space-y-5 animate-fadeIn">
+      <div className="min-h-[80vh] flex items-center justify-center px-3 sm:px-4 py-6 sm:py-12">
+        <div className="max-w-md w-full bg-white rounded-2xl sm:rounded-3xl border border-gray-200 p-5 sm:p-8 shadow-md text-center space-y-5 animate-fadeIn">
           <div className="w-16 h-16 rounded-3xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto shadow-inner">
             <Clock className="w-8 h-8 animate-pulse" />
           </div>

@@ -39,8 +39,8 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-slate-900 text-slate-100">
-      <div className="max-w-md w-full bg-slate-800/90 backdrop-blur-md rounded-3xl border border-slate-700 p-6 sm:p-8 shadow-2xl space-y-6">
+    <div className="min-h-[85vh] flex items-center justify-center px-3 sm:px-4 py-8 sm:py-12 bg-slate-900 text-slate-100">
+      <div className="max-w-md w-full bg-slate-800/90 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-slate-700 p-5 sm:p-8 shadow-2xl space-y-6">
         <div className="text-center space-y-2">
           <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center mx-auto">
             <ShieldCheck className="w-6 h-6" />

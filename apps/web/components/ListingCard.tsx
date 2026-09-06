@@ -138,20 +138,20 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
         </div>
 
         {/* Actions (Call Seller direct dial) */}
-        <div className="pt-1.5 sm:pt-2.5 mt-1.5 sm:mt-2 border-t border-gray-100 flex items-center gap-1 sm:gap-1.5">
+        <div className="pt-1.5 sm:pt-2.5 mt-1.5 sm:mt-2 border-t border-gray-100 flex items-center gap-1.5">
           {!isSold ? (
             <a
               href={`tel:${listing.contactPhone}`}
-              className="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg bg-green-600 hover:bg-green-700 active:scale-95 text-white font-bold text-xs shadow-xs transition"
+              className="flex-1 flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-green-600 hover:bg-green-700 active:scale-95 text-white font-bold text-xs shadow-xs transition min-h-[36px]"
               title={`Call ${listing.contactPhone}`}
             >
-              <Phone className="w-3 h-3 shrink-0" />
+              <Phone className="w-3.5 h-3.5 shrink-0" />
               <span>Call</span>
             </a>
           ) : (
             <button
               disabled
-              className="flex-1 py-1.5 px-2 rounded-lg bg-gray-100 text-gray-400 font-medium text-[10px] text-center cursor-not-allowed"
+              className="flex-1 py-2 px-2 rounded-xl bg-gray-100 text-gray-400 font-medium text-[11px] text-center cursor-not-allowed min-h-[36px]"
             >
               Sold
             </button>
@@ -159,7 +159,7 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
 
           <Link
             href={`/listings/${listing.id}`}
-            className="px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs transition text-center"
+            className="px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs transition text-center min-h-[36px] flex items-center justify-center shrink-0"
           >
             Details
           </Link>

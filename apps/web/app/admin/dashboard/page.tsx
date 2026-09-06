@@ -749,11 +749,11 @@ export default function AdminDashboardPage() {
           <span className="text-green-700 font-semibold hidden sm:inline">⚡ 1-Click Navigation</span>
         </div>
 
-        <div className="flex sm:grid sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 overflow-x-auto no-scrollbar snap-x -mx-3 px-3 sm:mx-0 sm:px-0 py-1">
+        <div className="flex sm:grid sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 overflow-x-auto no-scrollbar w-full max-w-full py-1">
           {/* 1. Pending Sellers */}
           <button
             onClick={() => setActiveTab('seller_approvals')}
-            className={`min-w-[130px] max-w-[155px] sm:min-w-0 sm:max-w-none shrink-0 sm:shrink snap-start text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+            className={`min-w-[130px] max-w-[155px] sm:min-w-0 sm:max-w-none shrink-0 sm:shrink text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
               activeTab === 'seller_approvals'
                 ? 'bg-amber-50 border-amber-400 shadow-md ring-2 ring-amber-400/40'
                 : 'bg-white border-gray-200 hover:border-amber-400 hover:-translate-y-0.5 shadow-sm'
@@ -773,7 +773,7 @@ export default function AdminDashboardPage() {
           {/* 2. Pending Animals */}
           <button
             onClick={() => setActiveTab('moderation')}
-            className={`min-w-[130px] max-w-[155px] sm:min-w-0 sm:max-w-none shrink-0 sm:shrink snap-start text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+            className={`min-w-[130px] max-w-[155px] sm:min-w-0 sm:max-w-none shrink-0 sm:shrink text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
               activeTab === 'moderation'
                 ? 'bg-amber-50 border-amber-400 shadow-md ring-2 ring-amber-400/40'
                 : 'bg-white border-gray-200 hover:border-amber-400 hover:-translate-y-0.5 shadow-sm'
@@ -796,7 +796,7 @@ export default function AdminDashboardPage() {
               setActiveTab('all_listings');
               setListingStatusFilter('ACTIVE');
             }}
-            className={`min-w-[130px] max-w-[155px] sm:min-w-0 sm:max-w-none shrink-0 sm:shrink snap-start text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+            className={`min-w-[130px] max-w-[155px] sm:min-w-0 sm:max-w-none shrink-0 sm:shrink text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
               activeTab === 'all_listings' && listingStatusFilter === 'ACTIVE'
                 ? 'bg-green-50 border-green-500 shadow-md ring-2 ring-green-500/40'
                 : 'bg-white border-gray-200 hover:border-green-500 hover:-translate-y-0.5 shadow-sm'
@@ -819,7 +819,7 @@ export default function AdminDashboardPage() {
               setActiveTab('all_listings');
               setListingStatusFilter('SOLD');
             }}
-            className={`min-w-[130px] max-w-[155px] sm:min-w-0 sm:max-w-none shrink-0 sm:shrink snap-start text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+            className={`min-w-[130px] max-w-[155px] sm:min-w-0 sm:max-w-none shrink-0 sm:shrink text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
               activeTab === 'all_listings' && listingStatusFilter === 'SOLD'
                 ? 'bg-blue-50 border-blue-500 shadow-md ring-2 ring-blue-500/40'
                 : 'bg-white border-gray-200 hover:border-blue-500 hover:-translate-y-0.5 shadow-sm'
@@ -839,7 +839,7 @@ export default function AdminDashboardPage() {
           {/* 5. Sellers */}
           <button
             onClick={() => setActiveTab('sellers')}
-            className={`min-w-[130px] max-w-[155px] sm:min-w-0 sm:max-w-none shrink-0 sm:shrink snap-start text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+            className={`min-w-[130px] max-w-[155px] sm:min-w-0 sm:max-w-none shrink-0 sm:shrink text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
               activeTab === 'sellers'
                 ? 'bg-purple-50 border-purple-500 shadow-md ring-2 ring-purple-500/40'
                 : 'bg-white border-gray-200 hover:border-purple-500 hover:-translate-y-0.5 shadow-sm'
@@ -859,7 +859,7 @@ export default function AdminDashboardPage() {
           {/* 6. Reports */}
           <button
             onClick={() => setActiveTab('reports')}
-            className={`min-w-[130px] max-w-[155px] sm:min-w-0 sm:max-w-none shrink-0 sm:shrink snap-start text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
+            className={`min-w-[130px] max-w-[155px] sm:min-w-0 sm:max-w-none shrink-0 sm:shrink text-left p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer active:scale-95 flex flex-col justify-between border ${
               activeTab === 'reports'
                 ? 'bg-red-50 border-red-500 shadow-md ring-2 ring-red-500/40'
                 : 'bg-white border-gray-200 hover:border-red-500 hover:-translate-y-0.5 shadow-sm'

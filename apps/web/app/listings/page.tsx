@@ -226,14 +226,14 @@ function ListingsContent() {
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
             placeholder="Search by breed, cow, bull, location..."
-            className="w-full pl-9 pr-3 py-2 bg-white border border-gray-300 rounded-xl text-xs sm:text-sm outline-none focus:ring-2 focus:ring-green-500 shadow-xs"
+            className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-300 rounded-xl text-xs sm:text-sm outline-none focus:ring-2 focus:ring-green-500 shadow-xs min-h-[42px]"
           />
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
           <button
             onClick={() => setMobileFiltersOpen(true)}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-2 bg-white border border-gray-300 rounded-xl text-xs sm:text-sm font-semibold text-gray-700 hover:bg-gray-50 shadow-xs transition"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-2 bg-white border border-gray-300 rounded-xl text-xs sm:text-sm font-semibold text-gray-700 hover:bg-gray-50 shadow-xs transition min-h-[42px]"
           >
             <SlidersHorizontal className="w-3.5 h-3.5 text-green-600" />
             <span>Filters</span>
@@ -246,7 +246,7 @@ function ListingsContent() {
 
           <button
             onClick={() => handleApplyFilters()}
-            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-xs transition"
+            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-xs transition min-h-[42px]"
           >
             Apply
           </button>
@@ -674,7 +674,7 @@ function ListingsContent() {
                         }}
                         className={`flex items-center gap-2 p-2.5 sm:p-3 rounded-2xl border text-left transition-all active:scale-95 min-w-0 overflow-hidden ${
                           isSelected
-                            ? 'bg-green-50/90 border-green-500 text-green-900 shadow-xs ring-1 ring-green-500'
+                            ? 'bg-green-50 border-green-600 text-green-900 shadow-xs'
                             : 'bg-white border-gray-200 text-gray-800 hover:bg-gray-50'
                         }`}
                       >

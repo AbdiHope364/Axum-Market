@@ -42,7 +42,7 @@ export default async function ListingDetailPage({ params }: PageProps) {
   const isSold = listing.status === 'SOLD';
 
   return (
-    <div className="max-w-6xl mx-auto px-2.5 sm:px-6 lg:px-8 py-3 sm:py-6 space-y-3 sm:space-y-6">
+    <div className="max-w-6xl mx-auto px-2.5 sm:px-6 lg:px-8 py-3 sm:py-6 space-y-3 sm:space-y-6 pb-24 md:pb-8">
       {/* Back Button */}
       <div className="flex items-center justify-between">
         <Link
