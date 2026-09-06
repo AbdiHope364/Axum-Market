@@ -278,24 +278,24 @@ export default function HomeInteractiveView({
             )}
           </div>
 
-          {/* Responsive Category Cards: 3-column grid on mobile */}
-          <div className="grid grid-cols-3 sm:flex sm:overflow-x-auto sm:no-scrollbar gap-1.5 sm:gap-2.5 max-w-full">
+          {/* Responsive Category Cards: Smooth horizontal scroll row on all screen sizes */}
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1.5 w-full max-w-full snap-x">
             {/* "All" button */}
             <button
               onClick={() => setSelectedCategory('all')}
-              className={`flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-0.5 sm:gap-2 p-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl border text-center sm:text-left transition-all shadow-xs active:scale-95 min-w-0 w-full sm:w-auto sm:shrink-0 overflow-hidden cursor-pointer ${
+              className={`flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl border text-left transition-all shadow-xs active:scale-95 shrink-0 snap-start cursor-pointer whitespace-nowrap ${
                 selectedCategory === 'all'
                   ? 'bg-green-700 text-white border-green-700 shadow-green-700/20 ring-1 ring-green-600'
                   : 'bg-white text-gray-700 border-gray-200 hover:border-green-300 hover:bg-gray-50/60'
               }`}
             >
               <span className="text-base sm:text-lg shrink-0">🐾</span>
-              <div className="flex flex-col min-w-0 w-full overflow-hidden">
-                <span className="text-[11px] sm:text-xs font-black truncate w-full block">
+              <div className="flex flex-col min-w-0">
+                <span className="text-xs font-black">
                   All Animals
                 </span>
                 <span
-                  className={`text-[9px] sm:text-[10px] leading-none truncate w-full block ${
+                  className={`text-[9px] sm:text-[10px] leading-tight ${
                     selectedCategory === 'all' ? 'text-green-100' : 'text-gray-400'
                   }`}
                 >
@@ -314,20 +314,20 @@ export default function HomeInteractiveView({
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(isSelected ? 'all' : cat.name)}
-                  className={`flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-0.5 sm:gap-2 p-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl border text-center sm:text-left transition-all shadow-xs active:scale-95 min-w-0 w-full sm:w-auto sm:shrink-0 overflow-hidden cursor-pointer ${
+                  className={`flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl border text-left transition-all shadow-xs active:scale-95 shrink-0 snap-start cursor-pointer whitespace-nowrap ${
                     isSelected
                       ? 'bg-green-700 text-white border-green-700 shadow-green-700/20 ring-1 ring-green-600'
                       : 'bg-white text-gray-700 border-gray-200 hover:border-green-300 hover:bg-gray-50/60'
                   }`}
                 >
                   <span className="text-base sm:text-lg shrink-0">{cat.icon || '🐮'}</span>
-                  <div className="flex flex-col min-w-0 w-full overflow-hidden">
-                    <span className="text-[11px] sm:text-xs font-black truncate w-full block">
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-xs font-black">
                       {primary}
                     </span>
                     {secondary && (
                       <span
-                        className={`text-[9px] sm:text-[10px] leading-none truncate w-full block ${
+                        className={`text-[9px] sm:text-[10px] leading-tight ${
                           isSelected ? 'text-green-100' : 'text-gray-400'
                         }`}
                       >

@@ -133,13 +133,13 @@ export default function SellerRegisterPage() {
   }
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-      <div className="max-w-md w-full bg-white rounded-3xl border border-gray-200 p-6 sm:p-8 shadow-sm space-y-6">
+    <div className="min-h-[80vh] flex items-center justify-center px-3 sm:px-4 py-6 sm:py-12">
+      <div className="max-w-md w-full bg-white rounded-2xl sm:rounded-3xl border border-gray-200 p-4 sm:p-8 shadow-sm space-y-5 sm:space-y-6">
         <div className="text-center space-y-2">
           <div className="w-12 h-12 rounded-2xl bg-green-100 text-green-700 flex items-center justify-center mx-auto shadow-xs">
             <UserPlus className="w-6 h-6 stroke-[2.2]" />
           </div>
-          <h1 className="text-2xl font-black text-gray-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
             Register as a Livestock Seller
           </h1>
           <p className="text-xs sm:text-sm text-gray-500">
@@ -207,13 +207,13 @@ export default function SellerRegisterPage() {
           </div>
 
           {/* Region & City */}
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-2.5">
             <div className="relative">
               <select
                 value={region}
                 onChange={(e) => setRegion(e.target.value)}
                 aria-label="Region"
-                className="w-full px-3.5 py-3 bg-white border border-gray-300 rounded-2xl text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition shadow-xs"
+                className="w-full px-3.5 py-3 bg-white border border-gray-300 rounded-2xl text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition shadow-xs cursor-pointer"
               >
                 <option value="Oromia">Oromia</option>
                 <option value="Addis Ababa">Addis Ababa</option>

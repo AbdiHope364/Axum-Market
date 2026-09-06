@@ -1178,7 +1178,7 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Species / Category Quick Filter Chips */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 max-w-full -mx-3 px-3 sm:mx-0 sm:px-0 snap-x">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 w-full max-w-full snap-x">
             <span className="text-[11px] font-bold text-gray-500 shrink-0 mr-1 flex items-center gap-1">
               <Filter className="w-3 h-3 text-green-700" /> Species:
             </span>
