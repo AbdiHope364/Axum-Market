@@ -89,8 +89,8 @@ export async function POST(req: Request) {
       req.headers.get('x-forwarded-proto') === 'https' ||
       req.url.startsWith('https:');
 
-    // Admin session timeout: 5 minutes (300 seconds)
-    const ADMIN_MAX_AGE = 5 * 60;
+    // Admin session base timeout: 24 hours (Client-side enforces 5-min inactivity)
+    const ADMIN_MAX_AGE = 24 * 60 * 60;
 
     response.cookies.set('axum_admin_token', token, {
       httpOnly: true,

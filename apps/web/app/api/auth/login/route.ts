@@ -134,7 +134,7 @@ export async function POST(req: Request) {
       req.url.startsWith('https:');
 
     const isAdmin = user.role === 'ADMIN';
-    const cookieMaxAge = isAdmin ? 5 * 60 : 60 * 60 * 24 * 7;
+    const cookieMaxAge = isAdmin ? 24 * 60 * 60 : 60 * 60 * 24 * 7;
 
     response.cookies.set('axum_token', token, {
       httpOnly: true,

@@ -11,7 +11,7 @@ export interface TokenPayload {
   fullName: string;
 }
 
-export function signToken(payload: TokenPayload, expiresIn: any = payload.role === 'ADMIN' ? '5m' : '7d'): string {
+export function signToken(payload: TokenPayload, expiresIn: any = payload.role === 'ADMIN' ? '24h' : '7d'): string {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: expiresIn as any });
 }
 

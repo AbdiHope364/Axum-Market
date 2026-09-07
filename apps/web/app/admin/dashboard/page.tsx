@@ -323,6 +323,36 @@ export default function AdminDashboardPage() {
     fetchAdminData();
   }, [fetchAdminData]);
 
+  // Enforce 5-minute inactivity timeout
+  useEffect(() => {
+    let inactivityTimer: NodeJS.Timeout;
+    
+    const resetTimer = () => {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(async () => {
+        try {
+          await fetch('/api/auth/logout', { method: 'POST' });
+        } catch {}
+        router.push('/admin/login');
+      }, 5 * 60 * 1000); // 5 minutes
+    };
+
+    resetTimer(); // Start initially
+
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('keydown', resetTimer);
+    window.addEventListener('click', resetTimer);
+    window.addEventListener('scroll', resetTimer);
+
+    return () => {
+      clearTimeout(inactivityTimer);
+      window.removeEventListener('mousemove', resetTimer);
+      window.removeEventListener('keydown', resetTimer);
+      window.removeEventListener('click', resetTimer);
+      window.removeEventListener('scroll', resetTimer);
+    };
+  }, [router]);
+
   // Photo Upload Handler
   const handleUploadPhoto = async (file: File, angle: 'FRONT' | 'LEFT' | 'RIGHT') => {
     setUploadingAngle(angle);

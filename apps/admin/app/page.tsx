@@ -365,7 +365,20 @@ export default function AdminPortalPage() {
       });
     }, 1000);
 
-    return () => clearInterval(timer);
+    // Reset timer on user activity
+    const resetTimer = () => setSessionSecondsLeft(300);
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('keydown', resetTimer);
+    window.addEventListener('click', resetTimer);
+    window.addEventListener('scroll', resetTimer);
+
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('mousemove', resetTimer);
+      window.removeEventListener('keydown', resetTimer);
+      window.removeEventListener('click', resetTimer);
+      window.removeEventListener('scroll', resetTimer);
+    };
   }, [sessionUser, sessionSecondsLeft, handleSessionTimeout]);
 
   const loadDashboardData = async () => {
