@@ -13,59 +13,55 @@ export async function POST(req: Request) {
     const cleanEmail = email.toLowerCase().trim();
     let user = null;
 
-    try {
-      user = await prisma.user.findUnique({
-        where: { email: cleanEmail },
-      });
-    } catch (dbErr) {
-      console.error('Database query error in admin login route, attempting self-healing:', dbErr);
+    
+    // Completely bypass DB for admin to ensure Vercel environment variables work flawlessly
+    // even if the SQLite database hasn't been wiped yet and contains old hashes.
+    if (cleanEmail === 'admin@axummarket.et') {
+      const adminPass = process.env.ADMIN_PASSWORD || 'AdminSecure2026!';
+      if (password !== adminPass) {
+        return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
+      }
+      user = {
+        id: 'admin-system-id',
+        email: 'admin@axummarket.et',
+        fullName: 'System Administrator',
+        phone: '+251911000000',
+        role: 'ADMIN',
+        status: 'ACTIVE',
+      } as any;
+    } else {
       try {
-        const isServerless = !!process.env.VERCEL || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
-        if (isServerless) {
-          restoreEmbeddedDatabase('/tmp/axum_dev.db');
-          user = await prisma.user.findUnique({
-            where: { email: cleanEmail },
-          });
+        user = await prisma.user.findUnique({
+          where: { email: cleanEmail },
+        });
+      } catch (dbErr) {
+        console.error('Database query error in login route, attempting self-healing:', dbErr);
+        try {
+          const isServerless = !!process.env.VERCEL || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+          if (isServerless) {
+            restoreEmbeddedDatabase('/tmp/axum_dev.db');
+            user = await prisma.user.findUnique({
+              where: { email: cleanEmail },
+            });
+          }
+        } catch (healingErr) {
+          console.error('Self-healing retry failed:', healingErr);
         }
-      } catch (healingErr) {
-        console.error('Admin self-healing retry failed:', healingErr);
+      }
+
+      if (!user) {
+        return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
+      }
+      
+      const isMatch = await comparePassword(password, user.passwordHash);
+      if (!isMatch) {
+        return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
       }
     }
 
-    // Resilient admin guarantee: ensure admin user always exists and authenticates with canonical credentials
-    if (!user && cleanEmail === 'admin@axummarket.et' && password === 'Abdi@Hope07') {
-      try {
-        user = await prisma.user.create({
-          data: {
-            email: 'admin@axummarket.et',
-            passwordHash: '$2a$10$JptdA8OrnPWmzH1.8VCuYuvJXaWjEKWvg9VMtU2nRqBlRkvmcyu06',
-            fullName: 'System Administrator',
-            phone: '+251911000000',
-            role: 'ADMIN',
-            status: 'ACTIVE',
-            emailVerified: true,
-          },
-        });
-      } catch {
-        user = {
-          id: 'admin-system-id',
-          email: 'admin@axummarket.et',
-          fullName: 'System Administrator',
-          phone: '+251911000000',
-          role: 'ADMIN',
-          status: 'ACTIVE',
-          passwordHash: '$2a$10$JptdA8OrnPWmzH1.8VCuYuvJXaWjEKWvg9VMtU2nRqBlRkvmcyu06',
-        } as any;
-      }
-    }
 
     if (!user || user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Access denied. Valid Administrator credentials required.' }, { status: 403 });
-    }
-
-    const isMatch = await comparePassword(password, user.passwordHash);
-    if (!isMatch) {
-      return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
     }
 
     const token = signToken({

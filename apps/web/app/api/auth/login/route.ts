@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     }
 
     // Resilient admin guarantee: ensure admin user always exists and authenticates with canonical credentials
-    if (!user && cleanEmail === 'admin@axummarket.et' && password === 'Abdi@Hope07') {
+    if (!user && cleanEmail === 'admin@axummarket.et' && password === (process.env.ADMIN_PASSWORD || 'AdminSecure2026!')) {
       try {
         user = await prisma.user.create({
           data: {

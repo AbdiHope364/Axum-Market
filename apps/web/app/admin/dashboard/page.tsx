@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -324,32 +324,37 @@ export default function AdminDashboardPage() {
   }, [fetchAdminData]);
 
   // Enforce 5-minute inactivity timeout
+  const lastActivityRef = useRef<number>(Date.now());
+
   useEffect(() => {
-    let inactivityTimer: NodeJS.Timeout;
+    lastActivityRef.current = Date.now();
     
-    const resetTimer = () => {
-      clearTimeout(inactivityTimer);
-      inactivityTimer = setTimeout(async () => {
+    const updateActivity = () => {
+      lastActivityRef.current = Date.now();
+    };
+
+    window.addEventListener('mousemove', updateActivity, { passive: true });
+    window.addEventListener('keydown', updateActivity, { passive: true });
+    window.addEventListener('click', updateActivity, { passive: true });
+    window.addEventListener('scroll', updateActivity, { passive: true });
+
+    const interval = setInterval(async () => {
+      const elapsed = Date.now() - lastActivityRef.current;
+      if (elapsed >= 5 * 60 * 1000) {
+        clearInterval(interval);
         try {
           await fetch('/api/auth/logout', { method: 'POST' });
         } catch {}
         router.push('/admin/login');
-      }, 5 * 60 * 1000); // 5 minutes
-    };
-
-    resetTimer(); // Start initially
-
-    window.addEventListener('mousemove', resetTimer);
-    window.addEventListener('keydown', resetTimer);
-    window.addEventListener('click', resetTimer);
-    window.addEventListener('scroll', resetTimer);
+      }
+    }, 5000); // Check every 5 seconds instead of setting timeouts on every mouse move
 
     return () => {
-      clearTimeout(inactivityTimer);
-      window.removeEventListener('mousemove', resetTimer);
-      window.removeEventListener('keydown', resetTimer);
-      window.removeEventListener('click', resetTimer);
-      window.removeEventListener('scroll', resetTimer);
+      clearInterval(interval);
+      window.removeEventListener('mousemove', updateActivity);
+      window.removeEventListener('keydown', updateActivity);
+      window.removeEventListener('click', updateActivity);
+      window.removeEventListener('scroll', updateActivity);
     };
   }, [router]);
 
