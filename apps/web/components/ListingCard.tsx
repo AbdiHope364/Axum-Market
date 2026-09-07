@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -41,12 +43,31 @@ export interface ListingCardData {
 export default function ListingCard({ listing }: { listing: ListingCardData }) {
   const { t } = useLanguage();
   const images = Array.isArray(listing?.images) ? listing.images : [];
-  const frontImage =
-    images.find((img) => img?.imageType === 'FRONT' || img?.imageType === 'PROFILE') ||
-    images[0];
-  const imageUrl =
-    frontImage?.imageUrl ||
-    '/logo-emblem.png';
+  
+  // Sort images to ensure FRONT/PROFILE is first
+  const orderedImages = React.useMemo(() => {
+    if (images.length === 0) return [];
+    return [...images].sort((a, b) => {
+      const order: Record<string, number> = { FRONT: 1, PROFILE: 1, LEFT: 2, RIGHT: 3 };
+      return (order[a.imageType] || 4) - (order[b.imageType] || 4);
+    });
+  }, [images]);
+
+  const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
+
+  // Auto-cycle images every 1 second
+  React.useEffect(() => {
+    if (orderedImages.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % orderedImages.length);
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [orderedImages.length]);
+
+  const activeImage = orderedImages[currentImageIndex];
+  const imageUrl = activeImage?.imageUrl || '/logo-emblem.png';
 
   const isSold = listing?.status === 'SOLD';
   const categoryName = listing?.category?.name || 'Livestock';
@@ -56,11 +77,12 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
       {/* Image & Badges */}
       <Link href={`/listings/${listing?.id || ''}`} className="block relative aspect-[4/3] overflow-hidden bg-gray-100">
         <Image
+          key={imageUrl} // Force re-render for smooth transition or keep it without key for instant snap
           src={imageUrl}
           alt={listing?.title || 'Livestock'}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          className="object-cover transition-transform duration-300"
         />
 
         {/* Top Badges */}
