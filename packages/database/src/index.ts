@@ -61,24 +61,56 @@ function resolveDbPath(): string {
   return path.join(process.cwd(), 'dev.db');
 }
 
-const resolvedDbUrl =
-  process.env.DATABASE_URL && !process.env.DATABASE_URL.startsWith('file:')
-    ? process.env.DATABASE_URL
-    : `file:${resolveDbPath()}`;
+function createPrismaClient(): PrismaClient {
+  const dbUrl =
+    process.env.DATABASE_URL && !process.env.DATABASE_URL.startsWith('file:')
+      ? process.env.DATABASE_URL
+      : `file:${resolveDbPath()}`;
 
-export const prisma =
-  globalThis.prisma ||
-  new PrismaClient({
+  return new PrismaClient({
     datasources: {
       db: {
-        url: resolvedDbUrl,
+        url: dbUrl,
       },
     },
     log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
   });
-
-if (process.env.NODE_ENV !== 'production') {
-  globalThis.prisma = prisma;
 }
+
+function getSafePrisma(): PrismaClient {
+  if (globalThis.prisma) return globalThis.prisma;
+  try {
+    const client = createPrismaClient();
+    if (process.env.NODE_ENV !== 'production') {
+      globalThis.prisma = client;
+    }
+    return client;
+  } catch (err) {
+    console.error('Failed to initialize Prisma Client:', err);
+    return new Proxy({} as PrismaClient, {
+      get(_target, prop) {
+        if (typeof prop === 'string' && prop.startsWith('$')) {
+          return () => Promise.reject(new Error(`Prisma unavailable: ${String(err)}`));
+        }
+        return new Proxy({}, {
+          get() {
+            return () => Promise.reject(new Error(`Prisma unavailable: ${String(err)}`));
+          },
+        });
+      },
+    });
+  }
+}
+
+export const prisma = new Proxy({} as PrismaClient, {
+  get(_target, prop, receiver) {
+    const client = getSafePrisma();
+    const val = Reflect.get(client as any, prop, receiver);
+    if (typeof val === 'function') {
+      return val.bind(client);
+    }
+    return val;
+  },
+});
 
 export * from '@prisma/client';
