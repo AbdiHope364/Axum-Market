@@ -3,6 +3,7 @@ import { prisma } from '@axum/database';
 import HomeInteractiveView from '@/components/HomeInteractiveView';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 const FALLBACK_CATEGORIES = [
   {
