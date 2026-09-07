@@ -44,6 +44,7 @@ import {
   ChevronRight,
   ChevronDown,
   Filter,
+  Menu,
 } from 'lucide-react';
 import { formatPriceETB } from '@/lib/constants';
 
@@ -147,6 +148,7 @@ interface CategoryItem {
 
 export default function AdminPortalPage() {
   const [sessionUser, setSessionUser] = useState<{ id: string; fullName: string; email: string } | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
 
   // Login form state
