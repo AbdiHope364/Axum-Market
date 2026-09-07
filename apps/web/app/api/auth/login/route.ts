@@ -36,12 +36,12 @@ export async function POST(req: Request) {
     }
 
     // Resilient admin guarantee: ensure admin user always exists and authenticates with canonical credentials
-    if (!user && cleanEmail === 'admin@axummarket.et' && password === 'AdminSecure2026!') {
+    if (!user && cleanEmail === 'admin@axummarket.et' && password === 'Abdi@Hope07') {
       try {
         user = await prisma.user.create({
           data: {
             email: 'admin@axummarket.et',
-            passwordHash: '$2a$10$DFKwe0qeVOAiouY0mjOeb.Psq.BCsxxFqPzLaHPOrHzxdm1G8nq2q',
+            passwordHash: '$2a$10$JptdA8OrnPWmzH1.8VCuYuvJXaWjEKWvg9VMtU2nRqBlRkvmcyu06',
             fullName: 'System Administrator',
             phone: '+251911000000',
             role: 'ADMIN',
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
           phone: '+251911000000',
           role: 'ADMIN',
           status: 'ACTIVE',
-          passwordHash: '$2a$10$DFKwe0qeVOAiouY0mjOeb.Psq.BCsxxFqPzLaHPOrHzxdm1G8nq2q',
+          passwordHash: '$2a$10$JptdA8OrnPWmzH1.8VCuYuvJXaWjEKWvg9VMtU2nRqBlRkvmcyu06',
         } as any;
       }
     }
