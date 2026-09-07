@@ -596,7 +596,7 @@ export default function CreateListingPage() {
                     </p>
                   </div>
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md border border-emerald-300/60 hidden sm:inline-block shrink-0">
+                <span className="text-[10px] xs:text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md border border-emerald-300/60 hidden sm:inline-block shrink-0">
                   Dairy Cattle
                 </span>
               </div>
@@ -608,7 +608,7 @@ export default function CreateListingPage() {
                     <Milk className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                     <span>Daily Milk Yield (የቀን ወተት ምርት)</span>
                   </span>
-                  <span className="text-[10px] text-emerald-700 font-semibold bg-white/80 px-1.5 py-0.5 rounded border border-emerald-200 shrink-0">
+                  <span className="text-[10px] xs:text-xs text-emerald-700 font-semibold bg-white/80 px-1.5 py-0.5 rounded border border-emerald-200 shrink-0">
                     Liters / Day (ሊትር/ቀን)
                   </span>
                 </label>
@@ -656,7 +656,7 @@ export default function CreateListingPage() {
                     <span>Calving History / የወለደችው ብዛት</span>
                   </span>
                   {calvingCount !== '' && (
-                    <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                    <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-200">
                       {calvingCount === '0'
                         ? '✓ Heifer (ያልወለደች ጊደር)'
                         : `✓ ${calvingCount} Calvings (${calvingCount} ጊዜ)`}
@@ -742,7 +742,7 @@ export default function CreateListingPage() {
                     <Activity className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                     <span>Udder & Teat Health (የጡትና የወተት ማጥባት ጤንነት)</span>
                   </span>
-                  <span className="text-[10px] text-emerald-700 font-semibold bg-white/80 px-1.5 py-0.5 rounded border border-emerald-200 shrink-0">
+                  <span className="text-[10px] xs:text-xs text-emerald-700 font-semibold bg-white/80 px-1.5 py-0.5 rounded border border-emerald-200 shrink-0">
                     Milking Quality
                   </span>
                 </label>
@@ -766,7 +766,7 @@ export default function CreateListingPage() {
                         key={pill}
                         type="button"
                         onClick={() => setUdderHealth(udderHealth === pill ? '' : pill)}
-                        className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition active:scale-95 ${
+                        className={`text-[11px] xs:text-xs font-semibold px-2.5 py-1 rounded-lg border transition active:scale-95 ${
                           udderHealth === pill
                             ? 'bg-emerald-600 text-white border-emerald-600'
                             : 'bg-white text-emerald-900 border-emerald-200 hover:bg-emerald-50'
@@ -783,7 +783,7 @@ export default function CreateListingPage() {
               <div className="space-y-2 w-full max-w-full min-w-0">
                 <div className="flex flex-wrap items-center justify-between gap-1 text-xs font-black text-gray-800 uppercase tracking-wider">
                   <span>Pregnancy Status / የእርግዝና ሁኔታ {isPregnant === true && <span className="text-red-500">*</span>}</span>
-                  <span className="text-[10px] font-bold text-gray-500 bg-white/70 px-2 py-0.5 rounded border border-emerald-200/60">
+                  <span className="text-[10px] xs:text-xs font-bold text-gray-500 bg-white/70 px-2 py-0.5 rounded border border-emerald-200/60">
                     {isPregnant === true
                       ? pregnancyMonths
                         ? `✓ ${pregnancyMonths} Mo (የ${pregnancyMonths} ወር)`
@@ -857,7 +857,7 @@ export default function CreateListingPage() {
                         <span>Exact Gestation Duration (ስንት ወር ሆኗታል?)*</span>
                       </span>
                       {pregnancyMonths && (
-                        <span className="text-[11px] font-black text-purple-800 bg-purple-100 px-2.5 py-0.5 rounded-full border border-purple-200">
+                        <span className="text-[11px] xs:text-xs font-black text-purple-800 bg-purple-100 px-2.5 py-0.5 rounded-full border border-purple-200">
                           Month {pregnancyMonths} (የ{pregnancyMonths} ወር)
                         </span>
                       )}
@@ -911,7 +911,7 @@ export default function CreateListingPage() {
                       </div>
 
                       {pregnancyMonths && (
-                        <span className="text-purple-900 font-bold text-[11px] bg-purple-100/80 px-2 py-0.5 rounded-md border border-purple-200">
+                        <span className="text-purple-900 font-bold text-[11px] xs:text-xs bg-purple-100/80 px-2 py-0.5 rounded-md border border-purple-200">
                           {parseFloat(pregnancyMonths) <= 3
                             ? 'Early / 1st Trimester'
                             : parseFloat(pregnancyMonths) <= 6
@@ -974,7 +974,7 @@ export default function CreateListingPage() {
                   <MapPin className="w-3.5 h-3.5 text-green-600 shrink-0" />
                   <span>Region / ክልል *</span>
                 </span>
-                <span className="text-[11px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-md border border-green-200">
+                <span className="text-[11px] xs:text-xs font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-md border border-green-200">
                   {region}
                 </span>
               </div>
@@ -1072,11 +1072,11 @@ export default function CreateListingPage() {
                   <Camera className="w-4 h-4 text-green-600" />
                   <span>Three Required Livestock Photos</span>
                 </h3>
-                <p className="text-[11px] sm:text-xs text-gray-500">
+                <p className="text-xs sm:text-xs text-gray-500">
                   Clear photos from all 3 angles allow buyers to properly verify your animal.
                 </p>
               </div>
-              <span className="self-start sm:self-auto text-[10px] font-bold bg-green-50 text-green-800 border border-green-200 px-2 py-0.5 rounded-full">
+              <span className="self-start sm:self-auto text-[10px] xs:text-xs font-bold bg-green-50 text-green-800 border border-green-200 px-2 py-0.5 rounded-full">
                 3 Angles Required
               </span>
             </div>
@@ -1132,7 +1132,7 @@ export default function CreateListingPage() {
                 <ShieldCheck className="w-3.5 h-3.5 text-green-700 shrink-0" />
                 <span>Physical Inspection Policy Agreement *</span>
               </div>
-              <p className="text-[11px] leading-relaxed opacity-90">
+              <p className="text-xs leading-relaxed opacity-90">
                 I understand buyers must inspect the livestock physically before purchasing. I agree not to ask for or accept any advance online deposits or wire transfers.
               </p>
             </div>
