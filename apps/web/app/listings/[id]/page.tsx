@@ -5,6 +5,7 @@ import { prisma } from '@axum/database';
 import ImageGallery from '@/components/ImageGallery';
 import CallSellerButton from '@/components/CallSellerButton';
 import SafetyNotice from '@/components/SafetyNotice';
+import AutoTranslateText from '@/components/AutoTranslateText';
 import { formatPriceETB } from '@/lib/constants';
 import { MapPin, Shield, Calendar, User, Flag, ArrowLeft, CheckCircle2, Milk, Baby, Activity } from 'lucide-react';
 import ListingDetailClientActions from './ListingDetailClientActions';
@@ -250,9 +251,7 @@ export default async function ListingDetailPage({ params }: PageProps) {
               <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider">
                 Seller&rsquo;s Description
               </h3>
-              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line bg-slate-50 p-4 rounded-xl border border-slate-100">
-                {listing.description}
-              </p>
+              <AutoTranslateText text={listing.description} />
             </div>
           </div>
 
@@ -356,6 +355,9 @@ export default async function ListingDetailPage({ params }: PageProps) {
               />
             </div>
           </div>
+
+          {/* Direct Seller Safety Reminder Callout */}
+          <SafetyNotice variant="warning-box" />
         </div>
       </div>
 

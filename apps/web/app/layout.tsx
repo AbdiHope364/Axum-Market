@@ -4,6 +4,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import GlobalErrorHandler from '@/components/GlobalErrorHandler';
+import { LanguageProvider } from '@/context/LanguageContext';
 
 export const metadata: Metadata = {
   title: 'AxumMarket | Ethiopian Livestock Classifieds & Direct Marketplace',
@@ -40,11 +41,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full scroll-smooth">
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 antialiased selection:bg-green-100 selection:text-green-900 overflow-x-hidden max-w-full">
-        <GlobalErrorHandler />
-        <Navbar />
-        <main className="flex-1 w-full max-w-full overflow-x-hidden pb-16 md:pb-0">{children}</main>
-        <Footer />
-        <MobileBottomNav />
+        <LanguageProvider>
+          <GlobalErrorHandler />
+          <Navbar />
+          <main className="flex-1 w-full max-w-full overflow-x-hidden pb-16 md:pb-0">{children}</main>
+          <Footer />
+          <MobileBottomNav />
+        </LanguageProvider>
       </body>
     </html>
   );

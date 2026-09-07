@@ -1127,14 +1127,18 @@ export default function CreateListingPage() {
             >
               {inspectedAgreed && <Check className="w-3.5 h-3.5 stroke-[3]" />}
             </div>
-            <div className="space-y-0.5 text-xs">
+            <div className="space-y-1.5 text-xs">
               <div className="font-black flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5 text-green-700 shrink-0" />
-                <span>Physical Inspection Policy Agreement *</span>
+                <span>Physical Inspection &amp; Zero Online Payment Policy *</span>
               </div>
               <p className="text-xs leading-relaxed opacity-90">
-                I understand buyers must inspect the livestock physically before purchasing. I agree not to ask for or accept any advance online deposits or wire transfers.
+                I understand buyers must inspect the livestock physically in person before purchasing. I agree not to ask for or accept any advance online deposits or wire transfers. Axum Market connects buyers and sellers directly for offline market transactions.
               </p>
+              <div className="pt-1 text-[11px] text-amber-900/90 border-t border-amber-200/60 space-y-0.5 font-medium">
+                <p><strong>አማርኛ፦</strong> ገዢዎች ከመግዛታቸው በፊት እንስሳውን በአካል መመርመር አለባቸው። ምንም አይነት የቅድመ ክፍያ ወይም ዲፖዚት በኦንላይን እንደማልቀበል እስማማለሁ።</p>
+                <p><strong>Afaan Oromoo፦</strong> Bittaa dura bittuun beellada sana qaamaan sakatta&apos;uu qaba. Kaffaltii dursaa toora interneetii irratti akkan hin gaafanne nan walii gala.</p>
+              </div>
             </div>
           </div>
 

@@ -19,6 +19,7 @@ import {
   Sparkles,
   LayoutDashboard,
 } from 'lucide-react';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -119,6 +120,9 @@ export default function Navbar() {
                 Browse Animals
               </Link>
 
+              {/* Multilingual Selector (English default, Amharic, Afaan Oromoo) */}
+              <LanguageSwitcher variant="dropdown" />
+
               <div className="h-4 w-px bg-gray-200" />
 
               <Link
@@ -169,8 +173,10 @@ export default function Navbar() {
               )}
             </nav>
 
-            {/* Mobile Actions: Sell CTA + Comfortable Touch Toggle */}
+            {/* Mobile Actions: Language Switcher + Sell CTA + Comfortable Touch Toggle */}
             <div className="flex md:hidden items-center gap-1.5">
+              <LanguageSwitcher variant="dropdown" />
+
               <Link
                 href="/seller/create"
                 className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-xs font-bold shadow-xs active:scale-95 transition"
@@ -315,6 +321,9 @@ export default function Navbar() {
                   </div>
                 </div>
               )}
+
+              {/* Language Switcher in Drawer */}
+              <LanguageSwitcher variant="inline" />
 
               {/* Primary Actions */}
               <div className="space-y-1.5">
