@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 
 export async function POST(req: Request) {
   try {
@@ -12,7 +10,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No file received' }, { status: 400 });
     }
 
-    // Validate MIME type
     const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
     if (!validTypes.includes(file.type)) {
       return NextResponse.json(
@@ -21,7 +18,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Max 5MB
     if (file.size > 5 * 1024 * 1024) {
       return NextResponse.json(
         { error: 'Image size exceeds the 5MB limit.' },
@@ -32,16 +28,11 @@ export async function POST(req: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    await mkdir(uploadsDir, { recursive: true });
-
-    const ext = file.name.split('.').pop() || 'jpg';
-    const filename = `${imageType.toLowerCase()}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${ext}`;
-    const filePath = path.join(uploadsDir, filename);
-
-    await writeFile(filePath, buffer);
-
-    const publicUrl = `/uploads/${filename}`;
+    // Vercel Serverless environment has a read-only filesystem (except /tmp).
+    // To ensure uploads work across serverless deploys without an external S3 bucket,
+    // we convert the image directly into a base64 Data URI string.
+    const base64String = buffer.toString('base64');
+    const publicUrl = \`data:\${file.type};base64,\${base64String}\`;
 
     return NextResponse.json({
       success: true,
@@ -54,4 +45,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
   }
 }
-
