@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     // To ensure uploads work across serverless deploys without an external S3 bucket,
     // we convert the image directly into a base64 Data URI string.
     const base64String = buffer.toString('base64');
-    const publicUrl = \`data:\${file.type};base64,\${base64String}\`;
+    const publicUrl = `data:${file.type};base64,${base64String}`;
 
     return NextResponse.json({
       success: true,

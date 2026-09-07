@@ -2741,6 +2741,5 @@ export default function AdminDashboardPage() {
         })}
       </nav>
     </div>
-    </div>
   );
 }
