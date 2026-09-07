@@ -294,7 +294,7 @@ export default async function ListingDetailPage({ params }: PageProps) {
               <div className="pt-3">
                 <CallSellerButton
                   phoneNumber={listing.contactPhone}
-                  sellerName={listing.seller.fullName}
+                  sellerName={listing.seller.fullName === "System Administrator" ? "AxumMarket Official" : listing.seller.fullName}
                   variant="primary"
                 />
               </div>
@@ -319,11 +319,11 @@ export default async function ListingDetailPage({ params }: PageProps) {
 
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-green-100 text-green-800 font-bold text-sm flex items-center justify-center shrink-0">
-                {listing.seller.fullName[0]}
+                {listing.seller.fullName === "System Administrator" ? "A" : listing.seller.fullName[0]}
               </div>
               <div className="min-w-0">
                 <h4 className="font-bold text-xs sm:text-sm text-gray-900 truncate">
-                  {listing.seller.fullName}
+                  {listing.seller.fullName === "System Administrator" ? "AxumMarket Official" : listing.seller.fullName}
                 </h4>
                 <p className="text-[11px] text-gray-500 flex items-center gap-1">
                   <MapPin className="w-3 h-3 text-gray-400" />
@@ -337,7 +337,7 @@ export default async function ListingDetailPage({ params }: PageProps) {
               {!isSold ? (
                 <CallSellerButton
                   phoneNumber={listing.contactPhone}
-                  sellerName={listing.seller.fullName}
+                  sellerName={listing.seller.fullName === "System Administrator" ? "AxumMarket Official" : listing.seller.fullName}
                   variant="primary"
                 />
               ) : (
@@ -365,7 +365,7 @@ export default async function ListingDetailPage({ params }: PageProps) {
       {!isSold && (
         <CallSellerButton
           phoneNumber={listing.contactPhone}
-          sellerName={listing.seller.fullName}
+          sellerName={listing.seller.fullName === "System Administrator" ? "AxumMarket Official" : listing.seller.fullName}
           variant="sticky"
         />
       )}
