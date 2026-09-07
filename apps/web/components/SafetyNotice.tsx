@@ -153,10 +153,11 @@ export default function SafetyNotice({
   defaultLanguage,
 }: SafetyNoticeProps) {
   const { language } = useLanguage();
-  const [activeLang, setActiveLang] = useState<Language>(defaultLanguage || language);
+  const initialLang: Language = defaultLanguage || language || 'en';
+  const [activeLang, setActiveLang] = useState<Language>(initialLang);
 
   useEffect(() => {
-    if (!defaultLanguage && activeLang !== 'all') {
+    if (!defaultLanguage && activeLang !== 'all' && language) {
       setActiveLang(language);
     }
   }, [language, defaultLanguage]);
@@ -185,6 +186,9 @@ export default function SafetyNotice({
     { code: 'all', label: '🌐 All (ሁሉ/Hunda)' },
   ];
 
+  const safeLang: 'en' | 'am' | 'om' =
+    activeLang === 'am' || activeLang === 'om' ? activeLang : 'en';
+
   // Compact Variant (Inline warning banner or footer)
   if (variant === 'compact') {
     return (
@@ -206,7 +210,7 @@ export default function SafetyNotice({
                 type="button"
                 onClick={() => setActiveLang(l)}
                 className={`text-[10px] font-bold px-2 py-0.5 rounded-md transition ${
-                  activeLang === l
+                  safeLang === l
                     ? 'bg-amber-600 text-white shadow-xs'
                     : 'bg-amber-100/80 text-amber-800 hover:bg-amber-200'
                 }`}
@@ -217,17 +221,17 @@ export default function SafetyNotice({
           </div>
         </div>
 
-        {activeLang === 'en' && (
+        {safeLang === 'en' && (
           <p className="text-xs text-amber-900 leading-relaxed">
             <strong>For Info Only:</strong> Meet the seller in a public marketplace and inspect the animal before buying. <strong>Do NOT pay any money online.</strong> We are not responsible for private transactions between users.
           </p>
         )}
-        {activeLang === 'am' && (
+        {safeLang === 'am' && (
           <p className="text-xs text-amber-900 leading-relaxed">
             <strong>ለመረጃ አገልግሎት ብቻ፦</strong> ከሻጩ ጋር በገበያ ወይም በህዝብ ቦታ ተገናኝተው ከመግዛትዎ በፊት እንስሳውን በአካል ይመርምሩ። <strong>በኦንላይን ምንም ገንዘብ እንዳይከፍሉ!</strong> በመካከላችሁ ለሚደረግ ማንኛውም ግብይት ኃላፊነት አንወስድም።
           </p>
         )}
-        {activeLang === 'om' && (
+        {safeLang === 'om' && (
           <p className="text-xs text-amber-900 leading-relaxed">
             <strong>Odeeffannoo Qofaaf፦</strong> Gurguraa wajjin bakka gabaa uummataatti qaamaan wal arguun dura beelladicha sakatta&apos;aa. <strong>Toora interneetii irratti kaffaltii hin raawwatinaa!</strong> Daldala isin gidduutti raawwatamuuf itti gaafatamummaa hin fudhannu.
           </p>
@@ -280,7 +284,7 @@ export default function SafetyNotice({
                 type="button"
                 onClick={() => setActiveLang(l)}
                 className={`text-[10px] font-bold px-2 py-0.5 rounded-lg transition ${
-                  activeLang === l ? 'bg-white text-amber-950 shadow-xs' : 'text-amber-100 hover:text-white'
+                  safeLang === l ? 'bg-white text-amber-950 shadow-xs' : 'text-amber-100 hover:text-white'
                 }`}
               >
                 {l.toUpperCase()}
@@ -290,17 +294,17 @@ export default function SafetyNotice({
         </div>
 
         <div className="bg-black/15 p-2.5 rounded-xl text-xs text-amber-50 leading-relaxed border border-white/10">
-          {activeLang === 'en' && (
+          {safeLang === 'en' && (
             <span>
               Always meet sellers in public marketplaces and inspect animals physically before buying. <strong>Do NOT pay money online.</strong> Axum Market does not guarantee or take responsibility for financial transactions.
             </span>
           )}
-          {activeLang === 'am' && (
+          {safeLang === 'am' && (
             <span>
               ሁልጊዜ ከሻጩ ጋር በይፋዊ ገበያ በአካል ተገናኝተው እንስሳውን ይመርምሩ። <strong>በኦንላይን ምንም ዓይነት ገንዘብ እንዳይከፍሉ!</strong> በመድረኩ በሚደረግ ማንኛውም ግብይት ድርጅቱ ኃላፊነት አይወስድም።
             </span>
           )}
-          {activeLang === 'om' && (
+          {safeLang === 'om' && (
             <span>
               Yeroo hunda gurguraa wajjin bakka gabaa uummataatti qaamaan wal arguun beelladicha sakatta&apos;aa. <strong>Toora interneetii irratti maallaqa hin kaffalinaa!</strong> Daldala raawwatamuuf itti gaafatamummaa hin fudhannu.
             </span>
@@ -311,7 +315,9 @@ export default function SafetyNotice({
   }
 
   // Full Rich Card Variant (Used on Listing Detail Page and prominent sections)
-  const currentContent = activeLang === 'all' ? DISCLAIMERS.en : DISCLAIMERS[activeLang];
+  const currentContent = (activeLang !== 'all' && (activeLang === 'en' || activeLang === 'am' || activeLang === 'om'))
+    ? DISCLAIMERS[activeLang]
+    : DISCLAIMERS.en;
 
   return (
     <div
@@ -325,10 +331,10 @@ export default function SafetyNotice({
           </div>
           <div>
             <span className="inline-block text-[10px] font-black uppercase tracking-wider bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-md mb-0.5">
-              {currentContent.badge}
+              {currentContent?.badge || 'Safety Warning'}
             </span>
             <h3 className="font-black text-sm sm:text-base text-amber-950 leading-tight">
-              {currentContent.title}
+              {currentContent?.title || 'Marketplace Safety & Transaction Disclaimer'}
             </h3>
           </div>
         </div>
