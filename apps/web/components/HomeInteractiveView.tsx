@@ -255,7 +255,7 @@ export default function HomeInteractiveView({
       </section>
 
       {/* Main Interactive Content */}
-      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 space-y-4 sm:space-y-6 max-w-full overflow-hidden">
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 space-y-4 sm:space-y-6  overflow-hidden">
         {/* 3. Interactive Touch Category Bar (Responsive 3-column grid on mobile, horizontal row on desktop) */}
         <section className="space-y-1.5 sm:space-y-2.5 max-w-full">
           <div className="flex items-center justify-between">

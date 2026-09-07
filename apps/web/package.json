@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && mkdir -p .next/cache && touch .next/cache/.rscinfo",
     "start": "next start",
     "lint": "next lint"
   },
