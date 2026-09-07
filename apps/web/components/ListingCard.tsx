@@ -61,7 +61,7 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
     
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % orderedImages.length);
-    }, 1000);
+    }, 4000);
     
     return () => clearInterval(interval);
   }, [orderedImages.length]);
@@ -84,7 +84,7 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
               alt={listing?.title || 'Livestock'}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className={`object-cover transition-opacity duration-500 ${
+              className={`object-cover transition-opacity duration-1000 ${
                 index === currentImageIndex ? 'opacity-100' : 'opacity-0'
               }`}
             />
@@ -95,7 +95,7 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
             alt={listing?.title || 'Livestock'}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover transition-opacity duration-500 opacity-100"
+            className="object-cover transition-opacity duration-1000 opacity-100"
           />
         )}
 
