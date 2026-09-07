@@ -26,6 +26,11 @@
     "@prisma/engines": true,
     "esbuild": true,
     "prisma": true,
-    "sharp": true
+    "sharp": true,
+    "@prisma/client@5.22.0": true,
+    "@prisma/engines@5.22.0": true,
+    "esbuild@0.28.2": true,
+    "prisma@5.22.0": true,
+    "sharp@0.33.5": true
   }
 }
