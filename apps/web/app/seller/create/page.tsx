@@ -172,6 +172,11 @@ export default function CreateListingPage() {
       return;
     }
 
+    if (isPregnant === true && (!pregnancyMonths || parseFloat(pregnancyMonths) <= 0)) {
+      setError('Please specify the exact pregnancy duration in months (ስንት ወር እንደሆናት ይግለጹ) for the pregnant cow.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -196,7 +201,7 @@ export default function CreateListingPage() {
           calvingCount: calvingCount !== '' ? parseInt(calvingCount, 10) : undefined,
           udderHealth: udderHealth.trim() || undefined,
           isPregnant: isPregnant !== null ? isPregnant : undefined,
-          pregnancyMonths: pregnancyMonths !== '' ? parseInt(pregnancyMonths, 10) : undefined,
+          pregnancyMonths: isPregnant === true && pregnancyMonths !== '' ? parseInt(pregnancyMonths, 10) : undefined,
           age,
           gender,
           region,
@@ -348,7 +353,7 @@ export default function CreateListingPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-4 sm:space-y-6 pb-24 md:pb-10">
+    <div className="w-full max-w-3xl mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-4 sm:space-y-6 pb-24 md:pb-10 min-w-0 overflow-x-hidden">
       {/* Back button */}
       <button
         onClick={() => router.back()}
@@ -359,7 +364,7 @@ export default function CreateListingPage() {
       </button>
 
       {/* Main Card */}
-      <div className="bg-white rounded-2xl sm:rounded-3xl border border-gray-200/90 p-4 sm:p-7 md:p-8 shadow-xs space-y-5 sm:space-y-6">
+      <div className="bg-white rounded-2xl sm:rounded-3xl border border-gray-200/90 p-4 sm:p-7 md:p-8 shadow-xs space-y-5 sm:space-y-6 w-full max-w-full overflow-hidden">
         {/* Header */}
         <div className="space-y-1.5 border-b border-gray-100 pb-4 sm:pb-5">
           <div className="flex items-center gap-2">
@@ -382,48 +387,109 @@ export default function CreateListingPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-          {/* Category & Breed */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <div>
-              <label className="text-xs font-black text-gray-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
-                <Tag className="w-3.5 h-3.5 text-green-600" />
-                <span>Animal Category *</span>
-              </label>
-              <select
-                required
-                value={categoryId}
-                onChange={(e) => {
-                  setCategoryId(e.target.value);
-                  setBreedId('');
-                }}
-                className="w-full px-3.5 py-2.5 sm:py-3 bg-gray-50 border border-gray-300 rounded-xl text-xs sm:text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500 transition"
-              >
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 w-full max-w-full">
+          {/* Animal Category Selection (Touch-friendly responsive grid that stays 100% inside mobile bounds) */}
+          <div className="space-y-1.5 w-full max-w-full">
+            <div className="flex items-center justify-between text-xs font-black text-gray-700 uppercase tracking-wider">
+              <span className="flex items-center gap-1.5">
+                <Tag className="w-3.5 h-3.5 text-green-600 shrink-0" />
+                <span>Animal Category / የእንስሳት አይነት *</span>
+              </span>
+              {selectedCategory && (
+                <span className="text-[11px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-md border border-green-200 truncate max-w-[150px]">
+                  {selectedCategory.name.split('(')[0].trim()}
+                </span>
+              )}
             </div>
 
-            <div>
-              <label className="text-xs font-black text-gray-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
-                <span>Breed (Optional)</span>
-              </label>
-              <select
-                value={breedId}
-                onChange={(e) => setBreedId(e.target.value)}
-                className="w-full px-3.5 py-2.5 sm:py-3 bg-gray-50 border border-gray-300 rounded-xl text-xs sm:text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500 transition"
-              >
-                <option value="">Select Breed (or Cross / Local)</option>
-                {availableBreeds.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name}
-                  </option>
-                ))}
-              </select>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full max-w-full">
+              {categories.map((c) => {
+                const isSelected = categoryId === c.id;
+                const parts = c.name.match(/^(.*?)(?:\s*\((.*?)\))?$/);
+                const en = parts ? parts[1].trim() : c.name;
+                const am = parts && parts[2] ? parts[2].trim() : '';
+
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => {
+                      setCategoryId(c.id);
+                      setBreedId('');
+                    }}
+                    className={`p-2.5 rounded-xl text-left border transition-all active:scale-95 flex flex-col justify-between min-w-0 w-full cursor-pointer ${
+                      isSelected
+                        ? 'bg-green-50 border-green-600 text-green-900 shadow-xs ring-1 ring-green-600/30'
+                        : 'bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-1 w-full min-w-0">
+                      <span className="text-xs font-bold truncate">{en}</span>
+                      {isSelected && <Check className="w-3.5 h-3.5 text-green-600 shrink-0" />}
+                    </div>
+                    {am && (
+                      <span
+                        className={`text-[10px] truncate mt-0.5 ${
+                          isSelected ? 'text-green-700 font-semibold' : 'text-gray-400'
+                        }`}
+                      >
+                        {am}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
+          </div>
+
+          {/* Breed Selection */}
+          <div className="space-y-1.5 w-full max-w-full">
+            <div className="flex items-center justify-between text-xs font-black text-gray-700 uppercase tracking-wider">
+              <span>Breed / ዝርያ (Optional)</span>
+              {breedId && (
+                <button
+                  type="button"
+                  onClick={() => setBreedId('')}
+                  className="text-[10px] text-gray-400 hover:text-red-500 font-medium"
+                >
+                  Clear breed
+                </button>
+              )}
+            </div>
+            {availableBreeds.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5 w-full max-w-full">
+                <button
+                  type="button"
+                  onClick={() => setBreedId('')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition active:scale-95 border cursor-pointer ${
+                    !breedId
+                      ? 'bg-gray-800 text-white border-gray-800 shadow-xs'
+                      : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                  }`}
+                >
+                  Local / Cross / Other
+                </button>
+                {availableBreeds.map((b) => {
+                  const isSelected = breedId === b.id;
+                  return (
+                    <button
+                      key={b.id}
+                      type="button"
+                      onClick={() => setBreedId(isSelected ? '' : b.id)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition active:scale-95 border cursor-pointer ${
+                        isSelected
+                          ? 'bg-green-600 text-white border-green-600 shadow-xs'
+                          : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                      }`}
+                    >
+                      {b.name}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-xs text-gray-400 italic">No specific sub-breeds listed for this category. You can specify breed details in the title.</p>
+            )}
           </div>
 
           {/* Title */}
@@ -675,24 +741,34 @@ export default function CreateListingPage() {
                 </div>
               </div>
 
-              {/* 4. Pregnancy Status & Gestation */}
-              <div>
-                <label className="text-xs font-black text-gray-800 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-                  <span>Pregnancy Status (የእርግዝና ሁኔታና ወራት)</span>
-                  <span className="text-[10px] text-gray-500">
-                    {isPregnant === true ? (pregnancyMonths ? `${pregnancyMonths} Months Pregnant` : 'Pregnant') : isPregnant === false ? 'Not Pregnant' : 'Optional'}
+              {/* 4. Pregnancy Status & Gestation Duration (የእርግዝና ወራት በትክክል መግለጽ) */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs font-black text-gray-800 uppercase tracking-wider">
+                  <span className="flex items-center gap-1">
+                    <span>Pregnancy Status (የእርግዝና ሁኔታና ወራት)</span>
+                    {isPregnant === true && <span className="text-red-500">*</span>}
                   </span>
-                </label>
-                <div className="grid grid-cols-2 gap-2 mb-2">
+                  <span className="text-[10px] text-gray-500 font-bold">
+                    {isPregnant === true
+                      ? pregnancyMonths
+                        ? `✓ Month ${pregnancyMonths} (የ${pregnancyMonths} ወር እርጉዝ)`
+                        : '⚠️ Month Required'
+                      : isPregnant === false
+                      ? 'Not Pregnant (ክፍት)'
+                      : 'Optional'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => {
                       setIsPregnant(false);
                       setPregnancyMonths('');
                     }}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition active:scale-95 flex items-center justify-center gap-1.5 ${
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer ${
                       isPregnant === false
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs ring-1 ring-emerald-500'
                         : 'bg-white text-gray-700 border-emerald-200 hover:bg-emerald-50/50'
                     }`}
                   >
@@ -701,36 +777,100 @@ export default function CreateListingPage() {
                   <button
                     type="button"
                     onClick={() => setIsPregnant(true)}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition active:scale-95 flex items-center justify-center gap-1.5 ${
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer ${
                       isPregnant === true
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                        : 'bg-white text-gray-700 border-emerald-200 hover:bg-emerald-50/50'
+                        ? 'bg-purple-700 text-white border-purple-700 shadow-xs ring-1 ring-purple-600'
+                        : 'bg-white text-gray-700 border-purple-200 hover:bg-purple-50/50'
                     }`}
                   >
                     <span>Pregnant / In-Calf (እርጉዝ / ያረገዘች)</span>
                   </button>
                 </div>
 
+                {/* Specific Pregnancy Month Selector */}
                 {isPregnant === true && (
-                  <div className="p-3 bg-white rounded-xl border border-emerald-200 space-y-1.5">
-                    <span className="text-[11px] font-bold text-gray-700 block">
-                      Pregnancy Duration in Months (ስንት ወር ሆኗታል?):
-                    </span>
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((m) => (
-                        <button
-                          key={m}
-                          type="button"
-                          onClick={() => setPregnancyMonths(m.toString())}
-                          className={`px-2.5 py-1 text-xs font-bold rounded-lg border transition active:scale-95 ${
-                            pregnancyMonths === m.toString()
-                              ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                              : 'bg-emerald-50/60 text-emerald-900 border-emerald-200 hover:bg-emerald-100'
-                          }`}
-                        >
-                          {m} {m === 1 ? 'Month' : 'Months'} ({m} ወር)
-                        </button>
-                      ))}
+                  <div className="p-3 sm:p-4 bg-purple-50/60 rounded-2xl border border-purple-200 space-y-3 animate-fadeIn w-full max-w-full">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black text-purple-950 block">
+                        Select Exact Month of Pregnancy (ስንት ወር ሆኗታል?)*:
+                      </span>
+                      <span className="text-[10px] font-bold text-purple-700 bg-white px-2 py-0.5 rounded-full border border-purple-200">
+                        9-Month Gestation
+                      </span>
+                    </div>
+
+                    {/* 3x3 Responsive Mobile Grid for Months 1-9 */}
+                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2 w-full max-w-full">
+                      {[
+                        { m: '1', label: '1 Month', am: '1 ወር', stage: 'Early (ጅማሮ)' },
+                        { m: '2', label: '2 Months', am: '2 ወር', stage: 'Early (የ2 ወር)' },
+                        { m: '3', label: '3 Months', am: '3 ወር', stage: '1st Trimester' },
+                        { m: '4', label: '4 Months', am: '4 ወር', stage: 'Mid-term (መካከለኛ)' },
+                        { m: '5', label: '5 Months', am: '5 ወር', stage: '5 Months (የ5 ወር)' },
+                        { m: '6', label: '6 Months', am: '6 ወር', stage: 'Mid-term' },
+                        { m: '7', label: '7 Months', am: '7 ወር', stage: 'Late Term' },
+                        { m: '8', label: '8 Months', am: '8 ወር', stage: 'Late Term (የ8 ወር)' },
+                        { m: '9', label: '9 Months', am: '9 ወር', stage: 'Due Soon (ልትወልድ)' },
+                      ].map((item) => {
+                        const isSelected = pregnancyMonths === item.m;
+                        return (
+                          <button
+                            key={item.m}
+                            type="button"
+                            onClick={() => setPregnancyMonths(item.m)}
+                            className={`p-2 rounded-xl text-center border transition-all active:scale-95 flex flex-col items-center justify-center cursor-pointer min-w-0 ${
+                              isSelected
+                                ? 'bg-purple-700 text-white border-purple-700 shadow-xs ring-2 ring-purple-400'
+                                : 'bg-white text-gray-700 border-purple-200/80 hover:bg-purple-100/60'
+                            }`}
+                          >
+                            <span className="text-xs font-black block">{item.label}</span>
+                            <span
+                              className={`text-[10px] font-semibold block truncate ${
+                                isSelected ? 'text-purple-100' : 'text-purple-700'
+                              }`}
+                            >
+                              {item.am}
+                            </span>
+                            <span
+                              className={`text-[9px] block truncate mt-0.5 ${
+                                isSelected ? 'text-purple-200' : 'text-gray-400'
+                              }`}
+                            >
+                              {item.stage}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Numeric Input & Specific Selection Highlight */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 border-t border-purple-200/60">
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs font-bold text-purple-900 shrink-0">
+                          Or enter exact month:
+                        </label>
+                        <input
+                          type="number"
+                          step="0.5"
+                          min="1"
+                          max="9"
+                          value={pregnancyMonths}
+                          onChange={(e) => setPregnancyMonths(e.target.value)}
+                          placeholder="e.g. 5.5"
+                          className="w-24 px-2.5 py-1.5 bg-white border border-purple-300 rounded-xl text-xs font-bold text-purple-950 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        />
+                        <span className="text-xs font-semibold text-purple-800">Months</span>
+                      </div>
+
+                      {pregnancyMonths && (
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-purple-100 text-purple-900 rounded-lg text-xs font-bold border border-purple-300">
+                          <span>🤰</span>
+                          <span>
+                            {pregnancyMonths} Months Pregnant (የ{pregnancyMonths} ወር እርጉዝ)
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -777,58 +917,74 @@ export default function CreateListingPage() {
             </div>
           </div>
 
-          {/* Structured Location */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5">
-            <div>
-              <label className="text-xs font-black text-gray-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-green-600" />
-                <span>Region *</span>
-              </label>
-              <select
-                value={region}
-                onChange={(e) => {
-                  setRegion(e.target.value);
-                  setCity('');
-                }}
-                className="w-full px-3.5 py-2.5 sm:py-3 bg-gray-50 border border-gray-300 rounded-xl text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500 transition"
-              >
-                <option value="Oromia">Oromia</option>
-                <option value="Addis Ababa">Addis Ababa</option>
-                <option value="Amhara">Amhara</option>
-                <option value="Sidama">Sidama</option>
-                <option value="Somali">Somali</option>
-                <option value="Tigray">Tigray</option>
-              </select>
+          {/* Structured Location (100% Inside Mobile Boundary) */}
+          <div className="space-y-3 sm:space-y-4 w-full max-w-full">
+            {/* Region Selection */}
+            <div className="space-y-1.5 w-full max-w-full">
+              <div className="flex items-center justify-between text-xs font-black text-gray-700 uppercase tracking-wider">
+                <span className="flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-green-600 shrink-0" />
+                  <span>Region / ክልል *</span>
+                </span>
+                <span className="text-[11px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-md border border-green-200">
+                  {region}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 w-full max-w-full">
+                {['Oromia', 'Addis Ababa', 'Amhara', 'Sidama', 'Somali', 'Tigray'].map((r) => {
+                  const isSelected = region === r;
+                  return (
+                    <button
+                      key={r}
+                      type="button"
+                      onClick={() => {
+                        setRegion(r);
+                        setCity('');
+                      }}
+                      className={`py-2 px-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between border cursor-pointer active:scale-95 text-left min-w-0 ${
+                        isSelected
+                          ? 'bg-green-50 border-green-600 text-green-900 shadow-xs ring-1 ring-green-600/30'
+                          : 'bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700'
+                      }`}
+                    >
+                      <span className="truncate">{r}</span>
+                      {isSelected && <Check className="w-3.5 h-3.5 text-green-600 shrink-0 ml-1" />}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-black text-gray-700 uppercase tracking-wider mb-1.5">
-                City / Town *
-              </label>
-              {availableCities.length > 0 ? (
-                <select
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  className="w-full px-3.5 py-2.5 sm:py-3 bg-gray-50 border border-gray-300 rounded-xl text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500 transition"
-                >
-                  <option value="">Select City</option>
-                  {availableCities.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  type="text"
-                  required
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  placeholder="Sululta, Bishoftu..."
-                  className="w-full px-3.5 py-2.5 sm:py-3 bg-gray-50 border border-gray-300 rounded-xl text-xs sm:text-sm"
-                />
-              )}
-            </div>
+            {/* City / Town & Area */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5 w-full max-w-full">
+              <div>
+                <label className="block text-xs font-black text-gray-700 uppercase tracking-wider mb-1.5">
+                  City / Town *
+                </label>
+                {availableCities.length > 0 ? (
+                  <select
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="w-full px-3.5 py-2.5 sm:py-3 bg-gray-50 border border-gray-300 rounded-xl text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+                  >
+                    <option value="">Select City</option>
+                    {availableCities.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    required
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="Sululta, Bishoftu..."
+                    className="w-full px-3.5 py-2.5 sm:py-3 bg-gray-50 border border-gray-300 rounded-xl text-xs sm:text-sm"
+                  />
+                )}
+              </div>
 
             <div>
               <label className="block text-xs font-black text-gray-700 uppercase tracking-wider mb-1.5">
@@ -843,6 +999,7 @@ export default function CreateListingPage() {
               />
             </div>
           </div>
+        </div>
 
           {/* Description */}
           <div>

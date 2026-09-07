@@ -69,6 +69,14 @@ export async function POST(req: Request) {
       );
     }
 
+    const parsedIsPregnant = typeof isPregnant === 'boolean' ? isPregnant : (isPregnant === 'true' ? true : isPregnant === 'false' ? false : null);
+    if (parsedIsPregnant === true && (pregnancyMonths === undefined || pregnancyMonths === null || pregnancyMonths === '')) {
+      return NextResponse.json(
+        { error: 'Please specify the pregnancy duration in months for the pregnant cow.' },
+        { status: 400 }
+      );
+    }
+
     const listing = await prisma.listing.create({
       data: {
         sellerId:

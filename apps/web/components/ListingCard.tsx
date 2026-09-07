@@ -129,8 +129,9 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
               </span>
             )}
             {listing.isPregnant && (
-              <span className="bg-purple-50 text-purple-900 border border-purple-200 font-bold px-1.5 py-0.5 rounded">
-                {listing.pregnancyMonths ? `${listing.pregnancyMonths}M In-Calf` : 'In-Calf'}
+              <span className="bg-purple-50 text-purple-900 border border-purple-200 font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                <span>🤰</span>
+                <span>{listing.pregnancyMonths ? `${listing.pregnancyMonths}M In-Calf (${listing.pregnancyMonths}ወር)` : 'In-Calf'}</span>
               </span>
             )}
           </div>

@@ -369,6 +369,11 @@ export default function AdminDashboardPage() {
       return;
     }
 
+    if (postIsPregnant === true && !postPregnancyMonths) {
+      setPostFormError('Please specify the exact pregnancy duration in months (1-9 months) for the pregnant cow.');
+      return;
+    }
+
     setPostSubmitting(true);
     try {
       const res = await fetch('/api/listings/create', {

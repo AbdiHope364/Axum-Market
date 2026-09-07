@@ -210,9 +210,16 @@ export default async function ListingDetailPage({ params }: PageProps) {
                       </span>
                       <span className="font-bold text-emerald-950 text-xs sm:text-sm mt-1 block truncate">
                         {listing.isPregnant
-                          ? `Pregnant • ${listing.pregnancyMonths ? `${listing.pregnancyMonths} Mo` : 'In-Calf'}`
+                          ? listing.pregnancyMonths
+                            ? `${listing.pregnancyMonths} Months (የ${listing.pregnancyMonths} ወር)`
+                            : 'Pregnant (ያረገዘች)'
                           : 'Not Pregnant (ክፍት)'}
                       </span>
+                      {listing.isPregnant && listing.pregnancyMonths && (
+                        <span className="text-[9px] text-purple-700 font-semibold block mt-0.5 truncate">
+                          🤰 Month {listing.pregnancyMonths} of 9
+                        </span>
+                      )}
                     </div>
                   )}
 

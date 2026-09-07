@@ -39,10 +39,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full scroll-smooth">
-      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 antialiased selection:bg-green-100 selection:text-green-900">
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 antialiased selection:bg-green-100 selection:text-green-900 overflow-x-hidden max-w-full">
         <GlobalErrorHandler />
         <Navbar />
-        <main className="flex-1 w-full pb-16 md:pb-0">{children}</main>
+        <main className="flex-1 w-full max-w-full overflow-x-hidden pb-16 md:pb-0">{children}</main>
         <Footer />
         <MobileBottomNav />
       </body>
