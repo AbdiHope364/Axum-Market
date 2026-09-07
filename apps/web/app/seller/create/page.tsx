@@ -579,41 +579,41 @@ export default function CreateListingPage() {
           </div>
 
           {/* Dairy Cow / Maternal Attributes (የማልዳ / የወተት ላም ዝርዝር መረጃ) */}
-          {gender === 'FEMALE' && (
-            <div className="p-3.5 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-50/70 via-green-50/40 to-teal-50/30 border border-emerald-200/80 shadow-xs space-y-4">
-              <div className="flex items-center justify-between border-b border-emerald-200/60 pb-2.5">
-                <div className="flex items-center gap-2">
+          {(gender === 'FEMALE' || selectedCategory?.name?.toLowerCase().includes('cow') || selectedCategory?.name?.toLowerCase().includes('dairy') || selectedCategory?.name?.includes('የወተት')) && (
+            <div className="w-full max-w-full min-w-0 p-3 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-50/70 via-green-50/40 to-teal-50/30 border border-emerald-200/80 shadow-xs space-y-4 overflow-hidden">
+              <div className="flex items-center justify-between border-b border-emerald-200/60 pb-2.5 min-w-0">
+                <div className="flex items-center gap-2 min-w-0">
                   <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
                     <Milk className="w-4 h-4" />
                   </div>
-                  <div>
-                    <h3 className="text-xs sm:text-sm font-black text-emerald-950 flex items-center gap-1.5">
+                  <div className="min-w-0">
+                    <h3 className="text-xs sm:text-sm font-black text-emerald-950 flex flex-wrap items-center gap-1.5">
                       <span>Dairy & Maternal Profile</span>
                       <span className="text-[11px] font-bold text-emerald-700 font-sans">(የማልዳ / የወተት ላም መረጃ)</span>
                     </h3>
-                    <p className="text-[11px] text-emerald-800/80">
+                    <p className="text-[11px] text-emerald-800/80 truncate">
                       Essential milk yield, calving history, udder condition, & pregnancy information
                     </p>
                   </div>
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md border border-emerald-300/60 hidden sm:inline-block">
+                <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md border border-emerald-300/60 hidden sm:inline-block shrink-0">
                   Dairy Cattle
                 </span>
               </div>
 
               {/* 1. Daily Milk Yield */}
-              <div>
-                <label className="text-xs font-black text-gray-800 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+              <div className="w-full max-w-full min-w-0">
+                <label className="text-xs font-black text-gray-800 uppercase tracking-wider mb-1.5 flex flex-wrap items-center justify-between gap-1">
                   <span className="flex items-center gap-1">
-                    <Milk className="w-3.5 h-3.5 text-emerald-600" />
+                    <Milk className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                     <span>Daily Milk Yield (የቀን ወተት ምርት)</span>
                   </span>
-                  <span className="text-[10px] text-emerald-700 font-semibold bg-white/80 px-1.5 py-0.5 rounded border border-emerald-200">
+                  <span className="text-[10px] text-emerald-700 font-semibold bg-white/80 px-1.5 py-0.5 rounded border border-emerald-200 shrink-0">
                     Liters / Day (ሊትር/ቀን)
                   </span>
                 </label>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <div className="relative flex-1">
+                <div className="flex flex-col sm:flex-row gap-2 w-full min-w-0">
+                  <div className="relative flex-1 min-w-0">
                     <input
                       type="number"
                       step="0.5"
@@ -648,25 +648,25 @@ export default function CreateListingPage() {
                 </div>
               </div>
 
-              {/* 2. Calving / Parity History */}
-              <div>
-                <label className="text-xs font-black text-gray-800 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+              {/* 2. Calving / Parity History (100% Mobile Responsive Grid) */}
+              <div className="w-full max-w-full min-w-0">
+                <div className="flex flex-wrap items-center justify-between gap-1 text-xs font-black text-gray-800 uppercase tracking-wider mb-1.5">
                   <span className="flex items-center gap-1">
-                    <Baby className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Calving History (የወለደችው ብዛት / ካልቪንግ)</span>
+                    <Baby className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>Calving History (የወለደችው ብዛት)</span>
                   </span>
-                  <span className="text-[10px] text-gray-500 font-medium">
-                    {calvingCount === '0' ? 'Heifer (ያልወለደች)' : calvingCount ? `${calvingCount} Calvings` : 'Select status'}
+                  <span className="text-[10px] text-gray-500 font-semibold bg-white/70 px-2 py-0.5 rounded border border-emerald-200/60 truncate">
+                    {calvingCount === '0' ? 'Heifer (ያልወለደች)' : calvingCount ? `${calvingCount} Calvings` : 'Select parity'}
                   </span>
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 w-full max-w-full min-w-0">
                   {[
                     { label: 'Heifer (0)', sub: 'ያልወለደች ጊደር', count: '0', givenBirth: false },
                     { label: '1st Calving', sub: '1 ጊዜ የወለደች', count: '1', givenBirth: true },
                     { label: '2nd Calving', sub: '2 ጊዜ የወለደች', count: '2', givenBirth: true },
                     { label: '3rd Calving', sub: '3 ጊዜ የወለደች', count: '3', givenBirth: true },
                     { label: '4+ Calvings', sub: '4+ የወለደች', count: '4', givenBirth: true },
-                  ].map((item) => {
+                  ].map((item, idx) => {
                     const isSelected = calvingCount === item.count;
                     return (
                       <button
@@ -681,14 +681,23 @@ export default function CreateListingPage() {
                             setHasGivenBirth(item.givenBirth);
                           }
                         }}
-                        className={`p-2 rounded-xl text-left border transition active:scale-95 flex flex-col justify-between ${
+                        className={`p-2 sm:p-2.5 rounded-xl text-left border transition-all active:scale-95 flex flex-col justify-between min-w-0 w-full overflow-hidden cursor-pointer ${
+                          idx === 0 ? 'col-span-2 sm:col-span-1' : 'col-span-1'
+                        } ${
                           isSelected
                             ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs ring-2 ring-emerald-400'
                             : 'bg-white text-gray-700 border-emerald-200/80 hover:bg-emerald-50/50'
                         }`}
                       >
-                        <span className="text-xs font-bold block">{item.label}</span>
-                        <span className={`text-[10px] mt-0.5 ${isSelected ? 'text-emerald-100' : 'text-gray-400'}`}>
+                        <div className="flex items-center justify-between gap-1 w-full min-w-0">
+                          <span className="text-xs font-bold truncate">{item.label}</span>
+                          {isSelected && <Check className="w-3 h-3 text-white shrink-0" />}
+                        </div>
+                        <span
+                          className={`text-[10px] mt-0.5 truncate block ${
+                            isSelected ? 'text-emerald-100' : 'text-gray-400'
+                          }`}
+                        >
                           {item.sub}
                         </span>
                       </button>
@@ -698,17 +707,17 @@ export default function CreateListingPage() {
               </div>
 
               {/* 3. Udder & Breastfeeding Health */}
-              <div>
-                <label className="text-xs font-black text-gray-800 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+              <div className="w-full max-w-full min-w-0">
+                <label className="text-xs font-black text-gray-800 uppercase tracking-wider mb-1.5 flex flex-wrap items-center justify-between gap-1">
                   <span className="flex items-center gap-1">
-                    <Activity className="w-3.5 h-3.5 text-emerald-600" />
+                    <Activity className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                     <span>Udder & Teat Health (የጡትና የወተት ማጥባት ጤንነት)</span>
                   </span>
-                  <span className="text-[10px] text-emerald-700 font-semibold bg-white/80 px-1.5 py-0.5 rounded border border-emerald-200">
+                  <span className="text-[10px] text-emerald-700 font-semibold bg-white/80 px-1.5 py-0.5 rounded border border-emerald-200 shrink-0">
                     Milking Quality
                   </span>
                 </label>
-                <div className="space-y-2">
+                <div className="space-y-2 w-full min-w-0">
                   <input
                     type="text"
                     value={udderHealth}
@@ -741,17 +750,17 @@ export default function CreateListingPage() {
                 </div>
               </div>
 
-              {/* 4. Pregnancy Status & Gestation Duration (የእርግዝና ወራት በትክክል መግለጽ) */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs font-black text-gray-800 uppercase tracking-wider">
+              {/* 4. Pregnancy Status & Gestation Duration (100% Mobile Responsive) */}
+              <div className="space-y-2 w-full max-w-full min-w-0">
+                <div className="flex flex-wrap items-center justify-between gap-1 text-xs font-black text-gray-800 uppercase tracking-wider">
                   <span className="flex items-center gap-1">
                     <span>Pregnancy Status (የእርግዝና ሁኔታና ወራት)</span>
                     {isPregnant === true && <span className="text-red-500">*</span>}
                   </span>
-                  <span className="text-[10px] text-gray-500 font-bold">
+                  <span className="text-[10px] text-gray-500 font-bold bg-white/70 px-2 py-0.5 rounded border border-emerald-200/60 truncate">
                     {isPregnant === true
                       ? pregnancyMonths
-                        ? `✓ Month ${pregnancyMonths} (የ${pregnancyMonths} ወር እርጉዝ)`
+                        ? `✓ ${pregnancyMonths} Mo (የ${pregnancyMonths} ወር)`
                         : '⚠️ Month Required'
                       : isPregnant === false
                       ? 'Not Pregnant (ክፍት)'
@@ -759,58 +768,80 @@ export default function CreateListingPage() {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                {/* Mobile-contained 2-column buttons with vertical text layout */}
+                <div className="grid grid-cols-2 gap-2 w-full max-w-full min-w-0">
                   <button
                     type="button"
                     onClick={() => {
                       setIsPregnant(false);
                       setPregnancyMonths('');
                     }}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer ${
+                    className={`p-2.5 sm:p-3 rounded-xl border transition-all active:scale-95 flex flex-col items-center justify-center text-center min-w-0 w-full overflow-hidden cursor-pointer ${
                       isPregnant === false
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs ring-1 ring-emerald-500'
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs ring-2 ring-emerald-400'
                         : 'bg-white text-gray-700 border-emerald-200 hover:bg-emerald-50/50'
                     }`}
                   >
-                    <span>Not Pregnant / Open (ያልረገዘች)</span>
+                    <div className="flex items-center gap-1 min-w-0">
+                      <span className="text-xs sm:text-sm font-bold truncate">Not Pregnant</span>
+                      {isPregnant === false && <Check className="w-3.5 h-3.5 text-white shrink-0" />}
+                    </div>
+                    <span
+                      className={`text-[10px] sm:text-xs mt-0.5 truncate block ${
+                        isPregnant === false ? 'text-emerald-100 font-medium' : 'text-gray-400'
+                      }`}
+                    >
+                      Open (ያልረገዘች)
+                    </span>
                   </button>
+
                   <button
                     type="button"
                     onClick={() => setIsPregnant(true)}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer ${
+                    className={`p-2.5 sm:p-3 rounded-xl border transition-all active:scale-95 flex flex-col items-center justify-center text-center min-w-0 w-full overflow-hidden cursor-pointer ${
                       isPregnant === true
-                        ? 'bg-purple-700 text-white border-purple-700 shadow-xs ring-1 ring-purple-600'
+                        ? 'bg-purple-700 text-white border-purple-700 shadow-xs ring-2 ring-purple-400'
                         : 'bg-white text-gray-700 border-purple-200 hover:bg-purple-50/50'
                     }`}
                   >
-                    <span>Pregnant / In-Calf (እርጉዝ / ያረገዘች)</span>
+                    <div className="flex items-center gap-1 min-w-0">
+                      <span className="text-xs sm:text-sm font-bold truncate">Pregnant 🤰</span>
+                      {isPregnant === true && <Check className="w-3.5 h-3.5 text-white shrink-0" />}
+                    </div>
+                    <span
+                      className={`text-[10px] sm:text-xs mt-0.5 truncate block ${
+                        isPregnant === true ? 'text-purple-100 font-medium' : 'text-purple-700 font-medium'
+                      }`}
+                    >
+                      In-Calf (እርጉዝ)
+                    </span>
                   </button>
                 </div>
 
-                {/* Specific Pregnancy Month Selector */}
+                {/* Specific Pregnancy Month Selector (100% Inside Mobile Boundary) */}
                 {isPregnant === true && (
-                  <div className="p-3 sm:p-4 bg-purple-50/60 rounded-2xl border border-purple-200 space-y-3 animate-fadeIn w-full max-w-full">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-black text-purple-950 block">
-                        Select Exact Month of Pregnancy (ስንት ወር ሆኗታል?)*:
+                  <div className="p-2.5 sm:p-4 bg-purple-50/70 rounded-2xl border border-purple-200 space-y-2.5 animate-fadeIn w-full max-w-full min-w-0 overflow-hidden">
+                    <div className="flex flex-wrap items-center justify-between gap-1">
+                      <span className="text-xs font-black text-purple-950">
+                        Exact Pregnancy Month (ስንት ወር ሆኗታል?)*:
                       </span>
-                      <span className="text-[10px] font-bold text-purple-700 bg-white px-2 py-0.5 rounded-full border border-purple-200">
-                        9-Month Gestation
+                      <span className="text-[10px] font-bold text-purple-700 bg-white px-2 py-0.5 rounded-full border border-purple-200 shrink-0">
+                        1 - 9 Months
                       </span>
                     </div>
 
-                    {/* 3x3 Responsive Mobile Grid for Months 1-9 */}
-                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2 w-full max-w-full">
+                    {/* 3x3 Responsive Mobile Grid for Months 1-9 - strictly inside mobile bounds */}
+                    <div className="grid grid-cols-3 gap-1.5 w-full max-w-full min-w-0">
                       {[
-                        { m: '1', label: '1 Month', am: '1 ወር', stage: 'Early (ጅማሮ)' },
-                        { m: '2', label: '2 Months', am: '2 ወር', stage: 'Early (የ2 ወር)' },
-                        { m: '3', label: '3 Months', am: '3 ወር', stage: '1st Trimester' },
-                        { m: '4', label: '4 Months', am: '4 ወር', stage: 'Mid-term (መካከለኛ)' },
-                        { m: '5', label: '5 Months', am: '5 ወር', stage: '5 Months (የ5 ወር)' },
-                        { m: '6', label: '6 Months', am: '6 ወር', stage: 'Mid-term' },
-                        { m: '7', label: '7 Months', am: '7 ወር', stage: 'Late Term' },
-                        { m: '8', label: '8 Months', am: '8 ወር', stage: 'Late Term (የ8 ወር)' },
-                        { m: '9', label: '9 Months', am: '9 ወር', stage: 'Due Soon (ልትወልድ)' },
+                        { m: '1', label: '1 Mo', am: '1 ወር' },
+                        { m: '2', label: '2 Mos', am: '2 ወር' },
+                        { m: '3', label: '3 Mos', am: '3 ወር' },
+                        { m: '4', label: '4 Mos', am: '4 ወር' },
+                        { m: '5', label: '5 Mos', am: '5 ወር' },
+                        { m: '6', label: '6 Mos', am: '6 ወር' },
+                        { m: '7', label: '7 Mos', am: '7 ወር' },
+                        { m: '8', label: '8 Mos', am: '8 ወር' },
+                        { m: '9', label: '9 Mos', am: '9 ወር' },
                       ].map((item) => {
                         const isSelected = pregnancyMonths === item.m;
                         return (
@@ -818,13 +849,13 @@ export default function CreateListingPage() {
                             key={item.m}
                             type="button"
                             onClick={() => setPregnancyMonths(item.m)}
-                            className={`p-2 rounded-xl text-center border transition-all active:scale-95 flex flex-col items-center justify-center cursor-pointer min-w-0 ${
+                            className={`py-2 px-1 rounded-xl text-center border transition-all active:scale-95 flex flex-col items-center justify-center cursor-pointer min-w-0 w-full overflow-hidden ${
                               isSelected
                                 ? 'bg-purple-700 text-white border-purple-700 shadow-xs ring-2 ring-purple-400'
                                 : 'bg-white text-gray-700 border-purple-200/80 hover:bg-purple-100/60'
                             }`}
                           >
-                            <span className="text-xs font-black block">{item.label}</span>
+                            <span className="text-xs font-black block truncate">{item.label}</span>
                             <span
                               className={`text-[10px] font-semibold block truncate ${
                                 isSelected ? 'text-purple-100' : 'text-purple-700'
@@ -832,23 +863,16 @@ export default function CreateListingPage() {
                             >
                               {item.am}
                             </span>
-                            <span
-                              className={`text-[9px] block truncate mt-0.5 ${
-                                isSelected ? 'text-purple-200' : 'text-gray-400'
-                              }`}
-                            >
-                              {item.stage}
-                            </span>
                           </button>
                         );
                       })}
                     </div>
 
                     {/* Numeric Input & Specific Selection Highlight */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 border-t border-purple-200/60">
-                      <div className="flex items-center gap-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1.5 border-t border-purple-200/70 w-full min-w-0">
+                      <div className="flex items-center gap-1.5 min-w-0">
                         <label className="text-xs font-bold text-purple-900 shrink-0">
-                          Or enter exact month:
+                          Or exact month:
                         </label>
                         <input
                           type="number"
@@ -858,16 +882,16 @@ export default function CreateListingPage() {
                           value={pregnancyMonths}
                           onChange={(e) => setPregnancyMonths(e.target.value)}
                           placeholder="e.g. 5.5"
-                          className="w-24 px-2.5 py-1.5 bg-white border border-purple-300 rounded-xl text-xs font-bold text-purple-950 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          className="w-20 px-2 py-1 bg-white border border-purple-300 rounded-lg text-xs font-bold text-purple-950 focus:outline-none focus:ring-2 focus:ring-purple-500 shrink-0"
                         />
-                        <span className="text-xs font-semibold text-purple-800">Months</span>
+                        <span className="text-xs font-semibold text-purple-800 shrink-0">ወራት</span>
                       </div>
 
                       {pregnancyMonths && (
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-purple-100 text-purple-900 rounded-lg text-xs font-bold border border-purple-300">
+                        <div className="inline-flex items-center gap-1 px-2.5 py-1 bg-purple-100 text-purple-900 rounded-lg text-xs font-bold border border-purple-300 truncate max-w-full">
                           <span>🤰</span>
-                          <span>
-                            {pregnancyMonths} Months Pregnant (የ{pregnancyMonths} ወር እርጉዝ)
+                          <span className="truncate">
+                            {pregnancyMonths} Mo (የ{pregnancyMonths} ወር እርጉዝ)
                           </span>
                         </div>
                       )}
