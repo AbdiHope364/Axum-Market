@@ -2665,7 +2665,7 @@ export default function AdminDashboardPage() {
       )}
 
       {/* Mobile Bottom Navigation Bar (Fixed for phone thumb reach) */}
-      <nav aria-label="Mobile Navigation" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 border-t border-gray-200 backdrop-blur-xl px-1.5 py-1.5 flex items-center justify-around shadow-2xl">
+      <nav aria-label="Mobile Navigation" className="hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 border-t border-gray-200 backdrop-blur-xl px-1.5 py-1.5 flex items-center justify-around shadow-2xl">
         {[
           {
             id: 'seller_approvals',
@@ -2740,6 +2740,7 @@ export default function AdminDashboardPage() {
           );
         })}
       </nav>
+    </div>
     </div>
   );
 }
