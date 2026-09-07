@@ -21,6 +21,9 @@
   "devDependencies": {
     "turbo": "^2.4.4"
   },
+  "overrides": {
+    "next": "^15.5.25"
+  },
   "allowScripts": {
     "@prisma/client": true,
     "@prisma/engines": true,
