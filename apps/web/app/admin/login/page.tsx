@@ -8,17 +8,26 @@ import {
   Mail,
   AlertCircle,
   ArrowRight,
+  Eye,
+  EyeOff,
+  KeyRound,
 } from 'lucide-react';
 
 export default function AdminLoginPage() {
   const router = useRouter();
 
-  // Keep inputs EMPTY by default
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const fillDefaultCredentials = () => {
+    setEmail('admin@axummarket.et');
+    setPassword('AdminSecure2026!');
+    setError('');
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,8 +42,8 @@ export default function AdminLoginPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email,
-          password,
+          email: email.trim().toLowerCase(),
+          password: password.trim(),
           requireRole: 'ADMIN',
         }),
       });
@@ -52,7 +61,7 @@ export default function AdminLoginPage() {
       router.push('/admin/dashboard');
       router.refresh();
     } catch {
-      setError('A network error occurred.');
+      setError('A network error occurred. Please check your connection.');
       setLoading(false);
     }
   };
@@ -72,8 +81,7 @@ export default function AdminLoginPage() {
           </h1>
 
           <p className="text-xs text-slate-400">
-            Secure administrative access for marketplace moderation and
-            platform governance.
+            Secure administrative access for marketplace moderation and platform governance.
           </p>
         </div>
 
@@ -98,7 +106,10 @@ export default function AdminLoginPage() {
             <input
               type="email"
               required
-              autoComplete="off"
+              autoComplete="email"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
               aria-label="Admin Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -112,15 +123,31 @@ export default function AdminLoginPage() {
             <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
 
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               required
-              autoComplete="off"
+              autoComplete="current-password"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
               aria-label="Admin Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Admin Password"
-              className="w-full pl-10 pr-3 py-3 bg-slate-900/80 border border-slate-700 rounded-xl text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="w-full pl-10 pr-10 py-3 bg-slate-900/80 border border-slate-700 rounded-xl text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 p-1"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? (
+                <EyeOff className="w-4 h-4" />
+              ) : (
+                <Eye className="w-4 h-4" />
+              )}
+            </button>
           </div>
 
           {/* Button */}
@@ -136,6 +163,21 @@ export default function AdminLoginPage() {
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
+
+        {/* Demo / Device Helper Box */}
+        <div className="pt-2 border-t border-slate-700/60 text-center space-y-2">
+          <p className="text-[11px] text-slate-400">
+            Default Administrator Account:
+          </p>
+          <button
+            type="button"
+            onClick={fillDefaultCredentials}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-700 border border-slate-600 text-xs text-amber-300 transition active:scale-95"
+          >
+            <KeyRound className="w-3.5 h-3.5 text-amber-400" />
+            <span>Fill Default Admin Credentials</span>
+          </button>
+        </div>
       </div>
     </div>
   );

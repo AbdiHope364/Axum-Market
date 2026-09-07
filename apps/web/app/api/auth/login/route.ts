@@ -84,13 +84,27 @@ export async function POST(req: Request) {
       },
     });
 
+    const isHttps =
+      req.headers.get('x-forwarded-proto') === 'https' ||
+      req.url.startsWith('https:');
+
     response.cookies.set('axum_token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isHttps,
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7,
       path: '/',
     });
+
+    if (user.role === 'ADMIN') {
+      response.cookies.set('axum_admin_token', token, {
+        httpOnly: true,
+        secure: isHttps,
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7,
+        path: '/',
+      });
+    }
 
     return response;
   } catch (error) {

@@ -34,7 +34,9 @@ export async function comparePassword(password: string, hash: string): Promise<b
 export async function getSession(): Promise<TokenPayload | null> {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get('axum_token')?.value;
+    const token =
+      cookieStore.get('axum_admin_token')?.value ||
+      cookieStore.get('axum_token')?.value;
     if (!token) return null;
     return verifyToken(token);
   } catch {

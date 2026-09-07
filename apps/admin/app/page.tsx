@@ -868,7 +868,10 @@ export default function AdminPortalPage() {
               <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="email"
-                autoComplete="off"
+                autoComplete="email"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
                 placeholder="Admin Email (e.g. admin@axummarket.et)"
@@ -882,7 +885,10 @@ export default function AdminPortalPage() {
               <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type={showPassword ? 'text' : 'password'}
-                autoComplete="new-password"
+                autoComplete="current-password"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 value={loginPassword}
                 onChange={(e) => setLoginPassword(e.target.value)}
                 placeholder="Admin Password"
@@ -909,6 +915,25 @@ export default function AdminPortalPage() {
               <span>{loginLoading ? 'Signing In...' : 'Unlock Admin Portal'}</span>
             </button>
           </form>
+
+          {/* Quick Demo Credentials for Testing on Any Device */}
+          <div className="pt-2 border-t border-slate-800/80 text-center space-y-2">
+            <p className="text-[11px] text-slate-400">
+              Default Administrator Account:
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setLoginEmail('admin@axummarket.et');
+                setLoginPassword('AdminSecure2026!');
+                setLoginError('');
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-700 text-xs text-amber-400 transition active:scale-95"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+              <span>Fill Default Admin Credentials</span>
+            </button>
+          </div>
         </div>
       </div>
     );
