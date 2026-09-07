@@ -2273,52 +2273,38 @@ export default function AdminDashboardPage() {
                   </div>
 
                   {/* Category & Breed */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 max-w-full">
+                  <div className="space-y-3 min-w-0 max-w-full">
                     <div className="min-w-0">
-                      <label className="block text-xs font-bold text-gray-700 mb-1">
-                        Category *
-                      </label>
-                      <div className="relative w-full min-w-0">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setPostCategoryDropdownOpen(!postCategoryDropdownOpen);
-                            setPostSellerDropdownOpen(false);
-                            setPostBreedDropdownOpen(false);
-                          }}
-                          className="w-full max-w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 sm:py-2 px-3 text-xs text-gray-900 flex items-center justify-between outline-none focus:border-green-600 transition text-left cursor-pointer"
-                        >
-                          <span className="truncate pr-2">
-                            {categories.find((c) => c.id === postCategoryId)
-                              ? `${categories.find((c) => c.id === postCategoryId)?.icon || '🏷️'} ${categories.find((c) => c.id === postCategoryId)?.name.split('/')[0].trim()}`
-                              : 'Select Category'}
+                      <div className="flex items-center justify-between text-xs font-bold text-gray-700 mb-1.5">
+                        <span>Category (የእንስሳት አይነት) *</span>
+                        {categories.find((c) => c.id === postCategoryId) && (
+                          <span className="text-[11px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-200">
+                            {categories.find((c) => c.id === postCategoryId)?.icon} {categories.find((c) => c.id === postCategoryId)?.name.split('/')[0].trim()}
                           </span>
-                          <ChevronDown className={`w-4 h-4 text-gray-500 shrink-0 transition-transform ${postCategoryDropdownOpen ? 'rotate-180' : ''}`} />
-                        </button>
-                        {postCategoryDropdownOpen && (
-                          <div className="absolute left-0 right-0 top-full mt-1 z-50 max-h-56 overflow-y-auto bg-white border border-gray-200 rounded-xl shadow-2xl p-1 space-y-0.5 w-full max-w-full">
-                            {categories.map((c) => {
-                              const isSelected = postCategoryId === c.id;
-                              return (
-                                <button
-                                  key={c.id}
-                                  type="button"
-                                  onClick={() => {
-                                    setPostCategoryId(c.id);
-                                    setPostBreedId('');
-                                    setPostCategoryDropdownOpen(false);
-                                  }}
-                                  className={`w-full text-left px-3 py-2 text-xs rounded-lg transition flex items-center justify-between cursor-pointer ${
-                                    isSelected ? 'bg-green-50 text-green-800 font-bold' : 'text-gray-700 hover:bg-gray-100'
-                                  }`}
-                                >
-                                  <span className="truncate">{c.icon} {c.name.split('/')[0].trim()}</span>
-                                  {isSelected && <Check className="w-3.5 h-3.5 text-green-600 shrink-0 ml-2" />}
-                                </button>
-                              );
-                            })}
-                          </div>
                         )}
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 w-full">
+                        {categories.map((c) => {
+                          const isSelected = postCategoryId === c.id;
+                          return (
+                            <button
+                              key={c.id}
+                              type="button"
+                              onClick={() => {
+                                setPostCategoryId(c.id);
+                                setPostBreedId('');
+                              }}
+                              className={`py-2 px-2.5 rounded-xl text-left border transition-all active:scale-95 flex items-center justify-between min-w-0 cursor-pointer overflow-hidden ${
+                                isSelected
+                                  ? 'bg-green-50 border-green-600 text-green-900 font-bold shadow-xs ring-1 ring-green-600/30'
+                                  : 'bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700'
+                              }`}
+                            >
+                              <span className="text-xs truncate">{c.icon} {c.name.split('/')[0].trim()}</span>
+                              {isSelected && <Check className="w-3.5 h-3.5 text-green-600 shrink-0 ml-1" />}
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
 
@@ -2468,22 +2454,40 @@ export default function AdminDashboardPage() {
                           <label className="block text-[11px] font-bold text-gray-700 mb-1">
                             Calving Count / Parity (የወለደችው)
                           </label>
-                          <select
-                            value={postCalvingCount}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              setPostCalvingCount(val);
-                              setPostHasGivenBirth(val === '0' ? false : val ? true : null);
-                            }}
-                            className="w-full bg-white border border-emerald-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-emerald-600 cursor-pointer"
-                          >
-                            <option value="">Select status</option>
-                            <option value="0">Heifer (0 - ያልወለደች ጊደር)</option>
-                            <option value="1">1st Calving (1 ጊዜ የወለደች)</option>
-                            <option value="2">2nd Calving (2 ጊዜ የወለደች)</option>
-                            <option value="3">3rd Calving (3 ጊዜ የወለደች)</option>
-                            <option value="4">4+ Calvings (4 እና ከዚያ በላይ)</option>
-                          </select>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 w-full">
+                            {[
+                              { count: '0', title: 'Heifer (0)', am: 'ያልወለደች' },
+                              { count: '1', title: '1st Calving', am: '1 ጊዜ' },
+                              { count: '2', title: '2nd Calving', am: '2 ጊዜ' },
+                              { count: '3', title: '3rd Calving', am: '3 ጊዜ' },
+                              { count: '4', title: '4+ Calvings', am: '4+ ጊዜ' },
+                            ].map((item) => {
+                              const isSelected = postCalvingCount === item.count;
+                              return (
+                                <button
+                                  key={item.count}
+                                  type="button"
+                                  onClick={() => {
+                                    if (isSelected) {
+                                      setPostCalvingCount('');
+                                      setPostHasGivenBirth(null);
+                                    } else {
+                                      setPostCalvingCount(item.count);
+                                      setPostHasGivenBirth(item.count !== '0');
+                                    }
+                                  }}
+                                  className={`py-1.5 px-2 rounded-lg text-left border transition-all text-xs flex items-center justify-between min-w-0 ${
+                                    isSelected
+                                      ? 'bg-emerald-600 text-white border-emerald-600 font-bold'
+                                      : 'bg-white text-gray-700 border-emerald-200 hover:bg-emerald-50'
+                                  }`}
+                                >
+                                  <span className="truncate">{item.title}</span>
+                                  {isSelected && <Check className="w-3 h-3 text-white shrink-0 ml-1" />}
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
                       </div>
 
@@ -2505,39 +2509,64 @@ export default function AdminDashboardPage() {
                           <label className="block text-[11px] font-bold text-gray-700 mb-1">
                             Pregnancy Status & Months (እርግዝና)
                           </label>
-                          <div className="flex gap-1.5">
-                            <select
-                              value={postIsPregnant === null ? '' : postIsPregnant ? 'true' : 'false'}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                if (val === 'true') setPostIsPregnant(true);
-                                else if (val === 'false') {
-                                  setPostIsPregnant(false);
-                                  setPostPregnancyMonths('');
-                                } else {
+                          <div className="grid grid-cols-2 gap-1.5 w-full">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (postIsPregnant === false) {
                                   setPostIsPregnant(null);
+                                } else {
+                                  setPostIsPregnant(false);
                                   setPostPregnancyMonths('');
                                 }
                               }}
-                              className="flex-1 bg-white border border-emerald-200 rounded-xl py-2 px-2 text-xs text-gray-900 outline-none focus:border-emerald-600 cursor-pointer"
+                              className={`py-1.5 px-2 rounded-lg text-xs font-bold transition flex items-center justify-between border min-w-0 ${
+                                postIsPregnant === false
+                                  ? 'bg-emerald-600 text-white border-emerald-600'
+                                  : 'bg-white text-gray-700 border-emerald-200 hover:bg-emerald-50'
+                              }`}
                             >
-                              <option value="">Unknown</option>
-                              <option value="false">Not Pregnant (ክፍት)</option>
-                              <option value="true">Pregnant (እርጉዝ)</option>
-                            </select>
-                            {postIsPregnant && (
-                              <select
-                                value={postPregnancyMonths}
-                                onChange={(e) => setPostPregnancyMonths(e.target.value)}
-                                className="w-24 bg-white border border-emerald-200 rounded-xl py-2 px-2 text-xs text-emerald-800 font-bold outline-none focus:border-emerald-600 cursor-pointer"
-                              >
-                                <option value="">Mo?</option>
-                                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((m) => (
-                                  <option key={m} value={m}>{m} Mo</option>
-                                ))}
-                              </select>
-                            )}
+                              <span className="truncate">Not Pregnant (ክፍት)</span>
+                              {postIsPregnant === false && <Check className="w-3 h-3 text-white shrink-0 ml-1" />}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (postIsPregnant === true) {
+                                  setPostIsPregnant(null);
+                                  setPostPregnancyMonths('');
+                                } else {
+                                  setPostIsPregnant(true);
+                                }
+                              }}
+                              className={`py-1.5 px-2 rounded-lg text-xs font-bold transition flex items-center justify-between border min-w-0 ${
+                                postIsPregnant === true
+                                  ? 'bg-purple-700 text-white border-purple-700'
+                                  : 'bg-white text-gray-700 border-purple-200 hover:bg-purple-50'
+                              }`}
+                            >
+                              <span className="truncate">Pregnant 🤰 (እርጉዝ)</span>
+                              {postIsPregnant === true && <Check className="w-3 h-3 text-white shrink-0 ml-1" />}
+                            </button>
                           </div>
+                          {postIsPregnant && (
+                            <div className="grid grid-cols-3 sm:grid-cols-9 gap-1 mt-1.5">
+                              {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((m) => (
+                                <button
+                                  key={m}
+                                  type="button"
+                                  onClick={() => setPostPregnancyMonths(m)}
+                                  className={`py-1 rounded text-center text-xs font-bold border transition ${
+                                    postPregnancyMonths === m
+                                      ? 'bg-purple-700 text-white border-purple-700'
+                                      : 'bg-white text-gray-700 border-purple-200 hover:bg-purple-100'
+                                  }`}
+                                >
+                                  {m} Mo
+                                </button>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
