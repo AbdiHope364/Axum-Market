@@ -16,7 +16,7 @@ interface PageProps {
 export default async function ListingDetailPage({ params }: PageProps) {
   const { id } = await params;
 
-  const listing = await prisma.listing.findUnique({
+  const rawListing = await prisma.listing.findUnique({
     where: { id },
     include: {
       category: true,
@@ -35,9 +35,18 @@ export default async function ListingDetailPage({ params }: PageProps) {
     },
   });
 
-  if (!listing) {
+  if (!rawListing) {
     notFound();
   }
+
+  const listing = rawListing as typeof rawListing & {
+    milkYieldLiters?: number | null;
+    hasGivenBirth?: boolean | null;
+    calvingCount?: number | null;
+    udderHealth?: string | null;
+    isPregnant?: boolean | null;
+    pregnancyMonths?: number | null;
+  };
 
   const isSold = listing.status === 'SOLD';
 
