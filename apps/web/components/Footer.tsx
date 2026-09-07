@@ -5,8 +5,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { ShieldCheck, Phone, MapPin, Heart } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function Footer() {
+  const { t } = useLanguage();
   const pathname = usePathname();
 
   if (pathname.startsWith('/admin')) {
@@ -34,18 +36,18 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-sm text-gray-400 max-w-md leading-relaxed">
-              Ethiopia&rsquo;s dedicated livestock classifieds and marketplace platform. Connecting dairy farmers, cattle fatteners, and pastoralists directly with buyers.
+              {t('footer_tagline')}
             </p>
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-800/80 border border-gray-700 text-xs text-amber-400">
               <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>Direct offline transactions only • Zero online checkout</span>
+              <span>{t('footer_offline_tag')}</span>
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4">
-              Explore Livestock
+              {t('explore_livestock')}
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
@@ -75,7 +77,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/listings" className="hover:text-green-400 transition">
-                  All Livestock Listings
+                  {t('all_animals')}
                 </Link>
               </li>
             </ul>
@@ -84,31 +86,36 @@ export default function Footer() {
           {/* Sellers & Safety */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4">
-              Sellers & Safety
+              {t('sellers_safety')}
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
                 <Link href="/seller/create" className="text-green-400 font-semibold hover:underline">
-                  + Post Animal Listing
+                  + {t('post_animal')}
                 </Link>
               </li>
               <li>
                 <Link href="/seller/login" className="hover:text-green-400 transition">
-                  Seller Dashboard Login
+                  {t('login')}
                 </Link>
               </li>
               <li>
                 <Link href="/seller/register" className="hover:text-green-400 transition">
-                  Register as Livestock Seller
+                  {t('register')}
                 </Link>
               </li>
               <li>
                 <Link href="/#safety" className="hover:text-green-400 transition">
-                  Buyer Safety Guidelines
+                  {t('safety_disclaimer_link')}
                 </Link>
               </li>
             </ul>
           </div>
+        </div>
+
+        {/* Safety Disclaimer Banner */}
+        <div className="bg-gray-800/60 border border-gray-700/80 rounded-2xl p-4 text-xs text-amber-300/90 leading-relaxed mb-6">
+          <p>{t('safety_reminder')}</p>
         </div>
 
         <div className="border-t border-gray-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">

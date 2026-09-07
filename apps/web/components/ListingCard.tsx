@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Phone, CheckCircle, ShieldAlert } from 'lucide-react';
 import { formatPriceETB } from '@/lib/constants';
+import { useLanguage } from '@/context/LanguageContext';
 
 export interface ListingCardData {
   id: string;
@@ -38,6 +39,7 @@ export interface ListingCardData {
 }
 
 export default function ListingCard({ listing }: { listing: ListingCardData }) {
+  const { t } = useLanguage();
   const images = Array.isArray(listing?.images) ? listing.images : [];
   const frontImage =
     images.find((img) => img?.imageType === 'FRONT' || img?.imageType === 'PROFILE') ||
@@ -89,7 +91,7 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
         {isSold && (
           <div className="absolute inset-0 bg-black/60 backdrop-blur-2xs flex items-center justify-center p-3">
             <span className="bg-red-600 text-white font-black text-xs sm:text-sm px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">
-              Sold Out
+              {t('sold_out')}
             </span>
           </div>
         )}
@@ -113,7 +115,7 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
           {/* Attributes Pills (Gender, Age, Weight, Milk Yield) */}
           <div className="flex flex-wrap gap-1 mt-1 sm:mt-1.5 text-[9px] sm:text-xs">
             <span className="bg-gray-100 text-gray-700 font-medium px-1.5 py-0.5 rounded">
-              {listing?.gender === 'FEMALE' ? 'Female' : 'Male'}
+              {listing?.gender === 'FEMALE' ? t('female') : t('male')}
             </span>
             {listing?.age && (
               <span className="bg-gray-100 text-gray-700 font-medium px-1.5 py-0.5 rounded">
@@ -129,13 +131,13 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
             {listing?.milkYieldLiters && (
               <span className="bg-emerald-50 text-emerald-900 border border-emerald-300 font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
                 <span>🥛</span>
-                <span>{listing.milkYieldLiters} L/day</span>
+                <span>{listing.milkYieldLiters} {t('liters_day')}</span>
               </span>
             )}
             {listing?.isPregnant && (
               <span className="bg-purple-50 text-purple-900 border border-purple-200 font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
                 <span>🤰</span>
-                <span>{listing.pregnancyMonths ? `${listing.pregnancyMonths}M In-Calf (${listing.pregnancyMonths}ወር)` : 'In-Calf'}</span>
+                <span>{listing.pregnancyMonths ? `${listing.pregnancyMonths}M ${t('in_calf')}` : t('in_calf')}</span>
               </span>
             )}
           </div>
@@ -165,14 +167,14 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
               title={`Call ${listing.contactPhone}`}
             >
               <Phone className="w-3.5 h-3.5 shrink-0" />
-              <span>Call</span>
+              <span>{t('call')}</span>
             </a>
           ) : (
             <button
               disabled
               className="flex-1 py-2 px-2 rounded-xl bg-gray-100 text-gray-400 font-medium text-[11px] text-center cursor-not-allowed min-h-[36px]"
             >
-              {isSold ? 'Sold' : 'No Phone'}
+              {isSold ? t('sold_out') : 'No Phone'}
             </button>
           )}
 
@@ -180,7 +182,7 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
             href={`/listings/${listing.id}`}
             className="px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs transition text-center min-h-[36px] flex items-center justify-center shrink-0"
           >
-            Details
+            {t('details')}
           </Link>
         </div>
       </div>

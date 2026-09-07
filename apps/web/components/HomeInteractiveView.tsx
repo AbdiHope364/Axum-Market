@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import ListingCard, { ListingCardData } from './ListingCard';
 import SafetyNotice from './SafetyNotice';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface CategoryItem {
   id: string;
@@ -51,6 +52,8 @@ export default function HomeInteractiveView({
   categories,
   initialListings,
 }: HomeInteractiveViewProps) {
+  const { t, language } = useLanguage();
+
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -60,10 +63,10 @@ export default function HomeInteractiveView({
 
   // Quick preset regions
   const quickRegions = [
-    { label: 'All Ethiopia', value: 'all' },
+    { label: t('all_ethiopia'), value: 'all' },
     { label: 'Oromia (Sululta, Bishoftu)', value: 'Oromia' },
-    { label: 'Addis Ababa', value: 'Addis Ababa' },
-    { label: 'Amhara', value: 'Amhara' },
+    { label: 'Addis Ababa (አዲስ አበባ)', value: 'Addis Ababa' },
+    { label: 'Amhara (አማራ)', value: 'Amhara' },
     { label: 'Sidama (Hawassa)', value: 'Sidama' },
   ];
 
@@ -157,13 +160,13 @@ export default function HomeInteractiveView({
           <div className="flex flex-wrap items-center justify-between gap-1.5">
             <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] sm:text-xs font-semibold text-green-200">
               <span>🇪🇹</span>
-              <span>Ethiopia Livestock Classifieds</span>
+              <span>{t('classifieds_badge')}</span>
             </div>
 
             {/* In-Person Inspection Pill */}
             <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-200 border border-amber-400/30 text-[10px] sm:text-[11px] font-medium">
               <ShieldCheck className="w-3 h-3 text-amber-300 shrink-0" />
-              <span>Direct Call • 0% Online Fee</span>
+              <span>{t('direct_call_badge')}</span>
             </div>
           </div>
 
@@ -181,10 +184,10 @@ export default function HomeInteractiveView({
             </div>
             <div className="space-y-0.5">
               <h1 className="text-lg sm:text-3xl lg:text-4xl font-black tracking-tight text-white leading-tight">
-                Buy & Sell Livestock <span className="text-green-400">Directly</span>
+                {t('hero_title_1')} <span className="text-green-400">{t('hero_title_2')}</span>
               </h1>
               <p className="text-[11px] sm:text-sm text-green-100/90 font-normal leading-tight line-clamp-1 sm:line-clamp-none">
-                Connect directly with Ethiopian cattle & sheep farmers by phone.
+                {t('hero_subtitle')}
               </p>
             </div>
           </div>
@@ -197,7 +200,7 @@ export default function HomeInteractiveView({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search dairy cow, Borana bull, sheep..."
+                placeholder={t('search_placeholder')}
                 className="w-full pl-2 pr-7 py-1.5 sm:py-2 text-xs sm:text-sm outline-none text-gray-900 placeholder:text-gray-400 font-medium"
               />
               {searchQuery && (
@@ -233,14 +236,14 @@ export default function HomeInteractiveView({
                 className="px-2.5 py-1 bg-green-600 hover:bg-green-700 active:scale-98 text-white font-bold text-[11px] sm:text-xs rounded-lg shadow-xs transition flex items-center justify-center gap-1 shrink-0"
               >
                 <SlidersHorizontal className="w-3 h-3" />
-                <span>Filters</span>
+                <span>{t('filters')}</span>
               </Link>
             </div>
           </div>
 
           {/* Quick Search Tag Chips */}
           <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 text-xs max-w-full">
-            <span className="text-green-300/80 font-semibold shrink-0 text-[10px]">Quick:</span>
+            <span className="text-green-300/80 font-semibold shrink-0 text-[10px]">{t('quick_tags')}</span>
             {['Friesian Cow', 'Borana Bull', 'Bishoftu', 'Sululta', 'Dorper Sheep'].map((tag) => (
               <button
                 key={tag}
@@ -260,10 +263,10 @@ export default function HomeInteractiveView({
         <section className="space-y-1.5 sm:space-y-2.5 max-w-full">
           <div className="flex items-center justify-between">
             <h2 className="text-xs sm:text-base font-black text-gray-900 flex items-center gap-1.5">
-              <span>Choose Animal Category</span>
+              <span>{t('choose_category')}</span>
               {selectedCategory !== 'all' && (
                 <span className="text-[10px] sm:text-xs font-semibold text-green-700 bg-green-50 px-1.5 py-0.2 rounded">
-                  Active
+                  {t('active')}
                 </span>
               )}
             </h2>
@@ -272,7 +275,7 @@ export default function HomeInteractiveView({
                 onClick={() => setSelectedCategory('all')}
                 className="text-[11px] sm:text-xs text-red-600 font-semibold hover:underline cursor-pointer"
               >
-                Show All
+                {t('show_all')}
               </button>
             )}
           </div>
@@ -290,14 +293,14 @@ export default function HomeInteractiveView({
             >
               <div className="flex flex-col min-w-0">
                 <span className="text-xs font-black">
-                  All Animals
+                  {t('all_animals')}
                 </span>
                 <span
                   className={`text-[9px] sm:text-[10px] leading-tight ${
                     selectedCategory === 'all' ? 'text-green-100' : 'text-gray-400'
                   }`}
                 >
-                  ሁሉም ከብቶች
+                  {t('all_animals_sub')}
                 </span>
               </div>
             </button>
@@ -342,11 +345,11 @@ export default function HomeInteractiveView({
         <section className="bg-slate-100/90 p-1 rounded-xl sm:rounded-2xl max-w-full overflow-hidden">
           <div className="flex items-center gap-1 overflow-x-auto no-scrollbar snap-x">
             {[
-              { id: 'all', label: 'All', amharic: 'ሁሉም' },
-              { id: 'dairy', label: 'Dairy', amharic: 'የወተት' },
-              { id: 'beef', label: 'Beef Cattle', amharic: 'የስጋ' },
-              { id: 'sheep_goat', label: 'Sheep & Goats', amharic: 'በጎች' },
-              { id: 'budget', label: '< 60k ETB', amharic: 'ቅናሽ' },
+              { id: 'all', labelKey: 'tab_all' },
+              { id: 'dairy', labelKey: 'tab_dairy' },
+              { id: 'beef', labelKey: 'tab_beef' },
+              { id: 'sheep_goat', labelKey: 'tab_sheep_goat' },
+              { id: 'budget', labelKey: 'tab_budget' },
             ].map((tab) => {
               const isActive = activeTab === tab.id;
               return (
@@ -359,8 +362,7 @@ export default function HomeInteractiveView({
                       : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
                   }`}
                 >
-                  <span>{tab.label}</span>
-                  <span className="text-[9px] opacity-75">({tab.amharic})</span>
+                  <span>{t(tab.labelKey)}</span>
                 </button>
               );
             })}
@@ -525,10 +527,10 @@ export default function HomeInteractiveView({
         <section className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 sm:p-6 space-y-3">
           <div className="text-center space-y-0.5">
             <span className="text-[10px] font-bold uppercase tracking-widest text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
-              Safe & Simple
+              {t('how_it_works_badge')}
             </span>
             <h2 className="text-sm sm:text-xl font-black text-gray-900">
-              How Buyers Trade on AxumMarket
+              {t('how_it_works_title')}
             </h2>
           </div>
 
@@ -537,9 +539,9 @@ export default function HomeInteractiveView({
               <div className="w-6 h-6 rounded-md bg-green-100 text-green-700 font-bold text-xs flex items-center justify-center mx-auto">
                 1
               </div>
-              <h4 className="font-bold text-[11px] sm:text-xs text-gray-900">Browse Photos</h4>
+              <h4 className="font-bold text-[11px] sm:text-xs text-gray-900">{t('step1_title')}</h4>
               <p className="text-[10px] text-gray-500 leading-tight">
-                Inspect 3 verified photo angles and live weight.
+                {t('step1_desc')}
               </p>
             </div>
 
@@ -547,9 +549,9 @@ export default function HomeInteractiveView({
               <div className="w-6 h-6 rounded-md bg-green-100 text-green-700 font-bold text-xs flex items-center justify-center mx-auto">
                 2
               </div>
-              <h4 className="font-bold text-[11px] sm:text-xs text-gray-900">Direct Call</h4>
+              <h4 className="font-bold text-[11px] sm:text-xs text-gray-900">{t('step2_title')}</h4>
               <p className="text-[10px] text-gray-500 leading-tight">
-                Dial the seller directly to discuss price.
+                {t('step2_desc')}
               </p>
             </div>
 
@@ -557,9 +559,9 @@ export default function HomeInteractiveView({
               <div className="w-6 h-6 rounded-md bg-green-100 text-green-700 font-bold text-xs flex items-center justify-center mx-auto">
                 3
               </div>
-              <h4 className="font-bold text-[11px] sm:text-xs text-gray-900">Physical Visit</h4>
+              <h4 className="font-bold text-[11px] sm:text-xs text-gray-900">{t('step3_title')}</h4>
               <p className="text-[10px] text-gray-500 leading-tight">
-                Inspect animal health and teeth in person.
+                {t('step3_desc')}
               </p>
             </div>
 
@@ -567,9 +569,9 @@ export default function HomeInteractiveView({
               <div className="w-6 h-6 rounded-md bg-green-100 text-green-700 font-bold text-xs flex items-center justify-center mx-auto">
                 4
               </div>
-              <h4 className="font-bold text-[11px] sm:text-xs text-gray-900">In-Person Pay</h4>
+              <h4 className="font-bold text-[11px] sm:text-xs text-gray-900">{t('step4_title')}</h4>
               <p className="text-[10px] text-gray-500 leading-tight">
-                Pay in cash/transfer only after complete satisfaction.
+                {t('step4_desc')}
               </p>
             </div>
           </div>
@@ -579,10 +581,10 @@ export default function HomeInteractiveView({
         <section className="bg-gradient-to-r from-emerald-800 to-green-700 rounded-2xl p-4 sm:p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
           <div className="space-y-0.5 text-center sm:text-left">
             <h3 className="text-base sm:text-xl font-black">
-              Selling Cattle or Sheep?
+              {t('seller_cta_title')}
             </h3>
             <p className="text-green-100 text-xs sm:text-sm max-w-md leading-tight">
-              Post in 2 minutes. Receive direct calls from buyers across Ethiopia with 0% commission.
+              {t('seller_cta_subtitle')}
             </p>
           </div>
           <Link
@@ -590,7 +592,7 @@ export default function HomeInteractiveView({
             className="w-full sm:w-auto px-4 py-2 bg-white hover:bg-green-50 active:scale-98 text-green-800 font-bold text-xs sm:text-sm rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 shrink-0"
           >
             <PlusCircle className="w-3.5 h-3.5" />
-            <span>Post Livestock Now</span>
+            <span>{t('post_livestock_now')}</span>
           </Link>
         </section>
       </div>

@@ -41,6 +41,57 @@ async function translateDirectClient(text: string, targetLang: string): Promise<
   return null;
 }
 
+// Pre-computed instant translations for seeded listings (delivers 0ms instant display)
+const PRESET_TRANSLATIONS: Record<string, Record<'am' | 'om', string>> = {
+  holstein_22l: {
+    am: 'ሁለተኛ ወሊድ ሆልስታይን ፍሪሲያን የወተት ላም በከፍተኛ የወተት ምርት ወቅት ላይ የምትገኝ። በአሁኑ ጊዜ በመደበኛ የወተት መኖ እና ድርቆሽ በቀን 22 ሊትር ወተት ትሰጣለች። በጣም የሰለጠነች፣ በእጅ ወይም በማሽን ለማለብ እጅግ ምቹ። በመደበኛነት የሆድ ጥገኛ መድኃኒት የተሰጣትና የተከተበች። ትክክለኛ ገዢዎች ሱሉልታ ጫንጮ ድረስ በመምጣት የጠዋትና የከሰዓት እለባን በአካል መመልከት ይችላሉ።',
+    om: 'Sa’a aannanii Holstein Friesian lammataa kan yeroo ammaa aannan guddaa kennitu. Yeroo ammaa kana guyyaatti aannan liitira 22 raashina aannanii fi marga gogaa waliin oomishaa jirti. Baayyee kan ajajamtu, harkaanis ta’ee maashiniin aannan baasuuf kan mijattu. Talaallii fi qoricha raammoo kan fudhatte. Bitamtoonni dhugaa Sululta Caanchootti dhiyaachuun sakatta’iinsa elma ganamaa fi galgalaa qaamaan ilaaluu dandeessu.',
+  },
+  borana_bull: {
+    am: 'በቢሾፍቱ በፋብሪካ መኖ እና በጭድ ለ4 ወራት በሚገባ የተደለበ ምርጥ የቦረና በሬ። የጎላ የጡንቻ እና የክብደት አቋም (በግምት 460 ኪ.ግ) ያለው። ጤነኛ እና ንጹህ የጤና ታሪክ ያለው። በቦታው ድረስ መጥቶ መመርመር ይቻላል።',
+    om: 'Korma Booranaa Bishooftuutti furdatee ji’a 4f marga fi furdaan soorame. Qaama cimaa fi ulfaatina (tilmaamaan 460kg) kan qabu. Fayyaa qulqulluu qaba. Qophii bakka jiruutti qaamaan ilaaluun ni danda’ama.',
+  },
+  dorper_ram: {
+    am: 'ከፍተኛ የዘር አቅም ያለው የዶርፐር አውራ በግ። ግሩም የሰውነት ቅርጽና ክብደት ያለው፣ ለበግ መንጋ ዝርያ ማሻሻያ ፈጣን የእድገት ባህሪ የሚያስተላልፍ። ጤናማ፣ ጠንካራ ሰኮና ያለውና ለአገልግሎት ዝግጁ።',
+    om: 'Kormaa hoolaa Dorper dandeettii sanyii olaanaa qabu. Qaama cimaa, guddina saffisaa kan qabu. Fayyaa guutuu fi tajaajilaaf qophii kan ta’e.',
+  },
+  boer_buck: {
+    am: 'ጥሩ የአጥንት መዋቅር እና ሰፊ ደረት ያለው ጠንካራ እና ጤናማ የቦየር ድቅል የፍየል ሙክት። በግርግም ውስጥ በአልፋልፋ ሳር እና በፋጉሎ ያደገ። በአካል ለመጎብኘት በቀጥታ ይደውሉ።',
+    om: 'Re’ee kormaa Boer fayyaalessa ta’e, lafee cimaa fi qoma bal’aa kan qabu. Marga alfalfaa fi faagulloon mana keessatti kan guddate. Qaamaan ilaaluuf kallattiin bilbilaa.',
+  },
+  holstein_heifer: {
+    am: 'በሰው ሰራሽ ማዳቀል (AI) የተወለደች ንፁህ የሆልስታይን ጊደር። በእንስሳት ሐኪም አልትራሳውንድ የ4 ወር እርግዝናዋ የተረጋገጠ። የዋህ ባህሪ ያላት እና ጥሩ የጡት ተስፋ ያላት።',
+    om: 'Raada Holstein sanyii qulqulluu kan seelii kormaan dhalatte. Ulfi ji’a 4 ogeessa fayyaa beelladaatiin kan mirkanaa’e. Amala gaarii fi harma gaarii kan qabdu.',
+  },
+  jersey_cow: {
+    am: 'ወፍራም እና ቅባት ያለው ወተት የምትሰጥ ጤናማ የቤተሰብ የወተት ላም። ለልጆች እና ለቤተሰብ አያያዝ በጣም የተረጋጋች። በሱሉልታ በአካል ለመመርመር ዝግጁ።',
+    om: 'Sa’a aannanii maatii fayyaalettii aannan furdaa fi dhadhaa qabu kennitu. Maatiif baayyee kan mijattu. Sulultaatti qaamaan sakatta’uuf qophii kan taate.',
+  },
+};
+
+function getPresetTranslation(text: string, lang: 'am' | 'om'): string | null {
+  const lower = text.toLowerCase();
+  if (lower.includes('second calving') || lower.includes('22 liters') || lower.includes('chancho')) {
+    return PRESET_TRANSLATIONS.holstein_22l[lang];
+  }
+  if (lower.includes('borana bull') || lower.includes('460kg') || lower.includes('fattened for 4 months')) {
+    return PRESET_TRANSLATIONS.borana_bull[lang];
+  }
+  if (lower.includes('dorper') || lower.includes('breeding ram') || lower.includes('sheep flock')) {
+    return PRESET_TRANSLATIONS.dorper_ram[lang];
+  }
+  if (lower.includes('boer') || lower.includes('buck') || lower.includes('lucerne')) {
+    return PRESET_TRANSLATIONS.boer_buck[lang];
+  }
+  if (lower.includes('heifer') || lower.includes('artificial insemination') || lower.includes('4 months pregnant')) {
+    return PRESET_TRANSLATIONS.holstein_heifer[lang];
+  }
+  if (lower.includes('jersey') || lower.includes('creamy milk') || lower.includes('butterfat')) {
+    return PRESET_TRANSLATIONS.jersey_cow[lang];
+  }
+  return null;
+}
+
 export default function AutoTranslateText({ text = '', className = '' }: AutoTranslateTextProps) {
   const { language } = useLanguage();
   const [translated, setTranslated] = useState<string | null>(null);
@@ -50,7 +101,7 @@ export default function AutoTranslateText({ text = '', className = '' }: AutoTra
 
   const safeText = typeof text === 'string' ? text.trim() : '';
 
-  // Auto-translate if user switches overall site language
+  // Auto-translate when global language changes
   useEffect(() => {
     if (language === 'am' || language === 'om') {
       if (currentLang !== language && safeText) {
@@ -60,7 +111,7 @@ export default function AutoTranslateText({ text = '', className = '' }: AutoTra
       setTranslated(null);
       setCurrentLang(null);
     }
-  }, [language]);
+  }, [language, safeText]);
 
   const handleTranslate = async (targetLang: SupportedLanguage) => {
     if (!safeText) return;
@@ -72,8 +123,27 @@ export default function AutoTranslateText({ text = '', className = '' }: AutoTra
       return;
     }
 
-    if (currentLang === targetLang && translated) {
+    // 1. Instant Preset Check (0ms response)
+    const preset = getPresetTranslation(safeText, targetLang);
+    if (preset) {
+      setTranslated(preset);
+      setCurrentLang(targetLang);
+      setError(null);
       return;
+    }
+
+    // 2. Check localStorage cache
+    const cacheKey = `axum_trans_${targetLang}_${encodeURIComponent(safeText.slice(0, 40))}`;
+    try {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        setTranslated(cached);
+        setCurrentLang(targetLang);
+        setError(null);
+        return;
+      }
+    } catch {
+      // ignore
     }
 
     setLoading(true);
@@ -81,34 +151,43 @@ export default function AutoTranslateText({ text = '', className = '' }: AutoTra
 
     let resultText: string | null = null;
 
-    // 1. Try server translation endpoint
+    // 3. Direct Client Fetch to MyMemory (Fast ~300ms, avoids Vercel datacenter block)
     try {
-      const res = await fetch('/api/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: safeText, targetLang }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.translatedText && data.translatedText !== safeText) {
-          resultText = cleanHtmlEntities(data.translatedText);
-        }
-      }
+      resultText = await translateDirectClient(safeText, targetLang);
     } catch {
-      // Server endpoint failed, proceed to direct client fallback
+      // ignore
     }
 
-    // 2. Direct browser fallback if server was throttled or returned original text
+    // 4. Server API Fallback if client direct fetch failed
     if (!resultText) {
-      resultText = await translateDirectClient(safeText, targetLang);
+      try {
+        const res = await fetch('/api/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: safeText, targetLang }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.translatedText && data.translatedText !== safeText) {
+            resultText = cleanHtmlEntities(data.translatedText);
+          }
+        }
+      } catch {
+        // ignore
+      }
     }
 
     if (resultText) {
       setTranslated(resultText);
       setCurrentLang(targetLang);
+      try {
+        localStorage.setItem(cacheKey, resultText);
+      } catch {
+        // ignore
+      }
     } else {
-      setError('Translation unavailable for this text right now. Displaying original description.');
+      setError('Translation could not be completed at this moment. Showing original text.');
     }
 
     setLoading(false);

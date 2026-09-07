@@ -20,8 +20,10 @@ import {
   LayoutDashboard,
 } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function Navbar() {
+  const { t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<{ fullName: string; role: string } | null>(null);
   const pathname = usePathname();
@@ -117,7 +119,7 @@ export default function Navbar() {
                 }`}
               >
                 <Compass className="w-4 h-4" />
-                Browse Animals
+                {t('browse_animals')}
               </Link>
 
               {/* Multilingual Selector (English default, Amharic, Afaan Oromoo) */}
@@ -130,7 +132,7 @@ export default function Navbar() {
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-green-600 hover:bg-green-700 text-white text-sm font-semibold shadow-sm transition-all hover:shadow hover:scale-[1.02] active:scale-[0.98]"
               >
                 <PlusCircle className="w-4 h-4" />
-                Post Animal
+                {t('post_animal')}
               </Link>
 
               {user ? (
@@ -143,7 +145,7 @@ export default function Navbar() {
                     <span className="max-w-[120px] truncate">{user.fullName.split(' ')[0]}</span>
                     {user.role === 'ADMIN' && (
                       <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded-md">
-                        Admin
+                        {t('admin_portal')}
                       </span>
                     )}
                   </Link>
@@ -161,13 +163,13 @@ export default function Navbar() {
                     href="/seller/login"
                     className="text-sm font-semibold text-gray-700 hover:text-green-600 px-3 py-1.5"
                   >
-                    Seller Login
+                    {t('login')}
                   </Link>
                   <Link
                     href="/seller/register"
                     className="text-sm font-semibold text-green-700 bg-green-50 hover:bg-green-100 px-3.5 py-1.5 rounded-xl border border-green-200 transition"
                   >
-                    Register
+                    {t('register')}
                   </Link>
                 </div>
               )}
@@ -182,7 +184,7 @@ export default function Navbar() {
                 className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-xs font-bold shadow-xs active:scale-95 transition"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
-                Sell
+                {t('sell')}
               </Link>
 
               {/* Thumb-friendly toggle button */}
@@ -340,7 +342,7 @@ export default function Navbar() {
                     <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center">
                       <PlusCircle className="w-5 h-5 text-white" />
                     </div>
-                    <span>Post Animal (Sell)</span>
+                    <span>{t('post_animal')}</span>
                   </div>
                   <ChevronRight className="w-5 h-5 opacity-80" />
                 </Link>
@@ -354,7 +356,7 @@ export default function Navbar() {
                     <div className="w-8 h-8 rounded-xl bg-green-100 text-green-700 flex items-center justify-center">
                       <Compass className="w-4 h-4" />
                     </div>
-                    <span>Browse All Livestock</span>
+                    <span>{t('browse_animals')}</span>
                   </div>
                   <ChevronRight className="w-4 h-4 text-gray-400" />
                 </Link>
