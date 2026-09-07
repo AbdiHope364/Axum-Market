@@ -379,7 +379,7 @@ export default function AdminPortalPage() {
       window.removeEventListener('click', resetTimer);
       window.removeEventListener('scroll', resetTimer);
     };
-  }, [sessionUser, sessionSecondsLeft, handleSessionTimeout]);
+  }, [sessionUser, handleSessionTimeout]);
 
   const loadDashboardData = async () => {
     try {
