@@ -8,19 +8,7 @@ declare global {
 }
 
 function resolveDbPath(): string {
-  // First, search upwards from process.cwd() for the canonical repo database: packages/database/prisma/dev.db
-  let curr = process.cwd();
-  for (let i = 0; i < 6; i++) {
-    const canonical = path.join(curr, 'packages/database/prisma/dev.db');
-    if (fs.existsSync(canonical)) {
-      return canonical;
-    }
-    const parent = path.dirname(curr);
-    if (parent === curr) break;
-    curr = parent;
-  }
-
-  // Second, check DATABASE_URL if explicitly pointing to an existing file
+  // First, check explicit DATABASE_URL if pointing to an existing file
   if (process.env.DATABASE_URL?.startsWith('file:')) {
     const rawPath = process.env.DATABASE_URL.replace('file:', '');
     if (fs.existsSync(rawPath)) {
@@ -28,16 +16,46 @@ function resolveDbPath(): string {
     }
   }
 
-  // Fallback: check prisma/dev.db in parent chain
-  curr = process.cwd();
+  // Find canonical database file in the repository
+  let sourceDbPath: string | null = null;
+  let curr = process.cwd();
   for (let i = 0; i < 6; i++) {
-    const candidate = path.join(curr, 'prisma/dev.db');
-    if (fs.existsSync(candidate)) {
-      return candidate;
+    const candidates = [
+      path.join(curr, 'packages/database/prisma/dev.db'),
+      path.join(curr, 'prisma/dev.db'),
+      path.join(curr, 'dev.db'),
+    ];
+    for (const cand of candidates) {
+      if (fs.existsSync(cand)) {
+        sourceDbPath = cand;
+        break;
+      }
     }
+    if (sourceDbPath) break;
     const parent = path.dirname(curr);
     if (parent === curr) break;
     curr = parent;
+  }
+
+  // If in Vercel or AWS Lambda, copy database to /tmp for read/write access
+  const isServerless = !!process.env.VERCEL || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+  if (isServerless) {
+    const tmpDbPath = path.join('/tmp', 'axum_dev.db');
+    if (sourceDbPath && fs.existsSync(sourceDbPath)) {
+      try {
+        if (!fs.existsSync(tmpDbPath) || fs.statSync(tmpDbPath).size === 0) {
+          fs.copyFileSync(sourceDbPath, tmpDbPath);
+        }
+      } catch (err) {
+        console.warn('Failed to copy db to /tmp:', err);
+      }
+      return tmpDbPath;
+    }
+    return tmpDbPath;
+  }
+
+  if (sourceDbPath) {
+    return sourceDbPath;
   }
 
   return path.join(process.cwd(), 'dev.db');

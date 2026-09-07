@@ -16,24 +16,29 @@ interface PageProps {
 export default async function ListingDetailPage({ params }: PageProps) {
   const { id } = await params;
 
-  const rawListing = await prisma.listing.findUnique({
-    where: { id },
-    include: {
-      category: true,
-      breed: true,
-      images: true,
-      seller: {
-        select: {
-          id: true,
-          fullName: true,
-          phone: true,
-          city: true,
-          region: true,
-          createdAt: true,
+  let rawListing = null;
+  try {
+    rawListing = await prisma.listing.findUnique({
+      where: { id },
+      include: {
+        category: true,
+        breed: true,
+        images: true,
+        seller: {
+          select: {
+            id: true,
+            fullName: true,
+            phone: true,
+            city: true,
+            region: true,
+            createdAt: true,
+          },
         },
       },
-    },
-  });
+    });
+  } catch (err) {
+    console.error(`ListingDetailPage DB error for id ${id}:`, err);
+  }
 
   if (!rawListing) {
     notFound();

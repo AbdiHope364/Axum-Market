@@ -22,6 +22,7 @@ build/
 *.db
 *.db-journal
 dev.db
+!packages/database/prisma/dev.db
 
 # Extensions & Binaries
 *.vsix
