@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma, restoreEmbeddedDatabase } from '@axum/database';
+import { prisma } from '@axum/database';
 import { comparePassword, signToken } from '@/lib/auth';
 
 export async function POST(req: Request) {

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma, restoreEmbeddedDatabase } from '@axum/database';
+import { prisma } from '@axum/database';
 import { comparePassword, signToken } from '@/lib/auth';
 
 export async function POST(req: Request) {
@@ -36,17 +36,7 @@ export async function POST(req: Request) {
         });
       } catch (dbErr) {
         console.error('Database query error in login route, attempting self-healing:', dbErr);
-        try {
-          const isServerless = !!process.env.VERCEL || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
-          if (isServerless) {
-            restoreEmbeddedDatabase('/tmp/axum_dev.db');
-            user = await prisma.user.findUnique({
-              where: { email: cleanEmail },
-            });
-          }
-        } catch (healingErr) {
-          console.error('Self-healing retry failed:', healingErr);
-        }
+        // No self-healing needed with Postgres
       }
 
       if (!user) {
