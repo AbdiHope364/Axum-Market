@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
+import { restoreEmbeddedDatabase } from './embedded-db';
 
 declare global {
   // eslint-disable-next-line no-var
@@ -11,22 +12,32 @@ function resolveDbPath(): string {
   // First, check explicit DATABASE_URL if pointing to an existing file
   if (process.env.DATABASE_URL?.startsWith('file:')) {
     const rawPath = process.env.DATABASE_URL.replace('file:', '');
-    if (fs.existsSync(rawPath)) {
+    if (fs.existsSync(rawPath) && fs.statSync(rawPath).size >= 50000) {
       return path.resolve(rawPath);
     }
   }
 
-  // Find canonical database file in the repository
+  const isServerless = !!process.env.VERCEL || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+  const tmpDbPath = path.join('/tmp', 'axum_dev.db');
+
+  // If in serverless and valid tmpDb already exists with data, use it directly
+  if (isServerless && fs.existsSync(tmpDbPath) && fs.statSync(tmpDbPath).size >= 50000) {
+    return tmpDbPath;
+  }
+
+  // Search canonical database files in the repository
   let sourceDbPath: string | null = null;
   let curr = process.cwd();
   for (let i = 0; i < 6; i++) {
     const candidates = [
       path.join(curr, 'packages/database/prisma/dev.db'),
+      path.join(curr, 'apps/web/prisma/dev.db'),
+      path.join(curr, 'apps/admin/prisma/dev.db'),
       path.join(curr, 'prisma/dev.db'),
       path.join(curr, 'dev.db'),
     ];
     for (const cand of candidates) {
-      if (fs.existsSync(cand)) {
+      if (fs.existsSync(cand) && fs.statSync(cand).size >= 50000) {
         sourceDbPath = cand;
         break;
       }
@@ -37,28 +48,50 @@ function resolveDbPath(): string {
     curr = parent;
   }
 
-  // If in Vercel or AWS Lambda, copy database to /tmp for read/write access
-  const isServerless = !!process.env.VERCEL || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+  // Also check relative to directory structure
+  if (!sourceDbPath) {
+    const dirCandidates = [
+      path.join(__dirname, 'dev.db'),
+      path.join(__dirname, '../dev.db'),
+      path.join(__dirname, '../../dev.db'),
+      path.join(__dirname, '../../../dev.db'),
+      path.join(__dirname, '../../../../dev.db'),
+      path.join(__dirname, '../prisma/dev.db'),
+      path.join(__dirname, '../../prisma/dev.db'),
+      path.join(__dirname, '../../../../packages/database/prisma/dev.db'),
+    ];
+    for (const cand of dirCandidates) {
+      if (fs.existsSync(cand) && fs.statSync(cand).size >= 50000) {
+        sourceDbPath = cand;
+        break;
+      }
+    }
+  }
+
+  // Serverless mode (Vercel / Lambda): writable /tmp required
   if (isServerless) {
-    const tmpDbPath = path.join('/tmp', 'axum_dev.db');
     if (sourceDbPath && fs.existsSync(sourceDbPath)) {
       try {
-        if (!fs.existsSync(tmpDbPath) || fs.statSync(tmpDbPath).size === 0) {
-          fs.copyFileSync(sourceDbPath, tmpDbPath);
-        }
+        fs.copyFileSync(sourceDbPath, tmpDbPath);
+        return tmpDbPath;
       } catch (err) {
-        console.warn('Failed to copy db to /tmp:', err);
+        console.warn('Failed to copy db to /tmp, falling back to embedded snapshot:', err);
       }
-      return tmpDbPath;
     }
+    // Reliable fallback: restore from embedded snapshot
+    restoreEmbeddedDatabase(tmpDbPath);
     return tmpDbPath;
   }
 
+  // Local/container mode:
   if (sourceDbPath) {
     return sourceDbPath;
   }
 
-  return path.join(process.cwd(), 'dev.db');
+  // Default local fallback: restore embedded snapshot to cwd dev.db
+  const defaultLocalDb = path.join(process.cwd(), 'dev.db');
+  restoreEmbeddedDatabase(defaultLocalDb);
+  return defaultLocalDb;
 }
 
 function createPrismaClient(): PrismaClient {
@@ -114,3 +147,4 @@ export const prisma = new Proxy({} as PrismaClient, {
 });
 
 export * from '@prisma/client';
+export { resolveDbPath, restoreEmbeddedDatabase };

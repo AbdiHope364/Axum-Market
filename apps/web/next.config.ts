@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
     '/**': [
       '../../packages/database/prisma/dev.db',
       '../../node_modules/.prisma/client/**/*',
+      './prisma/dev.db',
+      './dev.db',
     ],
   },
 };

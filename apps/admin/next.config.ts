@@ -14,6 +14,14 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  outputFileTracingIncludes: {
+    '/**': [
+      '../../packages/database/prisma/dev.db',
+      '../../node_modules/.prisma/client/**/*',
+      './prisma/dev.db',
+      './dev.db',
+    ],
+  },
 };
 
 export default nextConfig;
