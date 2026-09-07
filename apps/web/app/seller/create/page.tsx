@@ -390,7 +390,7 @@ export default function CreateListingPage() {
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 w-full max-w-full">
           {/* Animal Category Selection (Touch-friendly responsive grid that stays 100% inside mobile bounds) */}
           <div className="space-y-1.5 w-full max-w-full">
-            <div className="flex items-center justify-between text-xs font-black text-gray-700 uppercase tracking-wider">
+            <div className="flex flex-wrap items-center justify-between gap-1 text-xs font-black text-gray-700 uppercase tracking-wider">
               <span className="flex items-center gap-1.5">
                 <Tag className="w-3.5 h-3.5 text-green-600 shrink-0" />
                 <span>Animal Category / የእንስሳት አይነት *</span>
@@ -417,7 +417,7 @@ export default function CreateListingPage() {
                       setCategoryId(c.id);
                       setBreedId('');
                     }}
-                    className={`p-2.5 rounded-xl text-left border transition-all active:scale-95 flex flex-col justify-between min-w-0 w-full cursor-pointer ${
+                    className={`p-2.5 rounded-xl text-left border transition-all active:scale-95 flex flex-col justify-between min-w-0 w-full cursor-pointer overflow-hidden ${
                       isSelected
                         ? 'bg-green-50 border-green-600 text-green-900 shadow-xs ring-1 ring-green-600/30'
                         : 'bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700'
@@ -634,7 +634,7 @@ export default function CreateListingPage() {
                       <button
                         key={amt}
                         type="button"
-                        onClick={() => setMilkYieldLiters(amt.toString())}
+                        onClick={() => setMilkYieldLiters(milkYieldLiters === amt.toString() ? '' : amt.toString())}
                         className={`px-2.5 py-1.5 text-xs font-bold rounded-lg border transition active:scale-95 ${
                           milkYieldLiters === amt.toString()
                             ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
@@ -648,25 +648,31 @@ export default function CreateListingPage() {
                 </div>
               </div>
 
-              {/* 2. Calving / Parity History (100% Mobile Responsive Grid) */}
-              <div className="w-full max-w-full min-w-0">
-                <div className="flex flex-wrap items-center justify-between gap-1 text-xs font-black text-gray-800 uppercase tracking-wider mb-1.5">
+              {/* 2. Calving / Parity History (100% Mobile Responsive Parity Selector) */}
+              <div className="w-full max-w-full min-w-0 space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-1 text-xs font-black text-gray-800 uppercase tracking-wider">
                   <span className="flex items-center gap-1">
                     <Baby className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>Calving History (የወለደችው ብዛት)</span>
+                    <span>Calving History / የወለደችው ብዛት</span>
                   </span>
-                  <span className="text-[10px] text-gray-500 font-semibold bg-white/70 px-2 py-0.5 rounded border border-emerald-200/60 truncate">
-                    {calvingCount === '0' ? 'Heifer (ያልወለደች)' : calvingCount ? `${calvingCount} Calvings` : 'Select parity'}
-                  </span>
+                  {calvingCount !== '' && (
+                    <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                      {calvingCount === '0'
+                        ? '✓ Heifer (ያልወለደች ጊደር)'
+                        : `✓ ${calvingCount} Calvings (${calvingCount} ጊዜ)`}
+                    </span>
+                  )}
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 w-full max-w-full min-w-0">
+
+                {/* 5-Column Compact Parity Row (Fits all phones without overflow) */}
+                <div className="grid grid-cols-5 gap-1 sm:gap-2 w-full max-w-full min-w-0">
                   {[
-                    { label: 'Heifer (0)', sub: 'ያልወለደች ጊደር', count: '0', givenBirth: false },
-                    { label: '1st Calving', sub: '1 ጊዜ የወለደች', count: '1', givenBirth: true },
-                    { label: '2nd Calving', sub: '2 ጊዜ የወለደች', count: '2', givenBirth: true },
-                    { label: '3rd Calving', sub: '3 ጊዜ የወለደች', count: '3', givenBirth: true },
-                    { label: '4+ Calvings', sub: '4+ የወለደች', count: '4', givenBirth: true },
-                  ].map((item, idx) => {
+                    { count: '0', num: '0', label: 'Heifer', sub: 'ያልወለደች', givenBirth: false },
+                    { count: '1', num: '1', label: '1st', sub: '1 ጊዜ', givenBirth: true },
+                    { count: '2', num: '2', label: '2nd', sub: '2 ጊዜ', givenBirth: true },
+                    { count: '3', num: '3', label: '3rd', sub: '3 ጊዜ', givenBirth: true },
+                    { count: '4', num: '4+', label: '4+ Calv', sub: '4+ ጊዜ', givenBirth: true },
+                  ].map((item) => {
                     const isSelected = calvingCount === item.count;
                     return (
                       <button
@@ -681,21 +687,19 @@ export default function CreateListingPage() {
                             setHasGivenBirth(item.givenBirth);
                           }
                         }}
-                        className={`p-2 sm:p-2.5 rounded-xl text-left border transition-all active:scale-95 flex flex-col justify-between min-w-0 w-full overflow-hidden cursor-pointer ${
-                          idx === 0 ? 'col-span-2 sm:col-span-1' : 'col-span-1'
-                        } ${
+                        className={`py-2 px-1 rounded-xl text-center border transition-all active:scale-95 flex flex-col items-center justify-center cursor-pointer min-w-0 w-full overflow-hidden ${
                           isSelected
-                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs ring-2 ring-emerald-400'
-                            : 'bg-white text-gray-700 border-emerald-200/80 hover:bg-emerald-50/50'
+                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm ring-2 ring-emerald-400 font-black'
+                            : 'bg-white text-gray-800 border-emerald-200/80 hover:bg-emerald-50 font-bold'
                         }`}
                       >
-                        <div className="flex items-center justify-between gap-1 w-full min-w-0">
-                          <span className="text-xs font-bold truncate">{item.label}</span>
-                          {isSelected && <Check className="w-3 h-3 text-white shrink-0" />}
-                        </div>
+                        <span className="text-sm sm:text-base leading-tight font-black">{item.num}</span>
+                        <span className="text-[10px] sm:text-xs leading-tight mt-0.5 font-bold truncate max-w-full block">
+                          {item.label}
+                        </span>
                         <span
-                          className={`text-[10px] mt-0.5 truncate block ${
-                            isSelected ? 'text-emerald-100' : 'text-gray-400'
+                          className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 truncate max-w-full block ${
+                            isSelected ? 'text-emerald-100 font-medium' : 'text-gray-400'
                           }`}
                         >
                           {item.sub}
@@ -703,6 +707,31 @@ export default function CreateListingPage() {
                       </button>
                     );
                   })}
+                </div>
+
+                {/* Optional exact parity numeric input */}
+                <div className="flex items-center gap-1.5 pt-0.5">
+                  <label className="text-xs font-bold text-emerald-900 shrink-0">
+                    Or exact calvings:
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="25"
+                    value={calvingCount}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setCalvingCount(val);
+                      if (val === '') {
+                        setHasGivenBirth(null);
+                      } else {
+                        setHasGivenBirth(parseInt(val, 10) > 0);
+                      }
+                    }}
+                    placeholder="e.g. 5"
+                    className="w-16 px-2.5 py-1 bg-white border border-emerald-300 rounded-lg text-xs font-bold text-emerald-950 focus:outline-none focus:ring-2 focus:ring-emerald-500 shrink-0"
+                  />
+                  <span className="text-xs font-semibold text-emerald-800 shrink-0">ጊዜ የወለደች</span>
                 </div>
               </div>
 
@@ -736,7 +765,7 @@ export default function CreateListingPage() {
                       <button
                         key={pill}
                         type="button"
-                        onClick={() => setUdderHealth(pill)}
+                        onClick={() => setUdderHealth(udderHealth === pill ? '' : pill)}
                         className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition active:scale-95 ${
                           udderHealth === pill
                             ? 'bg-emerald-600 text-white border-emerald-600'
@@ -750,14 +779,11 @@ export default function CreateListingPage() {
                 </div>
               </div>
 
-              {/* 4. Pregnancy Status & Gestation Duration (100% Mobile Responsive) */}
+              {/* 4. Pregnancy Status (100% Mobile Responsive Segmented Bar) */}
               <div className="space-y-2 w-full max-w-full min-w-0">
                 <div className="flex flex-wrap items-center justify-between gap-1 text-xs font-black text-gray-800 uppercase tracking-wider">
-                  <span className="flex items-center gap-1">
-                    <span>Pregnancy Status (የእርግዝና ሁኔታና ወራት)</span>
-                    {isPregnant === true && <span className="text-red-500">*</span>}
-                  </span>
-                  <span className="text-[10px] text-gray-500 font-bold bg-white/70 px-2 py-0.5 rounded border border-emerald-200/60 truncate">
+                  <span>Pregnancy Status / የእርግዝና ሁኔታ {isPregnant === true && <span className="text-red-500">*</span>}</span>
+                  <span className="text-[10px] font-bold text-gray-500 bg-white/70 px-2 py-0.5 rounded border border-emerald-200/60">
                     {isPregnant === true
                       ? pregnancyMonths
                         ? `✓ ${pregnancyMonths} Mo (የ${pregnancyMonths} ወር)`
@@ -768,27 +794,31 @@ export default function CreateListingPage() {
                   </span>
                 </div>
 
-                {/* Mobile-contained 2-column buttons with vertical text layout */}
-                <div className="grid grid-cols-2 gap-2 w-full max-w-full min-w-0">
+                {/* 2-Option Segmented Toggle Container */}
+                <div className="grid grid-cols-2 p-1 bg-emerald-100/70 rounded-2xl border border-emerald-200/90 gap-1.5 w-full max-w-full min-w-0">
                   <button
                     type="button"
                     onClick={() => {
-                      setIsPregnant(false);
-                      setPregnancyMonths('');
+                      if (isPregnant === false) {
+                        setIsPregnant(null);
+                      } else {
+                        setIsPregnant(false);
+                        setPregnancyMonths('');
+                      }
                     }}
-                    className={`p-2.5 sm:p-3 rounded-xl border transition-all active:scale-95 flex flex-col items-center justify-center text-center min-w-0 w-full overflow-hidden cursor-pointer ${
+                    className={`py-2.5 px-2 rounded-xl text-center transition-all flex flex-col items-center justify-center cursor-pointer min-w-0 w-full overflow-hidden ${
                       isPregnant === false
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs ring-2 ring-emerald-400'
-                        : 'bg-white text-gray-700 border-emerald-200 hover:bg-emerald-50/50'
+                        ? 'bg-emerald-600 text-white shadow-sm ring-1 ring-emerald-700'
+                        : 'text-emerald-950 hover:bg-emerald-200/50'
                     }`}
                   >
-                    <div className="flex items-center gap-1 min-w-0">
-                      <span className="text-xs sm:text-sm font-bold truncate">Not Pregnant</span>
+                    <div className="flex items-center justify-center gap-1 font-black text-xs sm:text-sm w-full min-w-0">
+                      <span className="truncate">Not Pregnant</span>
                       {isPregnant === false && <Check className="w-3.5 h-3.5 text-white shrink-0" />}
                     </div>
                     <span
-                      className={`text-[10px] sm:text-xs mt-0.5 truncate block ${
-                        isPregnant === false ? 'text-emerald-100 font-medium' : 'text-gray-400'
+                      className={`text-[10px] mt-0.5 truncate w-full ${
+                        isPregnant === false ? 'text-emerald-100 font-medium' : 'text-emerald-800/80'
                       }`}
                     >
                       Open (ያልረገዘች)
@@ -797,20 +827,27 @@ export default function CreateListingPage() {
 
                   <button
                     type="button"
-                    onClick={() => setIsPregnant(true)}
-                    className={`p-2.5 sm:p-3 rounded-xl border transition-all active:scale-95 flex flex-col items-center justify-center text-center min-w-0 w-full overflow-hidden cursor-pointer ${
+                    onClick={() => {
+                      if (isPregnant === true) {
+                        setIsPregnant(null);
+                        setPregnancyMonths('');
+                      } else {
+                        setIsPregnant(true);
+                      }
+                    }}
+                    className={`py-2.5 px-2 rounded-xl text-center transition-all flex flex-col items-center justify-center cursor-pointer min-w-0 w-full overflow-hidden ${
                       isPregnant === true
-                        ? 'bg-purple-700 text-white border-purple-700 shadow-xs ring-2 ring-purple-400'
-                        : 'bg-white text-gray-700 border-purple-200 hover:bg-purple-50/50'
+                        ? 'bg-purple-700 text-white shadow-sm ring-1 ring-purple-800'
+                        : 'text-purple-950 hover:bg-purple-100/50'
                     }`}
                   >
-                    <div className="flex items-center gap-1 min-w-0">
-                      <span className="text-xs sm:text-sm font-bold truncate">Pregnant 🤰</span>
+                    <div className="flex items-center justify-center gap-1 font-black text-xs sm:text-sm w-full min-w-0">
+                      <span className="truncate">Pregnant 🤰</span>
                       {isPregnant === true && <Check className="w-3.5 h-3.5 text-white shrink-0" />}
                     </div>
                     <span
-                      className={`text-[10px] sm:text-xs mt-0.5 truncate block ${
-                        isPregnant === true ? 'text-purple-100 font-medium' : 'text-purple-700 font-medium'
+                      className={`text-[10px] mt-0.5 truncate w-full ${
+                        isPregnant === true ? 'text-purple-200 font-medium' : 'text-purple-800/80'
                       }`}
                     >
                       In-Calf (እርጉዝ)
@@ -818,59 +855,52 @@ export default function CreateListingPage() {
                   </button>
                 </div>
 
-                {/* Specific Pregnancy Month Selector (100% Inside Mobile Boundary) */}
+                {/* Specific Pregnancy Month Selector (Months 1 - 9) */}
                 {isPregnant === true && (
-                  <div className="p-2.5 sm:p-4 bg-purple-50/70 rounded-2xl border border-purple-200 space-y-2.5 animate-fadeIn w-full max-w-full min-w-0 overflow-hidden">
+                  <div className="p-3 sm:p-4 bg-white rounded-2xl border border-purple-200 shadow-xs space-y-2.5 animate-fadeIn w-full max-w-full overflow-hidden">
                     <div className="flex flex-wrap items-center justify-between gap-1">
-                      <span className="text-xs font-black text-purple-950">
-                        Exact Pregnancy Month (ስንት ወር ሆኗታል?)*:
+                      <span className="text-xs font-black text-purple-950 flex items-center gap-1">
+                        <span>🤰</span>
+                        <span>Exact Gestation Duration (ስንት ወር ሆኗታል?)*</span>
                       </span>
-                      <span className="text-[10px] font-bold text-purple-700 bg-white px-2 py-0.5 rounded-full border border-purple-200 shrink-0">
-                        1 - 9 Months
-                      </span>
+                      {pregnancyMonths && (
+                        <span className="text-[11px] font-black text-purple-800 bg-purple-100 px-2.5 py-0.5 rounded-full border border-purple-200">
+                          Month {pregnancyMonths} (የ{pregnancyMonths} ወር)
+                        </span>
+                      )}
                     </div>
 
-                    {/* 3x3 Responsive Mobile Grid for Months 1-9 - strictly inside mobile bounds */}
-                    <div className="grid grid-cols-3 gap-1.5 w-full max-w-full min-w-0">
-                      {[
-                        { m: '1', label: '1 Mo', am: '1 ወር' },
-                        { m: '2', label: '2 Mos', am: '2 ወር' },
-                        { m: '3', label: '3 Mos', am: '3 ወር' },
-                        { m: '4', label: '4 Mos', am: '4 ወር' },
-                        { m: '5', label: '5 Mos', am: '5 ወር' },
-                        { m: '6', label: '6 Mos', am: '6 ወር' },
-                        { m: '7', label: '7 Mos', am: '7 ወር' },
-                        { m: '8', label: '8 Mos', am: '8 ወር' },
-                        { m: '9', label: '9 Mos', am: '9 ወር' },
-                      ].map((item) => {
-                        const isSelected = pregnancyMonths === item.m;
+                    {/* Months 1-9 Touch Buttons */}
+                    <div className="grid grid-cols-3 sm:grid-cols-9 gap-1.5 w-full max-w-full min-w-0">
+                      {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((m) => {
+                        const isSelected = pregnancyMonths === m;
                         return (
                           <button
-                            key={item.m}
+                            key={m}
                             type="button"
-                            onClick={() => setPregnancyMonths(item.m)}
+                            onClick={() => setPregnancyMonths(m)}
                             className={`py-2 px-1 rounded-xl text-center border transition-all active:scale-95 flex flex-col items-center justify-center cursor-pointer min-w-0 w-full overflow-hidden ${
                               isSelected
-                                ? 'bg-purple-700 text-white border-purple-700 shadow-xs ring-2 ring-purple-400'
-                                : 'bg-white text-gray-700 border-purple-200/80 hover:bg-purple-100/60'
+                                ? 'bg-purple-700 text-white border-purple-700 shadow-sm ring-2 ring-purple-400 font-black'
+                                : 'bg-purple-50/60 text-purple-950 border-purple-200/80 hover:bg-purple-100 font-bold'
                             }`}
                           >
-                            <span className="text-xs font-black block truncate">{item.label}</span>
+                            <span className="text-sm font-black leading-tight">{m}</span>
                             <span
-                              className={`text-[10px] font-semibold block truncate ${
-                                isSelected ? 'text-purple-100' : 'text-purple-700'
+                              className={`text-[10px] leading-none mt-0.5 truncate w-full ${
+                                isSelected ? 'text-purple-200' : 'text-purple-700'
                               }`}
                             >
-                              {item.am}
+                              {m} ወር
                             </span>
                           </button>
                         );
                       })}
                     </div>
 
-                    {/* Numeric Input & Specific Selection Highlight */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1.5 border-t border-purple-200/70 w-full min-w-0">
-                      <div className="flex items-center gap-1.5 min-w-0">
+                    {/* Decimal Input & Stage Badge */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-100">
+                      <div className="flex items-center gap-1.5">
                         <label className="text-xs font-bold text-purple-900 shrink-0">
                           Or exact month:
                         </label>
@@ -882,18 +912,19 @@ export default function CreateListingPage() {
                           value={pregnancyMonths}
                           onChange={(e) => setPregnancyMonths(e.target.value)}
                           placeholder="e.g. 5.5"
-                          className="w-20 px-2 py-1 bg-white border border-purple-300 rounded-lg text-xs font-bold text-purple-950 focus:outline-none focus:ring-2 focus:ring-purple-500 shrink-0"
+                          className="w-20 px-2.5 py-1 bg-gray-50 border border-purple-300 rounded-lg text-xs font-bold text-purple-950 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 shrink-0"
                         />
                         <span className="text-xs font-semibold text-purple-800 shrink-0">ወራት</span>
                       </div>
 
                       {pregnancyMonths && (
-                        <div className="inline-flex items-center gap-1 px-2.5 py-1 bg-purple-100 text-purple-900 rounded-lg text-xs font-bold border border-purple-300 truncate max-w-full">
-                          <span>🤰</span>
-                          <span className="truncate">
-                            {pregnancyMonths} Mo (የ{pregnancyMonths} ወር እርጉዝ)
-                          </span>
-                        </div>
+                        <span className="text-purple-900 font-bold text-[11px] bg-purple-100/80 px-2 py-0.5 rounded-md border border-purple-200">
+                          {parseFloat(pregnancyMonths) <= 3
+                            ? 'Early / 1st Trimester'
+                            : parseFloat(pregnancyMonths) <= 6
+                            ? 'Mid-term Gestation'
+                            : 'Late Term / Near Calving'}
+                        </span>
                       )}
                     </div>
                   </div>
