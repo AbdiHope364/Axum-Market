@@ -1,4 +1,6 @@
-import { NextResponse } from 'next/server';
+const fs = require('fs');
+
+const routeTemplate = `import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
@@ -30,13 +32,13 @@ export async function POST(req: Request) {
       // Ignore if exists
     }
 
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    const uniqueSuffix = \`\${Date.now()}-\${Math.round(Math.random() * 1e9)}\`;
     const extension = file.name.split('.').pop() || 'jpg';
-    const filename = `img_${uniqueSuffix}.${extension}`;
+    const filename = \`img_\${uniqueSuffix}.\${extension}\`;
     const filepath = path.join(uploadDir, filename);
 
     await writeFile(filepath, buffer);
-    const imageUrl = `/uploads/${filename}`;
+    const imageUrl = \`/uploads/\${filename}\`;
 
     return NextResponse.json({
       success: true,
@@ -47,3 +49,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
   }
 }
+`;
+
+fs.writeFileSync('apps/admin/app/api/upload/route.ts', routeTemplate);
+fs.writeFileSync('apps/web/app/api/upload/route.ts', routeTemplate);
+console.log("Rewritten upload routes for traditional hosting!");

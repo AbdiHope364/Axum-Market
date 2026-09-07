@@ -1,4 +1,6 @@
-import { NextResponse } from 'next/server';
+const fs = require('fs');
+
+const routeTemplate = (roleCheck) => `import { NextResponse } from 'next/server';
 import { prisma } from '@axum/database';
 import { comparePassword, signToken } from '@/lib/auth';
 
@@ -40,11 +42,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
     }
 
-    
-    if (user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Access denied. Valid Administrator credentials required.' }, { status: 403 });
-    }
-
+    ${roleCheck}
 
     const isMatch = await comparePassword(password, user.passwordHash);
     if (!isMatch) {
@@ -97,3 +95,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+`;
+
+fs.writeFileSync('apps/admin/app/api/auth/login/route.ts', routeTemplate(`
+    if (user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Access denied. Valid Administrator credentials required.' }, { status: 403 });
+    }
+`));
+
+fs.writeFileSync('apps/web/app/api/auth/login/route.ts', routeTemplate(`
+    // Web app allows any role, or you can restrict if needed.
+`));
+
+console.log("Rewritten login routes for traditional hosting!");

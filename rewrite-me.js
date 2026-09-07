@@ -1,4 +1,6 @@
-import { NextResponse } from 'next/server';
+const fs = require('fs');
+
+const routeTemplate = `import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@axum/database';
 
@@ -39,3 +41,8 @@ export async function GET() {
     return NextResponse.json({ user: null });
   }
 }
+`;
+
+fs.writeFileSync('apps/admin/app/api/auth/me/route.ts', routeTemplate);
+fs.writeFileSync('apps/web/app/api/auth/me/route.ts', routeTemplate);
+console.log("Rewritten /auth/me routes for traditional hosting!");
