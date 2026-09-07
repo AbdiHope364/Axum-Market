@@ -6,7 +6,7 @@ import ImageGallery from '@/components/ImageGallery';
 import CallSellerButton from '@/components/CallSellerButton';
 import SafetyNotice from '@/components/SafetyNotice';
 import { formatPriceETB } from '@/lib/constants';
-import { MapPin, Shield, Calendar, User, Flag, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { MapPin, Shield, Calendar, User, Flag, ArrowLeft, CheckCircle2, Milk, Baby, Activity } from 'lucide-react';
 import ListingDetailClientActions from './ListingDetailClientActions';
 
 interface PageProps {
@@ -137,6 +137,92 @@ export default async function ListingDetailPage({ params }: PageProps) {
                 </span>
               </div>
             </div>
+
+            {/* Dairy & Maternal Profile (የማልዳ / የወተት ላም ዝርዝር መረጃ) */}
+            {(listing.milkYieldLiters !== null ||
+              listing.calvingCount !== null ||
+              listing.hasGivenBirth !== null ||
+              listing.udderHealth ||
+              listing.isPregnant !== null) && (
+              <div className="p-3.5 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-50/80 via-green-50/40 to-teal-50/30 border border-emerald-200/90 space-y-3">
+                <div className="flex items-center justify-between border-b border-emerald-200/70 pb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <Milk className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-xs sm:text-sm font-black text-emerald-950 flex items-center gap-1.5">
+                        <span>Dairy & Maternal Profile</span>
+                        <span className="text-[11px] font-bold text-emerald-700 font-sans">(የማልዳ / የወተት ላም መረጃ)</span>
+                      </h3>
+                      <p className="text-[11px] text-emerald-800/80">
+                        Verified dairy productivity & maternal characteristics
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md border border-emerald-300/60">
+                    Dairy Profile
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  {/* Daily Milk Yield */}
+                  {listing.milkYieldLiters !== null && (
+                    <div className="p-3 bg-white rounded-xl border border-emerald-200 shadow-2xs">
+                      <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">
+                        Daily Milk (የቀን ወተት)
+                      </span>
+                      <span className="font-black text-emerald-950 text-sm sm:text-base mt-1 flex items-baseline gap-1">
+                        <span>{listing.milkYieldLiters}</span>
+                        <span className="text-xs font-semibold text-emerald-700">L/day</span>
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Calving Parity */}
+                  {(listing.calvingCount !== null || listing.hasGivenBirth !== null) && (
+                    <div className="p-3 bg-white rounded-xl border border-emerald-200 shadow-2xs">
+                      <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">
+                        Calvings (የወለደችው)
+                      </span>
+                      <span className="font-bold text-emerald-950 text-xs sm:text-sm mt-1 block truncate">
+                        {listing.calvingCount === 0 || listing.hasGivenBirth === false
+                          ? 'Heifer (ያልወለደች)'
+                          : `${listing.calvingCount} Calvings (${listing.calvingCount} ጊዜ)`}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Pregnancy Status */}
+                  {listing.isPregnant !== null && (
+                    <div className="p-3 bg-white rounded-xl border border-emerald-200 shadow-2xs">
+                      <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">
+                        Pregnancy (እርግዝና)
+                      </span>
+                      <span className="font-bold text-emerald-950 text-xs sm:text-sm mt-1 block truncate">
+                        {listing.isPregnant
+                          ? `Pregnant • ${listing.pregnancyMonths ? `${listing.pregnancyMonths} Mo` : 'In-Calf'}`
+                          : 'Not Pregnant (ክፍት)'}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Udder & Teats Health */}
+                  {listing.udderHealth && (
+                    <div className={`p-3 bg-white rounded-xl border border-emerald-200 shadow-2xs ${
+                      listing.milkYieldLiters !== null && listing.isPregnant !== null && (listing.calvingCount !== null || listing.hasGivenBirth !== null) ? 'col-span-2 sm:col-span-1' : 'col-span-2'
+                    }`}>
+                      <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">
+                        Udder Health (የጡት ጤንነት)
+                      </span>
+                      <span className="font-bold text-emerald-950 text-xs sm:text-sm mt-1 block truncate" title={listing.udderHealth}>
+                        {listing.udderHealth}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Description */}
             <div className="pt-2 space-y-2">

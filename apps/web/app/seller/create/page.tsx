@@ -18,6 +18,9 @@ import {
   MapPin,
   Tag,
   Coins,
+  Milk,
+  Baby,
+  Activity,
 } from 'lucide-react';
 
 interface CategoryItem {
@@ -49,6 +52,14 @@ export default function CreateListingPage() {
   const [weightKg, setWeightKg] = useState('');
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('FEMALE');
+  // Dairy Cow & Maternal Profile fields
+  const [milkYieldLiters, setMilkYieldLiters] = useState('');
+  const [hasGivenBirth, setHasGivenBirth] = useState<boolean | null>(null);
+  const [calvingCount, setCalvingCount] = useState('');
+  const [udderHealth, setUdderHealth] = useState('');
+  const [isPregnant, setIsPregnant] = useState<boolean | null>(null);
+  const [pregnancyMonths, setPregnancyMonths] = useState('');
+  const [showDairyManualToggle, setShowDairyManualToggle] = useState(false);
   const [region, setRegion] = useState('Oromia');
   const [city, setCity] = useState('Sululta');
   const [area, setArea] = useState('');
@@ -180,6 +191,12 @@ export default function CreateListingPage() {
           description,
           price,
           weightKg: weightKg ? parseFloat(weightKg) : undefined,
+          milkYieldLiters: milkYieldLiters ? parseFloat(milkYieldLiters) : undefined,
+          hasGivenBirth: hasGivenBirth !== null ? hasGivenBirth : undefined,
+          calvingCount: calvingCount !== '' ? parseInt(calvingCount, 10) : undefined,
+          udderHealth: udderHealth.trim() || undefined,
+          isPregnant: isPregnant !== null ? isPregnant : undefined,
+          pregnancyMonths: pregnancyMonths !== '' ? parseInt(pregnancyMonths, 10) : undefined,
           age,
           gender,
           region,
@@ -494,6 +511,232 @@ export default function CreateListingPage() {
               </div>
             </div>
           </div>
+
+          {/* Dairy Cow / Maternal Attributes (የማልዳ / የወተት ላም ዝርዝር መረጃ) */}
+          {gender === 'FEMALE' && (
+            <div className="p-3.5 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-50/70 via-green-50/40 to-teal-50/30 border border-emerald-200/80 shadow-xs space-y-4">
+              <div className="flex items-center justify-between border-b border-emerald-200/60 pb-2.5">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <Milk className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs sm:text-sm font-black text-emerald-950 flex items-center gap-1.5">
+                      <span>Dairy & Maternal Profile</span>
+                      <span className="text-[11px] font-bold text-emerald-700 font-sans">(የማልዳ / የወተት ላም መረጃ)</span>
+                    </h3>
+                    <p className="text-[11px] text-emerald-800/80">
+                      Essential milk yield, calving history, udder condition, & pregnancy information
+                    </p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md border border-emerald-300/60 hidden sm:inline-block">
+                  Dairy Cattle
+                </span>
+              </div>
+
+              {/* 1. Daily Milk Yield */}
+              <div>
+                <label className="text-xs font-black text-gray-800 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                  <span className="flex items-center gap-1">
+                    <Milk className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Daily Milk Yield (የቀን ወተት ምርት)</span>
+                  </span>
+                  <span className="text-[10px] text-emerald-700 font-semibold bg-white/80 px-1.5 py-0.5 rounded border border-emerald-200">
+                    Liters / Day (ሊትር/ቀን)
+                  </span>
+                </label>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      type="number"
+                      step="0.5"
+                      min={0}
+                      max={120}
+                      value={milkYieldLiters}
+                      onChange={(e) => setMilkYieldLiters(e.target.value)}
+                      placeholder="e.g. 18.5"
+                      className="w-full pl-3.5 pr-14 py-2 sm:py-2.5 bg-white border border-emerald-300/80 rounded-xl text-xs sm:text-sm font-bold text-emerald-950 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-700">
+                      L/day
+                    </span>
+                  </div>
+                  {/* Quick Select Yield Chips */}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {[10, 15, 18, 22, 25].map((amt) => (
+                      <button
+                        key={amt}
+                        type="button"
+                        onClick={() => setMilkYieldLiters(amt.toString())}
+                        className={`px-2.5 py-1.5 text-xs font-bold rounded-lg border transition active:scale-95 ${
+                          milkYieldLiters === amt.toString()
+                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                            : 'bg-white text-emerald-900 border-emerald-200 hover:bg-emerald-50'
+                        }`}
+                      >
+                        {amt} L
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. Calving / Parity History */}
+              <div>
+                <label className="text-xs font-black text-gray-800 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                  <span className="flex items-center gap-1">
+                    <Baby className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Calving History (የወለደችው ብዛት / ካልቪንግ)</span>
+                  </span>
+                  <span className="text-[10px] text-gray-500 font-medium">
+                    {calvingCount === '0' ? 'Heifer (ያልወለደች)' : calvingCount ? `${calvingCount} Calvings` : 'Select status'}
+                  </span>
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
+                  {[
+                    { label: 'Heifer (0)', sub: 'ያልወለደች ጊደር', count: '0', givenBirth: false },
+                    { label: '1st Calving', sub: '1 ጊዜ የወለደች', count: '1', givenBirth: true },
+                    { label: '2nd Calving', sub: '2 ጊዜ የወለደች', count: '2', givenBirth: true },
+                    { label: '3rd Calving', sub: '3 ጊዜ የወለደች', count: '3', givenBirth: true },
+                    { label: '4+ Calvings', sub: '4+ የወለደች', count: '4', givenBirth: true },
+                  ].map((item) => {
+                    const isSelected = calvingCount === item.count;
+                    return (
+                      <button
+                        key={item.count}
+                        type="button"
+                        onClick={() => {
+                          if (isSelected) {
+                            setCalvingCount('');
+                            setHasGivenBirth(null);
+                          } else {
+                            setCalvingCount(item.count);
+                            setHasGivenBirth(item.givenBirth);
+                          }
+                        }}
+                        className={`p-2 rounded-xl text-left border transition active:scale-95 flex flex-col justify-between ${
+                          isSelected
+                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs ring-2 ring-emerald-400'
+                            : 'bg-white text-gray-700 border-emerald-200/80 hover:bg-emerald-50/50'
+                        }`}
+                      >
+                        <span className="text-xs font-bold block">{item.label}</span>
+                        <span className={`text-[10px] mt-0.5 ${isSelected ? 'text-emerald-100' : 'text-gray-400'}`}>
+                          {item.sub}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 3. Udder & Breastfeeding Health */}
+              <div>
+                <label className="text-xs font-black text-gray-800 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                  <span className="flex items-center gap-1">
+                    <Activity className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Udder & Teat Health (የጡትና የወተት ማጥባት ጤንነት)</span>
+                  </span>
+                  <span className="text-[10px] text-emerald-700 font-semibold bg-white/80 px-1.5 py-0.5 rounded border border-emerald-200">
+                    Milking Quality
+                  </span>
+                </label>
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    value={udderHealth}
+                    onChange={(e) => setUdderHealth(e.target.value)}
+                    placeholder="e.g. 4 Healthy & Functional Teats, Mastitis-Free (4ቱም ጡቶች ጤናማ ናቸው)"
+                    className="w-full px-3.5 py-2 sm:py-2.5 bg-white border border-emerald-300/80 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                  />
+                  {/* Quick Pills for Udder Health */}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {[
+                      '4 Healthy Teats (4ቱም ጡቶች ጤናማ)',
+                      'Mastitis-Free (ከጡት በሽታ የጠራች)',
+                      'All Teats Milking (4ቱም የሚያልቡ)',
+                      '3 Functional Teats (3ቱ ጤናማ)',
+                    ].map((pill) => (
+                      <button
+                        key={pill}
+                        type="button"
+                        onClick={() => setUdderHealth(pill)}
+                        className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition active:scale-95 ${
+                          udderHealth === pill
+                            ? 'bg-emerald-600 text-white border-emerald-600'
+                            : 'bg-white text-emerald-900 border-emerald-200 hover:bg-emerald-50'
+                        }`}
+                      >
+                        {pill}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* 4. Pregnancy Status & Gestation */}
+              <div>
+                <label className="text-xs font-black text-gray-800 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                  <span>Pregnancy Status (የእርግዝና ሁኔታና ወራት)</span>
+                  <span className="text-[10px] text-gray-500">
+                    {isPregnant === true ? (pregnancyMonths ? `${pregnancyMonths} Months Pregnant` : 'Pregnant') : isPregnant === false ? 'Not Pregnant' : 'Optional'}
+                  </span>
+                </label>
+                <div className="grid grid-cols-2 gap-2 mb-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsPregnant(false);
+                      setPregnancyMonths('');
+                    }}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition active:scale-95 flex items-center justify-center gap-1.5 ${
+                      isPregnant === false
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                        : 'bg-white text-gray-700 border-emerald-200 hover:bg-emerald-50/50'
+                    }`}
+                  >
+                    <span>Not Pregnant / Open (ያልረገዘች)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsPregnant(true)}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition active:scale-95 flex items-center justify-center gap-1.5 ${
+                      isPregnant === true
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                        : 'bg-white text-gray-700 border-emerald-200 hover:bg-emerald-50/50'
+                    }`}
+                  >
+                    <span>Pregnant / In-Calf (እርጉዝ / ያረገዘች)</span>
+                  </button>
+                </div>
+
+                {isPregnant === true && (
+                  <div className="p-3 bg-white rounded-xl border border-emerald-200 space-y-1.5">
+                    <span className="text-[11px] font-bold text-gray-700 block">
+                      Pregnancy Duration in Months (ስንት ወር ሆኗታል?):
+                    </span>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((m) => (
+                        <button
+                          key={m}
+                          type="button"
+                          onClick={() => setPregnancyMonths(m.toString())}
+                          className={`px-2.5 py-1 text-xs font-bold rounded-lg border transition active:scale-95 ${
+                            pregnancyMonths === m.toString()
+                              ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                              : 'bg-emerald-50/60 text-emerald-900 border-emerald-200 hover:bg-emerald-100'
+                          }`}
+                        >
+                          {m} {m === 1 ? 'Month' : 'Months'} ({m} ወር)
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Price & Contact Phone */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">

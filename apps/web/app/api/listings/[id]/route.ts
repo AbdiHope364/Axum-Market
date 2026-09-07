@@ -74,6 +74,13 @@ export async function PATCH(
         ...(body.price ? { price: parseFloat(body.price) } : {}),
         ...(body.description ? { description: body.description } : {}),
         ...(body.contactPhone ? { contactPhone: body.contactPhone } : {}),
+        ...(body.weightKg !== undefined ? { weightKg: body.weightKg ? parseFloat(body.weightKg) : null } : {}),
+        ...(body.milkYieldLiters !== undefined ? { milkYieldLiters: body.milkYieldLiters ? parseFloat(body.milkYieldLiters) : null } : {}),
+        ...(body.hasGivenBirth !== undefined ? { hasGivenBirth: typeof body.hasGivenBirth === 'boolean' ? body.hasGivenBirth : body.hasGivenBirth === 'true' } : {}),
+        ...(body.calvingCount !== undefined ? { calvingCount: body.calvingCount !== '' && body.calvingCount !== null ? parseInt(body.calvingCount, 10) : null } : {}),
+        ...(body.udderHealth !== undefined ? { udderHealth: body.udderHealth ? body.udderHealth.trim() : null } : {}),
+        ...(body.isPregnant !== undefined ? { isPregnant: typeof body.isPregnant === 'boolean' ? body.isPregnant : body.isPregnant === 'true' } : {}),
+        ...(body.pregnancyMonths !== undefined ? { pregnancyMonths: body.pregnancyMonths !== '' && body.pregnancyMonths !== null ? parseInt(body.pregnancyMonths, 10) : null } : {}),
       },
     });
 

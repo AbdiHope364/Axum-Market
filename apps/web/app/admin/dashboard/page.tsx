@@ -64,6 +64,12 @@ interface PendingListing {
   title: string;
   price: number;
   weightKg?: number | null;
+  milkYieldLiters?: number | null;
+  hasGivenBirth?: boolean | null;
+  calvingCount?: number | null;
+  udderHealth?: string | null;
+  isPregnant?: boolean | null;
+  pregnancyMonths?: number | null;
   age: string;
   gender: string;
   region: string;
@@ -81,6 +87,12 @@ interface InventoryListing {
   title: string;
   price: number;
   weightKg?: number | null;
+  milkYieldLiters?: number | null;
+  hasGivenBirth?: boolean | null;
+  calvingCount?: number | null;
+  udderHealth?: string | null;
+  isPregnant?: boolean | null;
+  pregnancyMonths?: number | null;
   status: string;
   age: string;
   gender: string;
@@ -256,6 +268,12 @@ export default function AdminDashboardPage() {
   const [postWeightKg, setPostWeightKg] = useState('');
   const [postAge, setPostAge] = useState('3.5 years');
   const [postGender, setPostGender] = useState<'FEMALE' | 'MALE'>('FEMALE');
+  const [postMilkYieldLiters, setPostMilkYieldLiters] = useState('');
+  const [postHasGivenBirth, setPostHasGivenBirth] = useState<boolean | null>(null);
+  const [postCalvingCount, setPostCalvingCount] = useState('');
+  const [postUdderHealth, setPostUdderHealth] = useState('');
+  const [postIsPregnant, setPostIsPregnant] = useState<boolean | null>(null);
+  const [postPregnancyMonths, setPostPregnancyMonths] = useState('');
   const [postRegion, setPostRegion] = useState('Oromia');
   const [postCity, setPostCity] = useState('Sululta');
   const [postArea, setPostArea] = useState('');
@@ -361,6 +379,12 @@ export default function AdminDashboardPage() {
           description: postDescription.trim() || 'Prime verified livestock from AxumMarket.',
           price: postPrice,
           weightKg: postWeightKg.trim() || null,
+          milkYieldLiters: postMilkYieldLiters.trim() || null,
+          hasGivenBirth: postHasGivenBirth,
+          calvingCount: postCalvingCount !== '' ? parseInt(postCalvingCount, 10) : null,
+          udderHealth: postUdderHealth.trim() || null,
+          isPregnant: postIsPregnant,
+          pregnancyMonths: postPregnancyMonths !== '' ? parseInt(postPregnancyMonths, 10) : null,
           age: postAge.trim(),
           gender: postGender,
           categoryId: postCategoryId,
@@ -397,6 +421,12 @@ export default function AdminDashboardPage() {
         setPostDescription('');
         setPostPrice('');
         setPostWeightKg('');
+        setPostMilkYieldLiters('');
+        setPostHasGivenBirth(null);
+        setPostCalvingCount('');
+        setPostUdderHealth('');
+        setPostIsPregnant(null);
+        setPostPregnancyMonths('');
         setPostFrontUrl('');
         setPostLeftUrl('');
         setPostRightUrl('');
@@ -1860,6 +1890,30 @@ export default function AdminDashboardPage() {
                           <span>⚖️ {inspectListing.weightKg} kg</span>
                         </div>
                       )}
+                      {inspectListing.milkYieldLiters && (
+                        <div className="flex justify-between text-emerald-700 font-bold">
+                          <span>Daily Milk Yield:</span>
+                          <span>🥛 {inspectListing.milkYieldLiters} L/day</span>
+                        </div>
+                      )}
+                      {(inspectListing.calvingCount !== null && inspectListing.calvingCount !== undefined) && (
+                        <div className="flex justify-between text-gray-700">
+                          <span>Calving History:</span>
+                          <span>{inspectListing.calvingCount === 0 ? 'Heifer (0)' : `${inspectListing.calvingCount} Calvings`}</span>
+                        </div>
+                      )}
+                      {inspectListing.udderHealth && (
+                        <div className="flex justify-between text-gray-700">
+                          <span>Udder Health:</span>
+                          <span className="truncate max-w-[150px]" title={inspectListing.udderHealth}>{inspectListing.udderHealth}</span>
+                        </div>
+                      )}
+                      {inspectListing.isPregnant !== null && inspectListing.isPregnant !== undefined && (
+                        <div className="flex justify-between text-purple-700">
+                          <span>Pregnancy:</span>
+                          <span>{inspectListing.isPregnant ? `Pregnant (${inspectListing.pregnancyMonths ? `${inspectListing.pregnancyMonths} Mo` : 'In-Calf'})` : 'Not Pregnant'}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between">
                         <span>Location:</span>
                         <strong className="text-gray-900">{inspectListing.city}, {inspectListing.region}</strong>
@@ -2376,6 +2430,113 @@ export default function AdminDashboardPage() {
                       />
                     </div>
                   </div>
+
+                  {/* Dairy & Maternal Profile (when FEMALE) */}
+                  {postGender === 'FEMALE' && (
+                    <div className="p-3 bg-emerald-50/50 border border-emerald-200 rounded-2xl space-y-2.5">
+                      <div className="flex items-center justify-between border-b border-emerald-100 pb-1.5">
+                        <span className="text-xs font-bold text-emerald-800 flex items-center gap-1.5">
+                          <span>🥛</span>
+                          <span>Dairy Cow & Maternal Profile (የማልዳ / የወተት ላም)</span>
+                        </span>
+                        <span className="text-[10px] text-emerald-700 bg-white px-1.5 py-0.5 rounded border border-emerald-200 font-semibold">
+                          Dairy Specs
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                            Daily Milk Yield (L/day) / የቀን ወተት
+                          </label>
+                          <input
+                            type="number"
+                            step="0.5"
+                            value={postMilkYieldLiters}
+                            onChange={(e) => setPostMilkYieldLiters(e.target.value)}
+                            placeholder="e.g. 18.5"
+                            className="w-full bg-white border border-emerald-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-emerald-600"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                            Calving Count / Parity (የወለደችው)
+                          </label>
+                          <select
+                            value={postCalvingCount}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setPostCalvingCount(val);
+                              setPostHasGivenBirth(val === '0' ? false : val ? true : null);
+                            }}
+                            className="w-full bg-white border border-emerald-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-emerald-600 cursor-pointer"
+                          >
+                            <option value="">Select status</option>
+                            <option value="0">Heifer (0 - ያልወለደች ጊደር)</option>
+                            <option value="1">1st Calving (1 ጊዜ የወለደች)</option>
+                            <option value="2">2nd Calving (2 ጊዜ የወለደች)</option>
+                            <option value="3">3rd Calving (3 ጊዜ የወለደች)</option>
+                            <option value="4">4+ Calvings (4 እና ከዚያ በላይ)</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                            Udder Health / የጡት ጤንነት
+                          </label>
+                          <input
+                            type="text"
+                            value={postUdderHealth}
+                            onChange={(e) => setPostUdderHealth(e.target.value)}
+                            placeholder="e.g. 4 Healthy Teats, Mastitis-Free"
+                            className="w-full bg-white border border-emerald-200 rounded-xl py-2 px-3 text-xs text-gray-900 outline-none focus:border-emerald-600"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                            Pregnancy Status & Months (እርግዝና)
+                          </label>
+                          <div className="flex gap-1.5">
+                            <select
+                              value={postIsPregnant === null ? '' : postIsPregnant ? 'true' : 'false'}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (val === 'true') setPostIsPregnant(true);
+                                else if (val === 'false') {
+                                  setPostIsPregnant(false);
+                                  setPostPregnancyMonths('');
+                                } else {
+                                  setPostIsPregnant(null);
+                                  setPostPregnancyMonths('');
+                                }
+                              }}
+                              className="flex-1 bg-white border border-emerald-200 rounded-xl py-2 px-2 text-xs text-gray-900 outline-none focus:border-emerald-600 cursor-pointer"
+                            >
+                              <option value="">Unknown</option>
+                              <option value="false">Not Pregnant (ክፍት)</option>
+                              <option value="true">Pregnant (እርጉዝ)</option>
+                            </select>
+                            {postIsPregnant && (
+                              <select
+                                value={postPregnancyMonths}
+                                onChange={(e) => setPostPregnancyMonths(e.target.value)}
+                                className="w-24 bg-white border border-emerald-200 rounded-xl py-2 px-2 text-xs text-emerald-800 font-bold outline-none focus:border-emerald-600 cursor-pointer"
+                              >
+                                <option value="">Mo?</option>
+                                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((m) => (
+                                  <option key={m} value={m}>{m} Mo</option>
+                                ))}
+                              </select>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Right: Live Buyer Preview: hidden on mobile to avoid bloat, 4 cols on desktop */}

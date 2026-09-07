@@ -66,6 +66,13 @@ model Listing {
   description     String
   price           Float          // In ETB (Ethiopian Birr)
   weightKg        Float?         // Optional live weight in KG (e.g. 450 for meat/bulls)
+  // Dairy Cow & Maternal Profile (የማልዳ / የወተት ላም መረጃ)
+  milkYieldLiters Float?         // Daily milk yield in liters (e.g. 18.5)
+  hasGivenBirth   Boolean?       // Has she given birth before?
+  calvingCount    Int?           // Parity / number of calvings (0 = heifer)
+  udderHealth     String?        // Udder & teat health (e.g. "4 Healthy Teats, Mastitis-Free")
+  isPregnant      Boolean?       // Is she currently pregnant / in calf?
+  pregnancyMonths Int?           // Gestation period in months (1 - 9)
   age             String         // e.g. "4 years", "18 months"
   gender          String         // FEMALE, MALE
   region          String

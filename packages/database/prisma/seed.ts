@@ -235,6 +235,12 @@ async function main() {
       title: 'High-Yielding Holstein Friesian Dairy Cow (22L Daily)',
       description: 'Second calving Holstein Friesian dairy cow in peak lactation. Currently producing 22 liters of milk per day with standard dairy ration and hay. Very docile, easy to hand-milk or machine-milk. Regularly dewormed and vaccinated. Serious buyers are welcome to visit Sululta Chancho for morning/evening milking inspection.',
       price: 175000,
+      milkYieldLiters: 22,
+      hasGivenBirth: true,
+      calvingCount: 2,
+      udderHealth: '4 Healthy & Milking Teats (4ቱም ጡቶች ጤናማ ናቸው)',
+      isPregnant: true,
+      pregnancyMonths: 3,
       age: '4.5 years',
       gender: 'FEMALE',
       region: 'Oromia',
@@ -317,6 +323,11 @@ async function main() {
       title: 'Pregnant Holstein Heifer (Confirmed 4 Months in Calf)',
       description: 'Pedigree artificial insemination sired Holstein heifer. Confirmed 4 months pregnant by certified veterinary sonogram. Gentle temperament, great udder promise.',
       price: 115000,
+      hasGivenBirth: false,
+      calvingCount: 0,
+      udderHealth: '4 Healthy Teats, Well-Formed (4ቱም ጡቶች ጤናማ)',
+      isPregnant: true,
+      pregnancyMonths: 4,
       age: '22 months',
       gender: 'FEMALE',
       region: 'Oromia',
@@ -337,6 +348,11 @@ async function main() {
       title: 'Jersey Cross Dairy Cow (16 Liters Morning & Evening)',
       description: 'Healthy family dairy cow producing rich creamy milk (high butterfat). Calm for children and family handling. Available for inspection in Sululta.',
       price: 145000,
+      milkYieldLiters: 16,
+      hasGivenBirth: true,
+      calvingCount: 1,
+      udderHealth: '4 Healthy Teats, Mastitis-Free (ከጡት በሽታ የጠራች)',
+      isPregnant: false,
       age: '4 years',
       gender: 'FEMALE',
       region: 'Oromia',
@@ -415,6 +431,11 @@ async function main() {
           },
         });
       }
+    } else {
+      await prisma.listing.update({
+        where: { id: existing.id },
+        data,
+      });
     }
   }
   } else {

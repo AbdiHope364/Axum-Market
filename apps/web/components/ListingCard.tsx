@@ -9,6 +9,11 @@ export interface ListingCardData {
   title: string;
   price: number;
   weightKg?: number | null;
+  milkYieldLiters?: number | null;
+  hasGivenBirth?: boolean | null;
+  calvingCount?: number | null;
+  isPregnant?: boolean | null;
+  pregnancyMonths?: number | null;
   age: string;
   gender: string;
   region: string;
@@ -65,6 +70,12 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
               <span>{listing.weightKg} kg</span>
             </span>
           )}
+          {listing.milkYieldLiters && (
+            <span className="bg-emerald-600 text-white font-black text-[9px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-full shadow-xs flex items-center gap-0.5">
+              <span>🥛</span>
+              <span>{listing.milkYieldLiters} L/day</span>
+            </span>
+          )}
           {listing.breed && (
             <span className="hidden sm:inline-block bg-white/90 backdrop-blur-md text-gray-800 text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-xs truncate max-w-[90px]">
               {listing.breed.name}
@@ -74,37 +85,30 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
 
         {/* Sold Overlay */}
         {isSold && (
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center">
-            <span className="bg-red-600 text-white font-extrabold text-xs sm:text-sm uppercase tracking-widest px-3 py-1 rounded-lg rotate-[-6deg] shadow-lg border border-white">
-              SOLD
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-2xs flex items-center justify-center p-3">
+            <span className="bg-red-600 text-white font-black text-xs sm:text-sm px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">
+              Sold Out
             </span>
           </div>
         )}
-
-        {/* 3 Photos Indicator */}
-        <div className="absolute bottom-1.5 right-1.5 sm:bottom-2 sm:right-2 bg-black/60 backdrop-blur-xs text-white text-[9px] sm:text-[10px] font-medium px-1.5 py-0.5 rounded">
-          {listing.images.length || 3} Photos
-        </div>
       </Link>
 
-      {/* Body Content */}
-      <div className="p-2 sm:p-3.5 flex-1 flex flex-col justify-between">
+      {/* Content */}
+      <div className="p-2 sm:p-4 flex flex-col justify-between flex-1">
         <div>
           {/* Price */}
-          <div className="flex items-baseline justify-between gap-1 mb-0.5">
-            <span className="text-sm sm:text-lg font-black text-green-700 tracking-tight">
-              {formatPriceETB(listing.price)}
-            </span>
+          <div className="text-sm sm:text-lg font-black text-green-700 tracking-tight">
+            {formatPriceETB(listing.price)}
           </div>
 
           {/* Title */}
-          <Link href={`/listings/${listing.id}`} className="block">
-            <h3 className="font-bold text-gray-900 text-xs sm:text-sm line-clamp-1 group-hover:text-green-600 transition-colors">
+          <Link href={`/listings/${listing.id}`} className="block group-hover:text-green-700 transition">
+            <h3 className="font-bold text-xs sm:text-sm text-gray-900 line-clamp-1 leading-snug mt-0.5">
               {listing.title}
             </h3>
           </Link>
 
-          {/* Attributes Pills (Gender, Age, Weight) */}
+          {/* Attributes Pills (Gender, Age, Weight, Milk Yield) */}
           <div className="flex flex-wrap gap-1 mt-1 sm:mt-1.5 text-[9px] sm:text-xs">
             <span className="bg-gray-100 text-gray-700 font-medium px-1.5 py-0.5 rounded">
               {listing.gender === 'FEMALE' ? 'Female' : 'Male'}
@@ -116,6 +120,17 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
               <span className="bg-amber-50 text-amber-900 border border-amber-300 font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
                 <span>⚖️</span>
                 <span>{listing.weightKg} kg</span>
+              </span>
+            )}
+            {listing.milkYieldLiters && (
+              <span className="bg-emerald-50 text-emerald-900 border border-emerald-300 font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                <span>🥛</span>
+                <span>{listing.milkYieldLiters} L/day</span>
+              </span>
+            )}
+            {listing.isPregnant && (
+              <span className="bg-purple-50 text-purple-900 border border-purple-200 font-bold px-1.5 py-0.5 rounded">
+                {listing.pregnancyMonths ? `${listing.pregnancyMonths}M In-Calf` : 'In-Calf'}
               </span>
             )}
           </div>
