@@ -87,32 +87,17 @@ export default function SellerRegisterPage() {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-3 sm:px-4 py-6 sm:py-12">
         <div className="max-w-md w-full bg-white rounded-2xl sm:rounded-3xl border border-gray-200 p-5 sm:p-8 shadow-md text-center space-y-5 animate-fadeIn">
-          <div className="w-16 h-16 rounded-3xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto shadow-inner">
-            <Clock className="w-8 h-8 animate-pulse" />
+          <div className="w-16 h-16 rounded-3xl bg-green-100 text-green-700 flex items-center justify-center mx-auto shadow-inner">
+            <CheckCircle2 className="w-8 h-8" />
           </div>
 
           <div className="space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
-              Registration Under Review
-            </span>
             <h2 className="text-2xl font-black text-gray-900">
-              Awaiting Admin Approval
+              Registration Successful!
             </h2>
             <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-              Thank you, <strong className="text-gray-900">{fullName}</strong>. To protect our livestock marketplace community and ensure authentic sellers, all new registrations require administrator approval before login.
+              Welcome, <strong className="text-gray-900">{fullName}</strong>. Your account has been created and you can now log in to start selling.
             </p>
-          </div>
-
-          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-left text-xs space-y-2">
-            <div className="flex items-center gap-2 font-bold text-gray-800">
-              <ShieldCheck className="w-4 h-4 text-green-600" />
-              <span>Next Steps:</span>
-            </div>
-            <ul className="space-y-1 text-gray-600 list-disc list-inside">
-              <li>Platform administrators will verify your details.</li>
-              <li>Once approved, your account will be activated immediately.</li>
-              <li>You can then log in using your email and password to post livestock.</li>
-            </ul>
           </div>
 
           <div className="flex flex-col gap-2 pt-2">
@@ -121,12 +106,6 @@ export default function SellerRegisterPage() {
               className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-sm shadow-md transition"
             >
               Go to Seller Login
-            </Link>
-            <Link
-              href="/"
-              className="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl text-xs transition"
-            >
-              Return to Homepage
             </Link>
           </div>
         </div>
@@ -320,20 +299,14 @@ export default function SellerRegisterPage() {
             </button>
           </div>
 
-          {/* Admin Approval Notice Badge */}
-          <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-900 flex items-start gap-2">
-            <Clock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            <span>
-              <strong>Admin Approval Required:</strong> Your seller account will be verified and approved by an administrator before you can publish animal listings.
-            </span>
-          </div>
+          {/* No Admin Approval Notice needed */}
 
           <button
             type="submit"
             disabled={loading}
             className="w-full py-3 bg-green-600 hover:bg-green-700 active:scale-[0.99] text-white font-bold rounded-2xl text-sm shadow-md shadow-green-600/20 transition flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
           >
-            <span>{loading ? 'Submitting Registration...' : 'Register for Seller Approval'}</span>
+            <span>{loading ? 'Creating Account...' : 'Create Seller Account'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>

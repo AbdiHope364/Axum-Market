@@ -15,7 +15,7 @@ model User {
   passwordHash  String
   phone         String
   role          String    @default("SELLER") // SELLER, ADMIN
-  status        String    @default("PENDING") // PENDING, ACTIVE, SUSPENDED, REJECTED
+  status        String    @default("ACTIVE") // PENDING, ACTIVE, SUSPENDED, REJECTED
   region        String?
   city          String?
   area          String?
@@ -80,7 +80,7 @@ model Listing {
   city            String
   area            String?
   contactPhone    String         // e.g. "+251911123456"
-  status          String         @default("PENDING") // PENDING, ACTIVE, REJECTED, SOLD, REMOVED
+  status          String         @default("ACTIVE") // PENDING, ACTIVE, REJECTED, SOLD, REMOVED
   rejectionReason String?
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt

@@ -211,9 +211,9 @@ export default function AutoTranslateText({ text = '', className = '' }: AutoTra
         <div className="flex items-center gap-1">
           {(
             [
-              { code: 'en', label: 'English', flag: '🇬🇧' },
-              { code: 'am', label: 'አማርኛ', flag: '🇪🇹' },
-              { code: 'om', label: 'Afaan Oromoo', flag: '🌳' },
+              { code: 'en', label: 'English' },
+              { code: 'am', label: 'አማርኛ' },
+              { code: 'om', label: 'Afaan Oromoo' },
             ] as const
           ).map((item) => (
             <button
@@ -227,7 +227,6 @@ export default function AutoTranslateText({ text = '', className = '' }: AutoTra
                   : 'bg-white text-slate-700 hover:bg-green-50 hover:text-green-800 border border-slate-200/80'
               }`}
             >
-              <span>{item.flag}</span>
               <span>{item.label}</span>
               {((currentLang === item.code) || (!currentLang && item.code === 'en')) && (
                 <Check className="w-2.5 h-2.5 ml-0.5" />

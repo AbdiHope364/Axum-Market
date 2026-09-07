@@ -4,10 +4,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Globe, Check, ChevronDown } from 'lucide-react';
 import { useLanguage, SupportedLanguage } from '@/context/LanguageContext';
 
-const LANGUAGES: { code: SupportedLanguage; label: string; native: string; flag: string }[] = [
-  { code: 'en', label: 'English (Default)', native: 'English', flag: '🇬🇧' },
-  { code: 'am', label: 'Amharic', native: 'አማርኛ', flag: '🇪🇹' },
-  { code: 'om', label: 'Afaan Oromoo', native: 'Oromoo', flag: '🌳' },
+const LANGUAGES: { code: SupportedLanguage; label: string; native: string }[] = [
+  { code: 'en', label: 'English (Default)', native: 'English' },
+  { code: 'am', label: 'Amharic', native: 'አማርኛ' },
+  { code: 'om', label: 'Afaan Oromoo', native: 'Oromoo' },
 ];
 
 interface LanguageSwitcherProps {
@@ -46,7 +46,6 @@ export default function LanguageSwitcher({ variant = 'dropdown', className = '' 
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/60'
             }`}
           >
-            <span>{item.flag}</span>
             <span>{item.native}</span>
           </button>
         ))}
@@ -72,7 +71,6 @@ export default function LanguageSwitcher({ variant = 'dropdown', className = '' 
                   : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
               }`}
             >
-              <span className="text-base leading-none mb-1">{item.flag}</span>
               <span className="text-[11px] truncate">{item.native}</span>
             </button>
           ))}
@@ -91,7 +89,6 @@ export default function LanguageSwitcher({ variant = 'dropdown', className = '' 
         aria-expanded={isOpen}
       >
         <Globe className="w-3.5 h-3.5 text-green-700 shrink-0" />
-        <span className="hidden sm:inline">{current.flag}</span>
         <span className="font-medium text-xs">{current.native}</span>
         <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
@@ -114,7 +111,6 @@ export default function LanguageSwitcher({ variant = 'dropdown', className = '' 
               }`}
             >
               <div className="flex items-center gap-2">
-                <span className="text-sm">{item.flag}</span>
                 <div>
                   <span className="block leading-tight font-medium">{item.native}</span>
                   <span className="text-[10px] text-gray-400">{item.label}</span>

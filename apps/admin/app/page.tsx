@@ -302,18 +302,42 @@ export default function AdminPortalPage() {
   const [changingPassword, setChangingPassword] = useState(false);
   const [passwordChangeError, setPasswordChangeError] = useState('');
 
+  // 5-Minute Session Timeout State
+  const [sessionSecondsLeft, setSessionSecondsLeft] = useState<number | null>(null);
+
+  const handleSessionTimeout = useCallback(async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch {
+      // ignore
+    }
+    setSessionUser(null);
+    setSessionSecondsLeft(null);
+    setLoginError('Your 5-minute admin session has timed out. For security, please enter your credentials again.');
+  }, []);
+
+  const formatRemainingTime = (seconds: number | null) => {
+    if (seconds === null) return '';
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const checkSession = useCallback(async () => {
     try {
       const res = await fetch('/api/auth/me');
       const data = await res.json();
       if (data?.user) {
         setSessionUser(data.user);
+        setSessionSecondsLeft(300); // 5 minutes (300 seconds)
         loadDashboardData();
       } else {
         setSessionUser(null);
+        setSessionSecondsLeft(null);
       }
     } catch {
       setSessionUser(null);
+      setSessionSecondsLeft(null);
     } finally {
       setAuthLoading(false);
     }
@@ -323,9 +347,34 @@ export default function AdminPortalPage() {
     checkSession();
   }, [checkSession]);
 
+  useEffect(() => {
+    if (!sessionUser) return;
+
+    if (sessionSecondsLeft !== null && sessionSecondsLeft <= 0) {
+      handleSessionTimeout();
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setSessionSecondsLeft((prev) => {
+        if (prev === null) return 300;
+        if (prev <= 1) {
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [sessionUser, sessionSecondsLeft, handleSessionTimeout]);
+
   const loadDashboardData = async () => {
     try {
       const res = await fetch('/api/dashboard');
+      if (res.status === 401 || res.status === 403) {
+        handleSessionTimeout();
+        return;
+      }
       if (res.ok) {
         const data = await res.json();
         setStats(data.stats);
@@ -376,6 +425,46 @@ export default function AdminPortalPage() {
     } finally {
       setUploadingAngle(null);
     }
+  };
+
+  // ---------------------------------------------------------------------------
+  // AUTHENTICATION HANDLERS
+  // ---------------------------------------------------------------------------
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginLoading(true);
+    setLoginError('');
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setLoginError(data.error || 'Authentication failed.');
+        setLoginLoading(false);
+        return;
+      }
+
+      setSessionUser(data.user);
+      setSessionSecondsLeft(300); // 5-minute countdown starts
+      showToast(`Welcome back, ${data.user.fullName}!`, 'success');
+      loadDashboardData();
+    } catch {
+      setLoginError('A network error occurred.');
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    setSessionUser(null);
+    setSessionSecondsLeft(null);
+    showToast('Signed out of admin session', 'info');
   };
 
   const handlePostLivestock = async (e: React.FormEvent) => {
@@ -466,40 +555,6 @@ export default function AdminPortalPage() {
     }
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoginLoading(true);
-    setLoginError('');
-
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        setLoginError(data.error || 'Authentication failed.');
-        setLoginLoading(false);
-        return;
-      }
-
-      setSessionUser(data.user);
-      showToast(`Welcome back, ${data.user.fullName}!`, 'success');
-      loadDashboardData();
-    } catch {
-      setLoginError('A network error occurred.');
-    } finally {
-      setLoginLoading(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    setSessionUser(null);
-    showToast('Signed out of admin session', 'info');
-  };
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();

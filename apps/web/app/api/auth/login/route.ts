@@ -133,20 +133,23 @@ export async function POST(req: Request) {
       req.headers.get('x-forwarded-proto') === 'https' ||
       req.url.startsWith('https:');
 
+    const isAdmin = user.role === 'ADMIN';
+    const cookieMaxAge = isAdmin ? 5 * 60 : 60 * 60 * 24 * 7;
+
     response.cookies.set('axum_token', token, {
       httpOnly: true,
       secure: isHttps,
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: cookieMaxAge,
       path: '/',
     });
 
-    if (user.role === 'ADMIN') {
+    if (isAdmin) {
       response.cookies.set('axum_admin_token', token, {
         httpOnly: true,
         secure: isHttps,
         sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7,
+        maxAge: cookieMaxAge,
         path: '/',
       });
     }

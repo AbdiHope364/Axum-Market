@@ -89,11 +89,14 @@ export async function POST(req: Request) {
       req.headers.get('x-forwarded-proto') === 'https' ||
       req.url.startsWith('https:');
 
+    // Admin session timeout: 5 minutes (300 seconds)
+    const ADMIN_MAX_AGE = 5 * 60;
+
     response.cookies.set('axum_admin_token', token, {
       httpOnly: true,
       secure: isHttps,
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: ADMIN_MAX_AGE,
       path: '/',
     });
 
@@ -101,7 +104,7 @@ export async function POST(req: Request) {
       httpOnly: true,
       secure: isHttps,
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: ADMIN_MAX_AGE,
       path: '/',
     });
 
