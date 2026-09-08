@@ -52,7 +52,7 @@ export async function POST(req: Request) {
     const token = signToken({
       userId: user.id,
       email: user.email,
-      role: user.role,
+      role: user.role as 'ADMIN' | 'SELLER',
       fullName: user.fullName,
     });
 
