@@ -120,9 +120,10 @@ export default function Footer() {
 
         <div className="border-t border-gray-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
           <p>© {new Date().getFullYear()} AxumMarket. Dedicated to Ethiopian Agricultural Livestock.</p>
-          <p className="flex items-center gap-1">
-            Built for Ethiopian farmers & buyers with direct phone connectivity.
-          </p>
+          <div className="flex items-center gap-4">
+            <Link href="/terms" className="hover:text-gray-300 transition">Terms of Service</Link>
+            <Link href="/privacy" className="hover:text-gray-300 transition">Privacy Policy</Link>
+          </div>
         </div>
       </div>
     </footer>
