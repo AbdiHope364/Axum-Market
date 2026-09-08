@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     const buffer = Buffer.from(bytes);
 
     // Save directly to the public folder on the traditional server
-    const uploadDir = path.join(process.cwd(), '..', 'web', 'public', 'uploads');
+    const uploadDir = process.env.UPLOAD_DIR || path.join(process.cwd(), '..', 'web', 'public', 'uploads');
     
     // Ensure directory exists
     try {
