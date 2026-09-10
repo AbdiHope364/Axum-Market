@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build && mkdir -p .next/cache && touch .next/cache/.rscinfo",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:push": "cd ../../packages/database && npx prisma db push",
+    "db:generate": "cd ../../packages/database && npx prisma generate",
+    "setup": "npm run db:generate && npm run db:push"
   },
   "dependencies": {
     "@axum/database": "*",
