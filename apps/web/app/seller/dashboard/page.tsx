@@ -25,7 +25,7 @@ interface SellerListing {
 
 export default function SellerDashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<{ id: string; fullName: string; email: string } | null>(null);
+  const [user, setUser] = useState<{ id: string; fullName: string; email: string; status: string } | null>(null);
   const [listings, setListings] = useState<SellerListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -102,15 +102,51 @@ export default function SellerDashboardPage() {
   const pendingCount = listings.filter((l) => l.status === 'PENDING').length;
   const rejectedCount = listings.filter((l) => l.status === 'REJECTED').length;
   const soldCount = listings.filter((l) => l.status === 'SOLD').length;
+  const isPendingAccount = user?.status === 'PENDING';
 
   return (
     <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-4 sm:space-y-6 pb-20 md:pb-8">
+      {/* Pending Account Notice Banner */}
+      {isPendingAccount && (
+        <div className="bg-amber-50 border-2 border-amber-300 p-4 sm:p-5 rounded-2xl sm:rounded-3xl shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-amber-200 text-amber-900 flex items-center justify-center shrink-0 mt-0.5">
+              <Clock className="w-5 h-5 stroke-[2.5]" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <h3 className="font-black text-amber-900 text-sm sm:text-base">
+                  Account Pending Admin Approval (በግምገማ ላይ)
+                </h3>
+                <span className="text-[10px] font-extrabold uppercase bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">
+                  Pending
+                </span>
+              </div>
+              <p className="text-xs text-amber-800 leading-relaxed max-w-2xl">
+                Your seller application is currently under review by AxumMarket Administrators. Once an admin approves your profile, your account status will change to <strong>ACTIVE</strong> and you will be able to post livestock listings.
+              </p>
+            </div>
+          </div>
+
+          <div className="shrink-0 bg-white/80 px-3 py-1.5 rounded-xl border border-amber-200 text-center text-amber-900 font-bold text-xs">
+            Status: PENDING
+          </div>
+        </div>
+      )}
+
       {/* Header with Welcome & Add Action */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4 bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-gray-200 shadow-xs">
         <div className="space-y-1">
-          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-green-700 bg-green-50 px-2.5 py-0.5 rounded-full">
-            Seller Dashboard
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-green-700 bg-green-50 px-2.5 py-0.5 rounded-full">
+              Seller Dashboard
+            </span>
+            {isPendingAccount && (
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full">
+                Approval Pending
+              </span>
+            )}
+          </div>
           <h1 className="text-xl sm:text-3xl font-black text-gray-900">
             Welcome, {user?.fullName || 'Seller'}
           </h1>
@@ -119,13 +155,23 @@ export default function SellerDashboardPage() {
           </p>
         </div>
 
-        <Link
-          href="/seller/create"
-          className="w-full sm:w-auto px-4 sm:px-5 py-2.5 sm:py-3 bg-green-600 hover:bg-green-700 active:scale-98 text-white font-bold text-xs sm:text-base rounded-xl sm:rounded-2xl shadow-sm transition flex items-center justify-center gap-2 shrink-0"
-        >
-          <PlusCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-          <span>+ Add New Animal</span>
-        </Link>
+        {isPendingAccount ? (
+          <div
+            title="Your account is pending admin approval"
+            className="w-full sm:w-auto px-4 sm:px-5 py-2.5 sm:py-3 bg-gray-200 text-gray-500 font-bold text-xs sm:text-base rounded-xl sm:rounded-2xl shadow-xs flex items-center justify-center gap-2 shrink-0 cursor-not-allowed"
+          >
+            <PlusCircle className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+            <span>+ Add New Animal (Approval Required)</span>
+          </div>
+        ) : (
+          <Link
+            href="/seller/create"
+            className="w-full sm:w-auto px-4 sm:px-5 py-2.5 sm:py-3 bg-green-600 hover:bg-green-700 active:scale-98 text-white font-bold text-xs sm:text-base rounded-xl sm:rounded-2xl shadow-sm transition flex items-center justify-center gap-2 shrink-0"
+          >
+            <PlusCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span>+ Add New Animal</span>
+          </Link>
+        )}
       </div>
 
       {/* KPI Stats Grid */}

@@ -49,7 +49,7 @@ export async function POST(req: Request) {
         phone: phone.trim(),
         passwordHash,
         role: 'SELLER',
-        status: 'ACTIVE', // Automatically approved
+        status: 'PENDING', // Pending Admin Approval
         region: region.trim(),
         city: city.trim(),
         area: area ? area.trim() : null,
@@ -58,9 +58,9 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      pendingApproval: false,
+      pendingApproval: true,
       message:
-        'Registration successful! You can now log in to your account.',
+        'Registration successful! Your seller account is currently pending admin approval.',
       user: {
         id: user.id,
         fullName: user.fullName,

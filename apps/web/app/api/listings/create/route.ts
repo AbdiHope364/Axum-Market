@@ -9,6 +9,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
+    // Verify seller status
+    if (session.role !== 'ADMIN') {
+      const user = await prisma.user.findUnique({
+        where: { id: session.userId },
+        select: { status: true },
+      });
+
+      if (!user || user.status !== 'ACTIVE') {
+        return NextResponse.json(
+          { error: 'Your seller account is currently pending admin approval. You cannot post listings until an admin approves your profile.' },
+          { status: 403 }
+        );
+      }
+    }
+
     const body = await req.json();
     const {
       categoryId,

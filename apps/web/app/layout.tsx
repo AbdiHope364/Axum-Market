@@ -20,9 +20,12 @@ export const metadata: Metadata = {
     'cattle classifieds',
   ],
   icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
-    apple: '/logo.png',
+    icon: [
+      { url: '/logo-emblem.png', type: 'image/png' },
+      { url: '/logo.png', type: 'image/png' },
+    ],
+    shortcut: '/logo-emblem.png',
+    apple: '/logo-emblem.png',
   },
 };
 

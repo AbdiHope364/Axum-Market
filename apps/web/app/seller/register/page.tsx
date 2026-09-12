@@ -86,17 +86,27 @@ export default function SellerRegisterPage() {
   if (submitted) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-3 sm:px-4 py-6 sm:py-12">
-        <div className="max-w-md w-full bg-white rounded-2xl sm:rounded-3xl border border-gray-200 p-5 sm:p-8 shadow-md text-center space-y-5 animate-fadeIn">
-          <div className="w-16 h-16 rounded-3xl bg-green-100 text-green-700 flex items-center justify-center mx-auto shadow-inner">
-            <CheckCircle2 className="w-8 h-8" />
+        <div className="max-w-md w-full bg-white rounded-2xl sm:rounded-3xl border border-amber-200 p-5 sm:p-8 shadow-md text-center space-y-5 animate-fadeIn">
+          <div className="w-16 h-16 rounded-3xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto shadow-inner">
+            <Clock className="w-8 h-8" />
           </div>
 
           <div className="space-y-2">
             <h2 className="text-2xl font-black text-gray-900">
-              Registration Successful!
+              Registration Submitted!
             </h2>
-            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-              Welcome, <strong className="text-gray-900">{fullName}</strong>. Your account has been created and you can now log in to start selling.
+            <span className="inline-block text-[11px] font-bold text-amber-800 bg-amber-100 px-3 py-1 rounded-full uppercase tracking-wider">
+              Pending Admin Approval (በግምገማ ላይ)
+            </span>
+            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed pt-2">
+              Welcome, <strong className="text-gray-900">{fullName}</strong>. Your seller account application has been submitted successfully. An AxumMarket administrator will review and approve your seller profile shortly.
+            </p>
+          </div>
+
+          <div className="p-3.5 bg-amber-50 rounded-xl border border-amber-200 text-left text-xs text-amber-900 space-y-1">
+            <strong className="block font-bold">What happens next?</strong>
+            <p className="text-[11px] text-amber-800 leading-normal">
+              You can log in to your seller dashboard at any time to check your account status. Once an admin approves your account, you will be able to post and manage your livestock listings.
             </p>
           </div>
 

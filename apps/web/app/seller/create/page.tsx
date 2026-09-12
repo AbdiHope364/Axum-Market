@@ -42,6 +42,7 @@ export default function CreateListingPage() {
   const [locations, setLocations] = useState<StructuredLocation[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [userStatus, setUserStatus] = useState<string>('ACTIVE');
 
   // Form fields
   const [categoryId, setCategoryId] = useState('');
@@ -86,6 +87,9 @@ export default function CreateListingPage() {
       if (!authData?.user) {
         router.push('/seller/login?redirect=/seller/create');
         return;
+      }
+      if (authData.user.status) {
+        setUserStatus(authData.user.status);
       }
       if (authData.user.phone) {
         setContactPhone(authData.user.phone);
@@ -379,6 +383,18 @@ export default function CreateListingPage() {
             Provide accurate details and photos from all 3 angles so buyers across Ethiopia can inspect your livestock.
           </p>
         </div>
+
+        {userStatus === 'PENDING' && (
+          <div className="p-4 bg-amber-50 border-2 border-amber-300 rounded-2xl text-amber-900 text-xs sm:text-sm space-y-2">
+            <div className="flex items-center gap-2 font-black text-amber-900">
+              <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+              <span>Account Pending Admin Approval (አካውንትዎ በግምገማ ላይ ነው)</span>
+            </div>
+            <p className="text-amber-800 leading-relaxed text-xs">
+              Your seller account is currently pending administrator approval. You will be able to post and publish your livestock listings once an AxumMarket admin approves your account.
+            </p>
+          </div>
+        )}
 
         {error && (
           <div className="p-3 sm:p-3.5 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs flex items-center gap-2 animate-fadeIn">
