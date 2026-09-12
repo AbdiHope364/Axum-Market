@@ -48,6 +48,14 @@ import {
 } from 'lucide-react';
 import { formatPriceETB } from '@/lib/constants';
 
+function formatImageUrl(url: string | null | undefined): string {
+  if (!url) return '/logo-emblem.png';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (url.startsWith('/uploads/')) return url;
+  if (url.startsWith('uploads/')) return `/${url}`;
+  return `/uploads/${url}`;
+}
+
 interface PendingSeller {
   id: string;
   fullName: string;
@@ -1594,7 +1602,7 @@ export default function AdminPortalPage() {
                               className="relative aspect-[4/3] rounded-lg overflow-hidden bg-slate-800 group border border-slate-700 hover:border-amber-400 transition cursor-pointer"
                             >
                               <Image
-                                src={img.imageUrl}
+                                src={formatImageUrl(img.imageUrl)}
                                 alt={img.imageType}
                                 fill
                                 sizes="120px"
@@ -1809,7 +1817,7 @@ export default function AdminPortalPage() {
                               title="Click to inspect all angles"
                             >
                               <Image
-                                src={frontImg.imageUrl}
+                                src={formatImageUrl(frontImg.imageUrl)}
                                 alt={listing.title}
                                 fill
                                 sizes="80px"
@@ -2437,7 +2445,7 @@ export default function AdminPortalPage() {
                       if (currentImg) {
                         return (
                           <Image
-                            src={currentImg.imageUrl}
+                            src={formatImageUrl(currentImg.imageUrl)}
                             alt={`${inspectListing.title} ${inspectAngle}`}
                             fill
                             sizes="(max-width: 768px) 100vw, 800px"
