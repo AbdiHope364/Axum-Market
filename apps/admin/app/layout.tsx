@@ -7,11 +7,11 @@ export const metadata: Metadata = {
   description: 'Dedicated administrative portal for seller approvals, listing moderation, and platform safety.',
   icons: {
     icon: [
-      { url: '/admin-logo.png', type: 'image/png' },
-      { url: '/logo-emblem.png', type: 'image/png' },
+      { url: '/admin-logo.png?v=2', type: 'image/png' },
+      { url: '/favicon.ico?v=2' },
     ],
-    shortcut: '/admin-logo.png',
-    apple: '/admin-logo.png',
+    shortcut: '/admin-logo.png?v=2',
+    apple: '/admin-logo.png?v=2',
   },
 };
 
