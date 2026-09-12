@@ -24,11 +24,11 @@ export default function Footer() {
             <div className="flex items-center gap-2.5">
               <div className="relative w-9 h-9 rounded-xl overflow-hidden shadow-sm bg-emerald-800 shrink-0">
                 <Image
-                  src="/logo.png"
+                  src="/logo-emblem.png"
                   alt="AxumMarket Logo"
                   fill
                   sizes="36px"
-                  className="object-cover"
+                  className="object-contain"
                 />
               </div>
               <span className="text-xl font-black tracking-tight text-white">

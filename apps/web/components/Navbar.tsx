@@ -91,11 +91,11 @@ export default function Navbar() {
               <Link href="/" className="flex items-center gap-2 group">
                 <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl overflow-hidden shadow-sm ring-1 ring-black/5 group-hover:scale-105 transition-transform bg-emerald-800 shrink-0">
                   <Image
-                    src="/logo.png"
+                    src="/logo-emblem.png"
                     alt="AxumMarket Logo"
                     fill
                     sizes="36px"
-                    className="object-cover"
+                    className="object-contain"
                     priority
                   />
                 </div>
