@@ -55,17 +55,6 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
 
   const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
 
-  // Auto-cycle images every 1 second
-  React.useEffect(() => {
-    if (orderedImages.length <= 1) return;
-    
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % orderedImages.length);
-    }, 4000);
-    
-    return () => clearInterval(interval);
-  }, [orderedImages.length]);
-
   const activeImage = orderedImages[currentImageIndex];
   const imageUrl = activeImage?.imageUrl || '/logo-emblem.png';
 
