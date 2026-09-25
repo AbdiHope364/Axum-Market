@@ -56,7 +56,12 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
   const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
 
   const activeImage = orderedImages[currentImageIndex];
-  const imageUrl = activeImage?.imageUrl || '/logo-emblem.png';
+  const initialSrc = activeImage?.imageUrl || '/logo-emblem.png';
+  const [imgSrc, setImgSrc] = React.useState(initialSrc);
+
+  React.useEffect(() => {
+    setImgSrc(activeImage?.imageUrl || '/logo-emblem.png');
+  }, [activeImage?.imageUrl]);
 
   const isSold = listing?.status === 'SOLD';
   const categoryName = listing?.category?.name || 'Livestock';
@@ -65,28 +70,14 @@ export default function ListingCard({ listing }: { listing: ListingCardData }) {
     <div className="group bg-white rounded-xl sm:rounded-2xl border border-gray-200 overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
       {/* Image & Badges */}
       <Link href={`/listings/${listing?.id || ''}`} className="block relative aspect-[4/3] overflow-hidden bg-gray-100">
-        {orderedImages.length > 0 ? (
-          orderedImages.map((img, index) => (
-            <Image
-              key={img.imageUrl || index}
-              src={img.imageUrl || '/logo-emblem.png'}
-              alt={listing?.title || 'Livestock'}
-              fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className={`object-cover transition-opacity duration-1000 ${
-                index === currentImageIndex ? 'opacity-100' : 'opacity-0'
-              }`}
-            />
-          ))
-        ) : (
-          <Image
-            src="/logo-emblem.png"
-            alt={listing?.title || 'Livestock'}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover transition-opacity duration-1000 opacity-100"
-          />
-        )}
+        <Image
+          src={imgSrc}
+          alt={listing?.title || 'Livestock'}
+          fill
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          className="object-cover transition-opacity duration-300 opacity-100"
+          onError={() => setImgSrc('/logo-emblem.png')}
+        />
 
         {/* Top Badges */}
         <div className="absolute top-1.5 left-1.5 sm:top-2.5 sm:left-2.5 flex flex-wrap gap-1">

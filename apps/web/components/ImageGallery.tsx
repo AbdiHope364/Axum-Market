@@ -49,17 +49,24 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
     );
   }
 
+  const [mainImgSrc, setMainImgSrc] = useState(activeImage?.imageUrl || '/logo-emblem.png');
+
+  React.useEffect(() => {
+    setMainImgSrc(activeImage?.imageUrl || '/logo-emblem.png');
+  }, [activeImage?.imageUrl]);
+
   return (
     <div className="space-y-3">
       {/* Main Large Image Container */}
       <div className="relative aspect-[4/3] sm:aspect-[16/10] w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-gray-950 border border-gray-200 shadow-md group">
         <Image
-          src={activeImage.imageUrl}
+          src={mainImgSrc}
           alt={`${title} - ${getLabel(activeImage.imageType)}`}
           fill
           priority
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 800px"
           className="object-cover object-center transition-all duration-300 group-hover:scale-105"
+          onError={() => setMainImgSrc('/logo-emblem.png')}
         />
 
         {/* View Angle Pill Badge */}
