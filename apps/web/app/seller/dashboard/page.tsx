@@ -105,7 +105,7 @@ export default function SellerDashboardPage() {
   const isPendingAccount = user?.status === 'PENDING';
 
   return (
-    <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-4 sm:space-y-6 pb-20 md:pb-8">
+    <div className="w-full max-w-full px-3 sm:px-6 lg:px-10 xl:px-12 py-4 sm:py-8 space-y-4 sm:space-y-6 pb-20 md:pb-8">
       {/* Pending Account Notice Banner */}
       {isPendingAccount && (
         <div className="bg-amber-50 border-2 border-amber-300 p-4 sm:p-5 rounded-2xl sm:rounded-3xl shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

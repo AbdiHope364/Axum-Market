@@ -258,7 +258,7 @@ export default function HomeInteractiveView({
       </section>
 
       {/* Main Interactive Content */}
-      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 space-y-4 sm:space-y-6  overflow-hidden">
+      <div className="w-full max-w-full px-2.5 sm:px-6 lg:px-10 xl:px-12 space-y-4 sm:space-y-6 overflow-hidden">
         {/* 3. Interactive Touch Category Bar (Responsive 3-column grid on mobile, horizontal row on desktop) */}
         <section className="space-y-1.5 sm:space-y-2.5 max-w-full">
           <div className="flex items-center justify-between">
@@ -431,9 +431,9 @@ export default function HomeInteractiveView({
             </div>
           )}
 
-          {/* 2-Column Mobile Feed Grid */}
+          {/* 2-Column Mobile Feed Grid & Expanded Desktop Feed Grid */}
           {filteredListings.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-4">
               {filteredListings.map((listing) => (
                 <ListingCard key={listing.id} listing={listing} />
               ))}

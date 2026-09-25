@@ -215,7 +215,7 @@ function ListingsContent() {
   ].filter(Boolean).length;
 
   return (
-    <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-3 sm:py-6 space-y-3 sm:space-y-5">
+    <div className="w-full max-w-full px-2.5 sm:px-6 lg:px-10 xl:px-12 py-3 sm:py-6 space-y-3 sm:space-y-5">
       {/* Top Search & Filter Bar for Mobile */}
       <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center justify-between">
         <div className="relative flex-1">
@@ -352,7 +352,7 @@ function ListingsContent() {
       )}
 
       {/* Main Layout (Desktop Sidebar + Listings Grid) */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-5 xl:grid-cols-6 gap-6 sm:gap-8">
         {/* Desktop Sidebar Filters */}
         <aside className="hidden lg:block lg:col-span-1 space-y-6 bg-white p-5 rounded-2xl border border-gray-200 h-fit sticky top-20">
           <div className="flex items-center justify-between pb-3 border-b border-gray-100">
@@ -524,7 +524,7 @@ function ListingsContent() {
         </aside>
 
         {/* Listings Content */}
-        <main className="lg:col-span-3 space-y-4">
+        <main className="lg:col-span-4 xl:col-span-5 space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-xs sm:text-sm text-gray-600">
               Showing <span className="font-bold text-gray-900">{listings.length}</span> livestock classifieds
@@ -541,8 +541,8 @@ function ListingsContent() {
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-4">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <div
                   key={i}
                   className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 aspect-[3/4] animate-pulse p-2.5 sm:p-4 space-y-2 sm:space-y-3"
@@ -554,7 +554,7 @@ function ListingsContent() {
               ))}
             </div>
           ) : listings.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-4">
               {listings.map((item) => (
                 <ListingCard key={item.id} listing={item} />
               ))}
