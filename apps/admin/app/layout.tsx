@@ -6,12 +6,9 @@ export const metadata: Metadata = {
   title: 'AxumMarket — Administrative Governance Portal (Port 3001)',
   description: 'Dedicated administrative portal for seller approvals, listing moderation, and platform safety.',
   icons: {
-    icon: [
-      { url: '/admin-logo.png?v=2', type: 'image/png' },
-      { url: '/favicon.ico?v=2' },
-    ],
-    shortcut: '/admin-logo.png?v=2',
-    apple: '/admin-logo.png?v=2',
+    icon: '/admin-logo.png',
+    shortcut: '/admin-logo.png',
+    apple: '/admin-logo.png',
   },
 };
 
